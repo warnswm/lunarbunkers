@@ -1,0 +1,3 @@
+name: Asd
+version: '${project.version}'
+main: qwezxc.asd.Asd
