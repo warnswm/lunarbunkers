@@ -1,5 +1,6 @@
 package qwezxc.asd.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -24,6 +25,7 @@ public class PlayerJoin implements Listener {
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent e){
         Player p = e.getPlayer();
+        world = Bukkit.getWorld("world");
         Location location = new Location(world,80,44,10);
         Location location2 = new Location(world,10,44,80);
         locations.add(location);
