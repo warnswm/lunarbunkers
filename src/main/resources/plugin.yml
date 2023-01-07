@@ -1,3 +1,7 @@
 name: Asd
 version: '${project.version}'
 main: qwezxc.asd.Asd
+depend: [Citizens]
+commands:
+  companion:
+    description: test message

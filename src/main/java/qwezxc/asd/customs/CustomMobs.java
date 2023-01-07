@@ -7,13 +7,12 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static qwezxc.asd.Utils.*;
+import static qwezxc.asd.Util.Utils.*;
 
 
 public enum CustomMobs {

@@ -7,11 +7,10 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import java.util.*;
 
-import static qwezxc.asd.Utils.*;
+import static qwezxc.asd.Util.Utils.*;
 
 
 public enum CustomLord {

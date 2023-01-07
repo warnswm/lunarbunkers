@@ -1,7 +1,5 @@
-package qwezxc.asd;
+package qwezxc.asd.Util;
 
-import jdk.jpackage.internal.Log;
-import jdk.tools.jmod.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;

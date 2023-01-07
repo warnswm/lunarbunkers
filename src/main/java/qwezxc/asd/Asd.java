@@ -3,6 +3,8 @@ package qwezxc.asd;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Ordering;
+import net.citizensnpcs.api.CitizensAPI;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -29,16 +31,18 @@ import org.bukkit.event.entity.*;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import qwezxc.asd.commands.companioncommand;
 import qwezxc.asd.customs.CustomLord;
 import qwezxc.asd.customs.CustomMobs;
 import qwezxc.asd.listeners.PlayerDropEvent;
-import qwezxc.asd.listeners.PlayerJoin;
+import qwezxc.asd.listeners.PlayerJoinORleave;
 
 import java.util.*;
 
 import java.text.DecimalFormat;
+import java.util.logging.Level;
 
-import static qwezxc.asd.Utils.color;
+import static qwezxc.asd.Util.Utils.color;
 
 public final class Asd extends JavaPlugin implements Listener {
 
@@ -50,7 +54,6 @@ public final class Asd extends JavaPlugin implements Listener {
     private DecimalFormat formatter = new DecimalFormat("#.##");
     private Map<LivingEntity, Map<Player, Double>> daList;
     private Map<Player, Double> map = new HashMap<>();
-    ArrayList<Location> locations = new ArrayList<Location>();
     public Asd() {
         this.daList = new HashMap<LivingEntity, Map<Player, Double>>();
     }
@@ -58,9 +61,17 @@ public final class Asd extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         world = Bukkit.getWorld("world");
+        Plugin citizens = getServer().getPluginManager().getPlugin("Citizens");
+        if (citizens == null || !citizens.isEnabled()) {
+            getLogger().log(Level.SEVERE, "Citizens is not found or not enabled. Please make sure you have Citizens 2.x or higher.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         getServer().getPluginManager().registerEvents(this,this);
         getServer().getPluginManager().registerEvents(new PlayerDropEvent(this),this);
-        getServer().getPluginManager().registerEvents(new PlayerJoin(this),this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinORleave(this),this);
+        this.getCommand("companion").setExecutor((CommandExecutor) new companioncommand(this));
+        loadConfig();
         spawnMobs(9, 10, 1);
         spawnlord(0,1,3*20);
         new BukkitRunnable() {
@@ -83,7 +94,10 @@ public final class Asd extends JavaPlugin implements Listener {
         }.runTaskTimer(this, 0L, 1L);
     }
 
-
+    public void loadConfig() {
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+    }
     public void spawnMobs(int size, int mobCap, int spawnTime) {
         CustomMobs[] mobTypes = CustomMobs.values();
         task = new BukkitRunnable() {
@@ -181,7 +195,6 @@ public final class Asd extends JavaPlugin implements Listener {
     }
     @EventHandler(priority = EventPriority.NORMAL)
     public void onDamage(EntityDamageByEntityEvent event) {
-        // Ensure that damager is a player
         Entity damager = event.getDamager();
         if (damager instanceof  Player) {
             // Update damage done
@@ -412,26 +425,8 @@ public final class Asd extends JavaPlugin implements Listener {
             }
         }
     }*/
-    /*@EventHandler
-    public void onPlayerJoinEvent(PlayerJoinEvent e){
-        Player p = e.getPlayer();
-        Location location = new Location(world,80,44,10);
-        Location location2 = new Location(world,10,44,80);
-        locations.add(location);
-        locations.add(location2);
-        int i = 0;
-        Location nearestLoc = locations.get(0);
-        Location playerloc = p.getLocation();
-        for (Location l : locations) {
-            if (i != locations.size()) {
-                if (playerloc.distance(l) < playerloc.distance(nearestLoc)) {
-                    nearestLoc = l;
-                }
-                i++;
-            }
-        }
-        p.teleport(nearestLoc);
-    }*/
+
+
     @Override
     public void onDisable() {
 
