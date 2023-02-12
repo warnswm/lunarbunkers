@@ -6,81 +6,92 @@ import org.bukkit.entity.Player;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.UUID;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Economy {
-    private HashMap<UUID, Double> balances = new HashMap<>();
+
     private Connection connection;
 
-    public Economy(){
+    public Economy() {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:plugins/Asd/PlayerBalance.db");
             createTable();
-            loadBalances();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private void createTable() throws SQLException {
-        connection.prepareStatement("CREATE TABLE IF NOT EXISTS players (uuid TEXT PRIMARY KEY, name TEXT, balance REAL)").execute();
+        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS players (" + "uuid TEXT PRIMARY KEY," + "name TEXT," + "balance REAL" + ")");
+        statement.execute();
     }
 
-    private void loadBalances() throws SQLException {
-        ResultSet result = connection.prepareStatement("SELECT * FROM players").executeQuery();
-        while (result.next()) {
-            UUID uuid = UUID.fromString(result.getString("uuid"));
-            double balance = result.getDouble("balance");
-            balances.put(uuid, balance);
-        }
-    }
-    private void saveBalances() throws SQLException {
-        for (UUID uuid : balances.keySet()) {
-            double balance = balances.get(uuid);
-            Player player = Bukkit.getPlayer(uuid);
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO players (uuid, name ,balance) VALUES (?, ?) ON CONFLICT(uuid) DO UPDATE SET balance = ?");
-            statement.setString(1, uuid.toString());
-            statement.setString(2, player.getName());
-            statement.setDouble(3, balance);
-            statement.execute();
-        }
-    }
-
-    public double getBalance(UUID playerUUID) {
-        return balances.getOrDefault(playerUUID, 0.0);
-    }
-
-    public void DisableEconomy(){
+    public void addBalance(UUID uuid, double amount) {
         try {
-            saveBalances();
-            connection.close();
+            PreparedStatement statement = connection.prepareStatement("UPDATE players SET balance = balance + ? WHERE uuid = ?");
+            statement.setDouble(1, amount);
+            statement.setString(2, uuid.toString());
+            statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean isPlayerinEconomyBase(UUID uuid) {
+    public double getBalance(UUID uuid) {
         try {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM players WHERE uuid = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT balance FROM players WHERE uuid = ?");
             statement.setString(1, uuid.toString());
             ResultSet result = statement.executeQuery();
-            return result.next();
+            if (result.next()) {
+                return result.getDouble("balance");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return 0;
     }
-    public void addPlayertoEconomyBase(Player player) {
-        UUID uuid = player.getUniqueId();
-        if (!isPlayerinEconomyBase(uuid)) {
-            try {
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO players (uuid, name, balance) VALUES (?, ?, 0)");
-                statement.setString(1, uuid.toString());
-                statement.setString(2, player.getName());
-                statement.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+
+    public void removeBalance(String uuid, double amount) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE players SET balance = balance - ? WHERE uuid = ?"
+            );
+            statement.setDouble(1, amount);
+            statement.setString(2, uuid);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
+    public void resetBalance(String uuid) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE players SET balance = 0 WHERE uuid = ?"
+            );
+            statement.setString(1, uuid);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addPlayer(UUID uuid, String name) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT OR IGNORE INTO players (uuid, name, balance) VALUES (?, ?, 0)");
+            statement.setString(1, uuid.toString());
+            statement.setString(2, name);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
+
+

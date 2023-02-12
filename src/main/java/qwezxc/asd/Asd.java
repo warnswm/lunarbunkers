@@ -7,6 +7,7 @@ import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.*;
 
 
+import java.sql.SQLException;
 import java.util.*;
 
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
@@ -32,6 +34,9 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
@@ -90,21 +95,33 @@ public final class Asd extends JavaPlugin implements Listener {
         getCommand("balance").setExecutor(new BalanceCommand(this));
         getCommand("pickaxe").setExecutor(new teamcmd(this));
         getCommand("testcmd").setExecutor(new testcmd(this));
-        boolean npcinworld = getConfig().getBoolean("npcinworld");
+        boolean npcinworldtrader = getConfig().getBoolean("npctraderinworld");
         for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
             if (!npc.getName().equals("Trader")) {
-                getConfig().set("npcinworld", false);
+                getConfig().set("npctraderinworld", false);
             } else {
-                getConfig().set("npcinworld", true);
+                getConfig().set("npctraderinworld", true);
             }
         }
-        if (npcinworld == false) {
+        if (npcinworldtrader == false) {
             NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Trader");
             npc.spawn(new Location(Bukkit.getWorld("world"), 0, 41, 80));
-            getConfig().set("npcinworld", true);
+            getConfig().set("npctraderinworld", true);
+        }
+        boolean npcinworldseller = getConfig().getBoolean("npcsellerinworld");
+        for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
+            if (!npc.getName().equals("Seller")) {
+                getConfig().set("npcsellerinworld", false);
+            } else {
+                getConfig().set("npcsellerinworld", true);
+            }
+        }
+        if (npcinworldseller == false) {
+            NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Seller");
+            npc.spawn(new Location(Bukkit.getWorld("world"), 0, 41, 70));
+            getConfig().set("npcsellerinworld", true);
         }
         saveConfig();
-
 
     }
 
@@ -118,70 +135,149 @@ public final class Asd extends JavaPlugin implements Listener {
     @EventHandler
     public void onNPCInteract(NPCRightClickEvent event) {
         NPC npc = event.getNPC();
-        if (!npc.getName().equals("Trader")) return;
-
         Player player = event.getClicker();
-
-        Inventory inventory = Bukkit.createInventory(null, 54, "Trader");
-
-        ItemStack speedPotion = new ItemStack(Material.POTION);
-        PotionMeta speedPotionItemMeta = (PotionMeta) speedPotion.getItemMeta();
-        speedPotionItemMeta.setDisplayName(ChatColor.AQUA + "Speed Potion II");
-        speedPotionItemMeta.setBasePotionData(new PotionData(PotionType.SPEED, false, true));
-        List<String> speedlore = new ArrayList<>();
-        speedlore.add(ChatColor.DARK_GRAY + "―――――――――――――――――――――――――――");
-        speedlore.add(ChatColor.DARK_GRAY +  "x1 Speed II Potion");
-        speedlore.add(ChatColor.DARK_GRAY + "―――――――――――――――――――――――――――");
-        speedlore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$10");
-        speedPotionItemMeta.setLore(speedlore);
-        speedPotion.setItemMeta(speedPotionItemMeta);
-
-        ItemStack healPotion = new ItemStack(Material.SPLASH_POTION);
-        PotionMeta healPotionItemMeta = (PotionMeta) healPotion.getItemMeta();
-        healPotionItemMeta.setDisplayName(ChatColor.GREEN + "Health Potion II");
-        healPotionItemMeta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL, false, true));
-        List<String> heallore = new ArrayList<>();
-        heallore.add(ChatColor.DARK_GRAY + "―――――――――――――――――――――――――――");
-        heallore.add(ChatColor.DARK_GRAY +  "x1 Health Splash Potion");
-        heallore.add(ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to fill your inventory");
-        heallore.add(ChatColor.DARK_GRAY + "―――――――――――――――――――――――――――");
-        heallore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$5");
-        healPotionItemMeta.setLore(heallore);
-        healPotion.setItemMeta(healPotionItemMeta);
-
-        ItemStack firePotion = new ItemStack(Material.POTION);
-        PotionMeta firePotionItemMeta = (PotionMeta) firePotion.getItemMeta();
-        firePotionItemMeta.setDisplayName(ChatColor.GOLD + "Fire Resistance Potion (3:00)");
-        firePotionItemMeta.setBasePotionData(new PotionData(PotionType.FIRE_RESISTANCE, false, false));
-        List<String> firelore = new ArrayList<>();
-        firelore.add(ChatColor.DARK_GRAY + "―――――――――――――――――――――――――――");
-        firelore.add(ChatColor.DARK_GRAY +  "x1 Fire Resistance Potion");
-        firelore.add(ChatColor.DARK_GRAY + "―――――――――――――――――――――――――――");
-        firelore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$25");
-        firePotionItemMeta.setLore(firelore);
-        firePotion.setItemMeta(firePotionItemMeta);
-
-        ItemStack slownesspotion = new ItemStack(Material.SPLASH_POTION);
-        PotionMeta slownesspotionItemMeta = (PotionMeta) slownesspotion.getItemMeta();
-        slownesspotionItemMeta.setDisplayName(ChatColor.GRAY + "Slowness Potion (1:07)");
-        slownesspotionItemMeta.setBasePotionData(new PotionData(PotionType.SLOWNESS, false, false));
-        List<String> slownesslore = new ArrayList<>();
-        slownesslore.add(ChatColor.DARK_GRAY + "―――――――――――――――――――――――――――");
-        slownesslore.add(ChatColor.DARK_GRAY +  "x1 Slowness Splash Potion");
-        slownesslore.add(ChatColor.DARK_GRAY + "―――――――――――――――――――――――――――");
-        slownesslore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$50");
-
-        slownesspotionItemMeta.setLore(slownesslore);
-        slownesspotion.setItemMeta(slownesspotionItemMeta);
+        Inventory plinv = player.getInventory();
+        if (npc.getName().equals("Trader")) {
 
 
+            Inventory inventory = Bukkit.createInventory(null, 54, "Trader Menu");
 
-        inventory.setItem(14,speedPotion);
-        inventory.setItem(15,firePotion);
-        inventory.setItem(24,healPotion);
-        inventory.setItem(34,slownesspotion);
+            ItemStack speedPotion = new ItemStack(Material.POTION);
+            PotionMeta speedPotionItemMeta = (PotionMeta) speedPotion.getItemMeta();
+            speedPotionItemMeta.setDisplayName(ChatColor.AQUA + "Speed Potion II");
+            speedPotionItemMeta.setBasePotionData(new PotionData(PotionType.SPEED, false, true));
+            List<String> speedlore = new ArrayList<>();
+            speedlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            speedlore.add(ChatColor.GRAY + "x1 Speed II Potion");
+            speedlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            speedlore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$10");
+            speedPotionItemMeta.setLore(speedlore);
+            speedPotion.setItemMeta(speedPotionItemMeta);
 
-        player.openInventory(inventory);
+            ItemStack healPotion = new ItemStack(Material.SPLASH_POTION);
+            PotionMeta healPotionItemMeta = (PotionMeta) healPotion.getItemMeta();
+            healPotionItemMeta.setDisplayName(ChatColor.GREEN + "Health Potion II");
+            healPotionItemMeta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL, false, true));
+            List<String> heallore = new ArrayList<>();
+            heallore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            heallore.add(ChatColor.GRAY + "x1 Health Splash Potion");
+            heallore.add(ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to fill your inventory");
+            heallore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            heallore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$5");
+            healPotionItemMeta.setLore(heallore);
+            healPotion.setItemMeta(healPotionItemMeta);
+
+            ItemStack firePotion = new ItemStack(Material.POTION);
+            PotionMeta firePotionItemMeta = (PotionMeta) firePotion.getItemMeta();
+            firePotionItemMeta.setDisplayName(ChatColor.GOLD + "Fire Resistance Potion (3:00)");
+            firePotionItemMeta.setBasePotionData(new PotionData(PotionType.FIRE_RESISTANCE, false, false));
+            List<String> firelore = new ArrayList<>();
+            firelore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            firelore.add(ChatColor.GRAY + "x1 Fire Resistance Potion");
+            firelore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            firelore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$25");
+            firePotionItemMeta.setLore(firelore);
+            firePotion.setItemMeta(firePotionItemMeta);
+
+            ItemStack slownesspotion = new ItemStack(Material.SPLASH_POTION);
+            PotionMeta slownesspotionItemMeta = (PotionMeta) slownesspotion.getItemMeta();
+            slownesspotionItemMeta.setDisplayName(ChatColor.DARK_GRAY + "Slowness Potion (1:07)");
+            slownesspotionItemMeta.setBasePotionData(new PotionData(PotionType.SLOWNESS, false, false));
+            List<String> slownesslore = new ArrayList<>();
+            slownesslore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            slownesslore.add(ChatColor.GRAY + "x1 Slowness Splash Potion");
+            slownesslore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            slownesslore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$50");
+
+            slownesspotionItemMeta.setLore(slownesslore);
+            slownesspotion.setItemMeta(slownesspotionItemMeta);
+
+
+            inventory.setItem(14, speedPotion);
+            inventory.setItem(15, firePotion);
+            inventory.setItem(24, healPotion);
+            inventory.setItem(34, slownesspotion);
+
+            player.openInventory(inventory);
+        }
+        if (npc.getName().equals("Seller")){
+            Inventory inventory = Bukkit.createInventory(null, 9, "Seller Menu");
+            ItemStack coal = new ItemStack(Material.COAL,1);
+            ItemMeta coalmeta = coal.getItemMeta();
+            coalmeta.setDisplayName(ChatColor.BLUE + "Sell Coal");
+            int coalcount = 0;
+            for (ItemStack itemStack : player.getInventory().getContents()) {
+                if (itemStack != null && itemStack.getType() == Material.COAL) {
+                    coalcount += itemStack.getAmount();
+                }
+            }
+            List<String> coaltext = new ArrayList<>();
+            coaltext.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            coaltext.add(ChatColor.GRAY + "Left click to sell 1 x Coal for 10$");
+            int coalcena = 10*coalcount;
+            coaltext.add(ChatColor.GRAY + "Right click to sell " + coalcount +  "x Coal for " + coalcena +"" +"$ ");
+            coaltext.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            coalmeta.setLore(coaltext);
+            coal.setItemMeta(coalmeta);
+            ItemStack iron = new ItemStack(Material.IRON_INGOT,1);
+            ItemMeta ironmeta = iron.getItemMeta();
+            ironmeta.setDisplayName(ChatColor.BLUE + "Sell Iron Ingot");
+            int ironcount = 0;
+            for (ItemStack itemStack : player.getInventory().getContents()) {
+                if (itemStack != null && itemStack.getType() == Material.IRON_INGOT) {
+                    ironcount += itemStack.getAmount();
+                }
+            }
+            List<String> irontext = new ArrayList<>();
+            irontext.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            irontext.add(ChatColor.GRAY + "Left click to sell 1 x Iron Ingot for 15$");
+            int ironcena = 15*ironcount;
+            irontext.add(ChatColor.GRAY + "Right click to sell " + ironcount +  "x Iron Ingot for " + ironcena + "$");
+            irontext.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            ironmeta.setLore(irontext);
+            iron.setItemMeta(ironmeta);
+            ItemStack diamond = new ItemStack(Material.DIAMOND,1);
+            ItemMeta dimondmeta = diamond.getItemMeta();
+            dimondmeta.setDisplayName(ChatColor.BLUE + "Sell Diamond");
+            int diamondcount = 0;
+            for (ItemStack itemStack : player.getInventory().getContents()) {
+                if (itemStack != null && itemStack.getType() == Material.DIAMOND) {
+                    diamondcount += itemStack.getAmount();
+                }
+            }
+            List<String> diamonttext = new ArrayList<>();
+            diamonttext.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            diamonttext.add(ChatColor.GRAY + "Left click to sell 1 x Diamond for 15$");
+            int diamondcena = 10*diamondcount;
+            diamonttext.add(ChatColor.GRAY + "Right click to sell " + ironcount +  "x Diamond for " + diamondcena + "$");
+            diamonttext.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            diamonttext.add(ChatColor.GRAY + "ТУТ НЕ ВЕРНАЯ ЦЕНА НАДО ИЗМЕНИТЬ");
+            dimondmeta.setLore(diamonttext);
+            diamond.setItemMeta(dimondmeta);
+            ItemStack gold = new ItemStack(Material.GOLD_INGOT,1);
+            ItemMeta goldmeta = gold.getItemMeta();
+            goldmeta.setDisplayName(ChatColor.BLUE + "Sell Gold Ingot");
+            int goldcount = 0;
+            for (ItemStack itemStack : player.getInventory().getContents()) {
+                if (itemStack != null && itemStack.getType() == Material.GOLD_INGOT) {
+                    goldcount += itemStack.getAmount();
+                }
+            }
+            List<String> goldtext = new ArrayList<>();
+            goldtext.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            goldtext.add(ChatColor.GRAY + "Left click to sell 1 x Diamond for 15$");
+            int goldcena = 10*goldcount;
+            goldtext.add(ChatColor.GRAY + "Right click to sell " + goldcount +  "x Diamond for " + goldcena + "$");
+            goldtext.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            goldtext.add(ChatColor.GRAY + "ТУТ НЕ ВЕРНАЯ ЦЕНА НАДО ИЗМЕНИТЬ");
+            goldmeta.setLore(goldtext);
+            gold.setItemMeta(goldmeta);
+            inventory.setItem(1,coal);
+            inventory.setItem(3,iron);
+            inventory.setItem(5,diamond);
+            inventory.setItem(7,gold);
+            player.openInventory(inventory);
+        }
     }
 
     @EventHandler
@@ -196,7 +292,7 @@ public final class Asd extends JavaPlugin implements Listener {
                 emptySlots++;
             }
         }
-        if (inventory.getTitle().equals("Trader")) {
+        if (inventory.getTitle().equals("Trader Menu")) {
 
             event.setCancelled(true);
 
@@ -205,57 +301,121 @@ public final class Asd extends JavaPlugin implements Listener {
             if (item == null) return;
 
             if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II")) {
-                if (player.getInventory().contains(Material.GOLD_INGOT)) {
-                    if (emptySlots == -1) {
-                        player.sendMessage("Inventory is full");
-                    }
-                    else{
-                    player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
-                    player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8226));
-                    player.sendMessage("You exchanged 1 gold for 1 diamond.");}
-                }
-            }
-            if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
-                if (player.getInventory().contains(Material.GOLD_INGOT)) {
-                    if (emptySlots == -1) {
-                        player.sendMessage("Inventory is full");
-                    } else  if (event.getClick() == ClickType.RIGHT) {
-                        for (ItemStack i : player.getInventory().getStorageContents()) {
-                            if (i == null || i.getType() == Material.AIR) {
-                                player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
-                                player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
-                                player.sendMessage(String.valueOf(emptySlots));
-                            }
+                if(player.isOnline()) {
+                    if (player.getInventory().contains(Material.GOLD_INGOT)) {
+                        if (emptySlots == -1) {
+                            player.sendMessage("Inventory is full");
+                        } else {
+                            player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                            player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8226));
+                            player.sendMessage("You exchanged 1 gold for 1 diamond.");
                         }
                     }
-                    else{
-                    player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
-                    player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
-                    player.sendMessage("You exchanged 1 gold for 1 diamond.");}
                 }
             }
-            if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)")) {
-                if (player.getInventory().contains(Material.GOLD_INGOT)) {
-                    if (emptySlots == -1) {
-                        player.sendMessage("Inventory is full");
-                    } else {
-                    player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
-                    player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8195));
-                    player.sendMessage("You exchanged 1 gold for 1 diamond.");}
+            else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
+                if(player.isOnline()) {
+                    if (player.getInventory().contains(Material.GOLD_INGOT)) {
+                        if (emptySlots == -1) {
+                            player.sendMessage("Inventory is full");
+                        } else if (event.getClick() == ClickType.RIGHT) {
+                            for (ItemStack i : player.getInventory().getStorageContents()) {
+                                if (i == null || i.getType() == Material.AIR) {
+                                    player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                                    player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
+                                    player.sendMessage(String.valueOf(emptySlots));
+                                }
+                            }
+                        } else {
+                            player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                            player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
+                            player.sendMessage("You exchanged 1 gold for 1 diamond.");
+                        }
+                    }
                 }
             }
-            if (item.getItemMeta().getDisplayName().equals(ChatColor.GRAY + "Slowness Potion (1:07)")) {
-                if (player.getInventory().contains(Material.GOLD_INGOT)) {
-                    if (emptySlots == -1) {
-                        player.sendMessage("Inventory is full");
-                    } else {
-                    player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
-                    player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16394));
-                    player.sendMessage("You exchanged 1 gold for 1 diamond.");}
+            else if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)")) {
+                if(player.isOnline()) {
+                    if (player.getInventory().contains(Material.GOLD_INGOT)) {
+                        if (emptySlots == -1) {
+                            player.sendMessage("Inventory is full");
+                        } else {
+                            player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                            player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8195));
+                            player.sendMessage("You exchanged 1 gold for 1 diamond.");
+                        }
+                    }
                 }
             }
-            if (item.getItemMeta().getDisplayName() == null){
+            else if (item.getItemMeta().getDisplayName().equals(ChatColor.GRAY + "Slowness Potion (1:07)")) {
+                if(player.isOnline()) {
+                    if (player.getInventory().contains(Material.GOLD_INGOT)) {
+                        if (emptySlots == -1) {
+                            player.sendMessage("Inventory is full");
+                        } else {
+                            player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                            player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16394));
+                            player.sendMessage("You exchanged 1 gold for 1 diamond.");
+                        }
+                    }
+                }
+            }
+            else if (item.getItemMeta().getDisplayName() == null){
                 return;
+            }
+            else{
+                return;
+            }
+            if(player.isOnline()){
+                player.sendMessage("PROVERKA TI ONLINE");
+            }
+        }
+        if (inventory.getTitle().equals("Seller Menu")) {
+            event.setCancelled(true);
+            if (item == null) return;
+            if (player.isOnline()) {
+                if (item.getType() == Material.COAL) {
+                    if (player.getInventory().contains(Material.COAL)) {
+                        if (event.getClick() == ClickType.RIGHT) {
+                            int coalcountinsellerforrightclick = 0;
+                            for (ItemStack itemStack : player.getInventory().getContents()) {
+                                if (itemStack != null && itemStack.getType() == Material.COAL) {
+                                    coalcountinsellerforrightclick += itemStack.getAmount();
+                                }
+                            }
+                            player.getInventory().removeItem(new ItemStack(Material.COAL, coalcountinsellerforrightclick));
+                            int addcoalbalance = coalcountinsellerforrightclick * 10;
+                            Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addcoalbalance);
+                            player.sendMessage(String.valueOf(addcoalbalance));
+                        } else if (event.getClick() == ClickType.LEFT) {
+                            player.getInventory().removeItem(new ItemStack(Material.COAL, 1));
+                            int addcoalbalance = 10;
+                            Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addcoalbalance);
+                            player.sendMessage(String.valueOf(addcoalbalance));
+                        }
+                    }
+                }
+                if (item.getType() == Material.IRON_INGOT) {
+                    if (player.getInventory().contains(Material.IRON_INGOT)) {
+                        if (event.getClick() == ClickType.RIGHT) {
+                            int ironcount = 0;
+                            for (ItemStack itemStack : player.getInventory().getContents()) {
+                                if (itemStack != null && itemStack.getType() == Material.IRON_INGOT) {
+                                    ironcount += itemStack.getAmount();
+                                }
+                            }
+                            player.getInventory().removeItem(new ItemStack(Material.IRON_INGOT, ironcount));
+                            int addironbalance = ironcount * 15;
+                            Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addironbalance);
+                            player.sendMessage(String.valueOf(addironbalance));
+                        } else if (event.getClick() == ClickType.LEFT) {
+                            player.getInventory().removeItem(new ItemStack(Material.IRON_INGOT, 1));
+                            int addironbalance = 15;
+                            Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addironbalance);
+                            player.sendMessage(String.valueOf(addironbalance));
+                        }
+                    }
+                }
             }
         }
 
@@ -334,6 +494,11 @@ public final class Asd extends JavaPlugin implements Listener {
         return time;
     }
 
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event){
+        Player player = event.getPlayer();
+
+    }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
@@ -353,6 +518,5 @@ public final class Asd extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         Asd.getInstance().getPluginManager().getDatabase().DisableDatabase();
-        Asd.getInstance().getPluginManager().getEconomy().DisableEconomy();
     }
 }

@@ -21,7 +21,7 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
         main.getPluginManager().getDatabase().addPlayertoDatabase(player);
-        main.getPluginManager().getEconomy().addPlayertoEconomyBase(player);
+        main.getPluginManager().getEconomy().addPlayer(player.getUniqueId(),player.getName());
     }
 
 }
