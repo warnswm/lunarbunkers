@@ -412,7 +412,7 @@ public final class Asd extends JavaPlugin implements Listener {
                             player.getInventory().removeItem(new ItemStack(Material.IRON_INGOT, 1));
                             int addironbalance = 15;
                             Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addironbalance);
-                            player.sendMessage(String.valueOf(addironbalance));
+                            player.sendMessage(String.valueOf(addironbalance));//tes
                         }
                     }
                 }
