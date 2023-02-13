@@ -6,7 +6,7 @@ import qwezxc.asd.Data.Database;
 
 public class PluginManager {
     private static PluginManager instance;
-
+    private ScoreboardManager scoreboardManager;
     private Database database;
 
     private Economy economy;
@@ -16,6 +16,7 @@ public class PluginManager {
         // Initialize the managers and utilities
         this.database = new Database();
         this.economy = new Economy();
+        this.scoreboardManager = new ScoreboardManager();
     }
 
     public static PluginManager getInstance() {
@@ -25,6 +26,7 @@ public class PluginManager {
         return instance;
     }
 
+    public ScoreboardManager getScoreboardManager(){return this.scoreboardManager;}
     public Database getDatabase() {
         return this.database;
     }

@@ -20,21 +20,21 @@ public class KOTH implements Listener {
     private Teams teams;
     private Location capturePoint;
     private double captureRadius;
-    private Map<UUID, Team> capturingPlayers;
+    private Map<Team, Long> captureTimers;
 
     public KOTH(Teams teams, Location capturePoint, double captureRadius) {
         this.teams = teams;
         this.capturePoint = capturePoint;
         this.captureRadius = captureRadius;
-        this.capturingPlayers = new HashMap<>();
+        this.captureTimers = new HashMap<>();
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        Team playerTeam = teams.getTeam(player);
+        Team team = teams.getTeam(player);
 
-        if (playerTeam == null) {
+        if (team == null) {
             return;
         }
 
@@ -42,47 +42,145 @@ public class KOTH implements Listener {
         if (Math.abs(playerLoc.getX()- capturePoint.getX()) <= captureRadius  &&
                 Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius  &&
                 Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius ) {
-            if (!capturingPlayers.containsKey(player.getUniqueId())) {
-                capturingPlayers.put(player.getUniqueId(), playerTeam);
-                player.sendMessage("TI ZASHEL");
-                startCaptureTimer(playerTeam);
+            //Надо бы проверку нормальную сделать
+            if (!captureTimers.containsKey(team)) {
+                captureTimers.put(team, System.currentTimeMillis());
+                player.sendMessage(team.getName() + " team has started capturing the territory!");
+               // updateScoreboard(team);
             }
-        } else {
-            if (capturingPlayers.containsKey(player.getUniqueId())) {
-                capturingPlayers.remove(player.getUniqueId());
-                player.sendMessage("TI VISHEL");
-                capturingPlayers.clear();
+        } else if (captureTimers.containsKey(team)) {
+            int playersInCapture = 0;
+            for (Map.Entry<UUID, Team> entry : teams.getPlayers().entrySet()) {
+                if (entry.getValue().equals(team) && Math.abs(playerLoc.getX()- capturePoint.getX()) <= captureRadius  &&
+                        Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius  &&
+                        Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius) {
+                    playersInCapture++;
+                }
+            }
+            if (playersInCapture <= 1) {
+                captureTimers.remove(team);
+                player.sendMessage(team.getName() + " team has stopped capturing the territory!");
+               // updateScoreboard(null);
             }
         }
     }
 
-    private void startCaptureTimer(Team capturingTeam) {
-        new BukkitRunnable() {
-            int time = 0;
 
-            @Override
-            public void run() {
-                if (capturingPlayers.values().stream().anyMatch(capturingTeam::equals)) {
-                    time++;
-                    for (UUID playeruuid : capturingPlayers.keySet()){
-                        Player player = Bukkit.getPlayer(playeruuid);
-                        player.sendMessage(String.valueOf(time));
-                    }
-                    if (time >= 10) {
-                        Bukkit.broadcastMessage(capturingTeam.getName() + " has captured the point!");
-                        cancel();
-                        time = 0;
-                        capturingPlayers.clear();
-                    }
-                } else {
-                    cancel();
-                    time = 0;
-                    capturingPlayers.clear();
-                }
-            }
-        }.runTaskTimer(Asd.getInstance(), 0, 20);
-    }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//            if (!capturingPlayers.containsKey(player.getUniqueId())) {
+//                capturingPlayers.put(player.getUniqueId(), playerTeam);
+//                player.sendMessage("TI ZASHEL");
+//                startCaptureTimer(playerTeam);
+//            }
+//        } else {
+//            if (capturingPlayers.containsKey(player.getUniqueId())) {
+//                capturingPlayers.remove(player.getUniqueId());
+//                player.sendMessage("TI VISHEL");
+//                capturingPlayers.clear();
+//            }
+//        }
+//    }
+//
+//    private void startCaptureTimer(Team capturingTeam) {
+//        new BukkitRunnable() {
+//            int time = 0;
+//
+//            @Override
+//            public void run() {
+//                if (capturingPlayers.values().stream().anyMatch(capturingTeam::equals)) {
+//                    time++;
+//                    for (UUID playeruuid : capturingPlayers.keySet()){
+//                        Player player = Bukkit.getPlayer(playeruuid);
+//                        player.sendMessage(String.valueOf(time));
+//                    }
+//                    if (time >= 10) {
+//                        Bukkit.broadcastMessage(capturingTeam.getName() + " has captured the point!");
+//                        cancel();
+//                        time = 0;
+//                        capturingPlayers.clear();
+//                    }
+//                } else {
+//                    cancel();
+//                    time = 0;
+//                    capturingPlayers.clear();
+//                }
+//            }
+//        }.runTaskTimer(Asd.getInstance(), 0, 20);
+//    }
+//
 
 }
 

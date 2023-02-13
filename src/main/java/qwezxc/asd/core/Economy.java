@@ -90,7 +90,10 @@ public class Economy {
             e.printStackTrace();
         }
     }
-
+    public boolean hasEnoughMoney(UUID uuid, double amount) {
+        double balance = getBalance(uuid);
+        return balance >= amount;
+    }
 
 }
 

@@ -45,6 +45,7 @@ import qwezxc.asd.command.testcmd;
 import qwezxc.asd.core.Economy;
 import qwezxc.asd.core.KOTH;
 import qwezxc.asd.core.PluginManager;
+import qwezxc.asd.core.ScoreboardManager;
 import qwezxc.asd.listener.OreRegeneration;
 import qwezxc.asd.listener.PlayerJoinListener;
 import qwezxc.asd.listener.TeamMenuListener;
@@ -54,7 +55,7 @@ public final class Asd extends JavaPlugin implements Listener {
     private static Asd instance;
     private Database database;
     private Economy economy;
-    private Scoreboard scoreboard;
+    private ScoreboardManager scoreboardManager;
     public World world;
 
     private Map<UUID, Integer> minutesInCenter = new HashMap<>();
@@ -76,10 +77,10 @@ public final class Asd extends JavaPlugin implements Listener {
         checkWorldsOnServer();
         world = Bukkit.getWorld("world");
         this.pluginManager = PluginManager.getInstance();
-        database = new Database();
-        economy = new Economy();
-        teams = new Teams();
-
+        this.database = new Database();
+        this.economy = new Economy();
+        this.teams = new Teams();
+        this.scoreboardManager = new ScoreboardManager();
         getServer().getPluginManager().registerEvents(new TeamMenuListener(teams), this);
         KOTH koth = new KOTH(teams, new Location(Bukkit.getWorld("world"), 10.5, 41.5, 10.5), 4.5);
         Bukkit.getPluginManager().registerEvents(koth, this);
@@ -192,7 +193,16 @@ public final class Asd extends JavaPlugin implements Listener {
             slownesspotionItemMeta.setLore(slownesslore);
             slownesspotion.setItemMeta(slownesspotionItemMeta);
 
-
+            //Diamond set + sword = 850$
+            //Diamond sword 100$
+            //Diamond Chestplate 275$
+            //Diamond leggings 250
+            //Diamond boots 125
+            //Enmder Perl 1=25, 16 =400
+            //Steak 16=75,64=300;
+            //Invisiblity  Splash при дамаге не снимать инвиз = 1250$
+            //Poison 50$ 33 sec
+            //Lesser Invisiblite Potion 5 00 min 100$ при дамаге снять инвиз
             inventory.setItem(14, speedPotion);
             inventory.setItem(15, firePotion);
             inventory.setItem(24, healPotion);
@@ -302,7 +312,7 @@ public final class Asd extends JavaPlugin implements Listener {
 
             if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II")) {
                 if(player.isOnline()) {
-                    if (player.getInventory().contains(Material.GOLD_INGOT)) {
+                    if (Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(uuid,10)) {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
@@ -315,7 +325,7 @@ public final class Asd extends JavaPlugin implements Listener {
             }
             else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
                 if(player.isOnline()) {
-                    if (player.getInventory().contains(Material.GOLD_INGOT)) {
+                    if (Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(uuid,5)) {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else if (event.getClick() == ClickType.RIGHT) {
@@ -326,8 +336,8 @@ public final class Asd extends JavaPlugin implements Listener {
                                     player.sendMessage(String.valueOf(emptySlots));
                                     rmbhill++;
                                 }
-                                Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,5*rmbhill);
                             }
+                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,5*rmbhill);
                         } else {
                             Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,5);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
@@ -338,7 +348,7 @@ public final class Asd extends JavaPlugin implements Listener {
             }
             else if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)")) {
                 if(player.isOnline()) {
-                    if (player.getInventory().contains(Material.GOLD_INGOT)) {
+                    if (Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(uuid,25)) {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
@@ -349,9 +359,9 @@ public final class Asd extends JavaPlugin implements Listener {
                     }
                 }
             }
-            else if (item.getItemMeta().getDisplayName().equals(ChatColor.GRAY + "Slowness Potion (1:07)")) {
+            else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Slowness Potion (1:07)")) {
                 if(player.isOnline()) {
-                    if (player.getInventory().contains(Material.GOLD_INGOT)) {
+                    if (Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(uuid,50)) {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
@@ -483,30 +493,6 @@ public final class Asd extends JavaPlugin implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
     }
-    private static int taskId;
-
-    int time = 0;
-
-
-    public static void stopTracking() {
-        Bukkit.getScheduler().cancelTask(taskId);
-    }
-
-    public int getTime() {
-        return time;
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event){
-        Player player = event.getPlayer();
-
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-
-    }
-
 
     public static Asd getInstance() {
         return instance;
