@@ -306,7 +306,7 @@ public final class Asd extends JavaPlugin implements Listener {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
-                            player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,10);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8226));
                             player.sendMessage("You exchanged 1 gold for 1 diamond.");
                         }
@@ -319,15 +319,17 @@ public final class Asd extends JavaPlugin implements Listener {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else if (event.getClick() == ClickType.RIGHT) {
+                            int rmbhill=0;
                             for (ItemStack i : player.getInventory().getStorageContents()) {
                                 if (i == null || i.getType() == Material.AIR) {
-                                    player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
                                     player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
                                     player.sendMessage(String.valueOf(emptySlots));
+                                    rmbhill++;
                                 }
+                                Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,5*rmbhill);
                             }
                         } else {
-                            player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,5);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
                             player.sendMessage("You exchanged 1 gold for 1 diamond.");
                         }
@@ -340,7 +342,7 @@ public final class Asd extends JavaPlugin implements Listener {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
-                            player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,25);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8195));
                             player.sendMessage("You exchanged 1 gold for 1 diamond.");
                         }
@@ -353,7 +355,7 @@ public final class Asd extends JavaPlugin implements Listener {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
-                            player.getInventory().removeItem(new ItemStack(Material.GOLD_INGOT, 1));
+                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,50);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16394));
                             player.sendMessage("You exchanged 1 gold for 1 diamond.");
                         }
@@ -412,7 +414,7 @@ public final class Asd extends JavaPlugin implements Listener {
                             player.getInventory().removeItem(new ItemStack(Material.IRON_INGOT, 1));
                             int addironbalance = 15;
                             Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addironbalance);
-                            player.sendMessage(String.valueOf(addironbalance));//test
+                            player.sendMessage(String.valueOf(addironbalance));
                         }
                     }
                 }

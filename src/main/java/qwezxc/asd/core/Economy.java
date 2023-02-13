@@ -55,13 +55,13 @@ public class Economy {
         return 0;
     }
 
-    public void removeBalance(String uuid, double amount) {
+    public void removeBalance(UUID uuid, double amount) {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE players SET balance = balance - ? WHERE uuid = ?"
             );
             statement.setDouble(1, amount);
-            statement.setString(2, uuid);
+            statement.setString(2, uuid.toString());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
