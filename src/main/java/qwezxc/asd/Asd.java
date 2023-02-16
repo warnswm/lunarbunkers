@@ -7,9 +7,10 @@ import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.*;
 
 
-import java.sql.SQLException;
 import java.util.*;
 
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import org.bukkit.event.block.Action;
@@ -17,7 +18,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
@@ -33,11 +33,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.potion.*;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
 import qwezxc.asd.command.teamcmd;
@@ -45,7 +40,7 @@ import qwezxc.asd.command.testcmd;
 import qwezxc.asd.core.Economy;
 import qwezxc.asd.core.KOTH;
 import qwezxc.asd.core.PluginManager;
-import qwezxc.asd.core.ScoreboardManager;
+import qwezxc.asd.core.PluginScoreboardManager;
 import qwezxc.asd.listener.OreRegeneration;
 import qwezxc.asd.listener.PlayerJoinListener;
 import qwezxc.asd.listener.TeamMenuListener;
@@ -55,7 +50,7 @@ public final class Asd extends JavaPlugin implements Listener {
     private static Asd instance;
     private Database database;
     private Economy economy;
-    private ScoreboardManager scoreboardManager;
+    private PluginScoreboardManager scoreboardManager;
     public World world;
 
     private Map<UUID, Integer> minutesInCenter = new HashMap<>();
@@ -63,7 +58,7 @@ public final class Asd extends JavaPlugin implements Listener {
     public KOTH koth;
     public double kothRadius = 5.0;
 
-
+    private OreRegeneration oreRegen;
     Teams teams = new Teams();
     public Map<UUID, Team> playerTeams = teams.getPlayers();
     @Override
@@ -80,34 +75,36 @@ public final class Asd extends JavaPlugin implements Listener {
         this.database = new Database();
         this.economy = new Economy();
         this.teams = new Teams();
-        this.scoreboardManager = new ScoreboardManager();
+        this.scoreboardManager = new PluginScoreboardManager();
         getServer().getPluginManager().registerEvents(new TeamMenuListener(teams), this);
-        KOTH koth = new KOTH(teams, new Location(Bukkit.getWorld("world"), 10.5, 41.5, 10.5), 4.5);
-        Bukkit.getPluginManager().registerEvents(koth, this);
+
+        koth = new KOTH(this,teams);
 
 
         Bukkit.getPluginManager().registerEvents(this, this);
-        Bukkit.getPluginManager().registerEvents(new OreRegeneration(this), this);
+        oreRegen = new OreRegeneration(this);
+        getServer().getPluginManager().registerEvents(oreRegen, this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
 
         saveDefaultConfig();
 
+
         getCommand("balance").setExecutor(new BalanceCommand(this));
         getCommand("pickaxe").setExecutor(new teamcmd(this));
         getCommand("testcmd").setExecutor(new testcmd(this));
-        boolean npcinworldtrader = getConfig().getBoolean("npctraderinworld");
+        boolean npcinworldtrader = getConfig().getBoolean("npcinworldtrader");
         for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
             if (!npc.getName().equals("Trader")) {
-                getConfig().set("npctraderinworld", false);
+                getConfig().set("npcinworldtrader", false);
             } else {
-                getConfig().set("npctraderinworld", true);
+                getConfig().set("npcinworldtrader", true);
             }
         }
         if (npcinworldtrader == false) {
             NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Trader");
             npc.spawn(new Location(Bukkit.getWorld("world"), 0, 41, 80));
-            getConfig().set("npctraderinworld", true);
+            getConfig().set("npcinworldtrader", true);
         }
         boolean npcinworldseller = getConfig().getBoolean("npcsellerinworld");
         for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
@@ -487,12 +484,27 @@ public final class Asd extends JavaPlugin implements Listener {
         return null;
     }
 
-
-
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
+        Location playerLoc = player.getLocation();
+        double captureRadius = 4.5;
+        Location capturePoint = new Location( Bukkit.getWorld("world"), 10.5, 41.5, 10.5);
+        if (Math.abs(playerLoc.getX()- capturePoint.getX()) <= captureRadius  &&
+                Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius  &&
+                Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius ) {
+            koth.startCapture(player);
+        }else{
+            koth.stopCapture(player);
+        }
     }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event){
+        Player player = event.getPlayer();
+        koth.stopCapture(player);
+    }
+
 
     public static Asd getInstance() {
         return instance;

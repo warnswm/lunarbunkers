@@ -15,8 +15,6 @@ import java.util.UUID;
 
 public class Database {
     private Connection connection;
-    private JavaPlugin plugin;
-    private Scoreboard scoreboard;
 
     public Database() {
         try {
@@ -26,13 +24,6 @@ public class Database {
             e.printStackTrace();
         }
 
-        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        Objective objective = scoreboard.getObjective("wins");
-        if (objective == null) {
-            objective = scoreboard.registerNewObjective("wins", "dummy");
-        }
-        objective.setDisplayName("Wins");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
     public void addWin(Player player) {
@@ -152,7 +143,22 @@ public class Database {
             e.printStackTrace();
         }
     }
-
+    public int getWins(String uuid) {
+        int wins = 0;
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT wins FROM players WHERE uuid = ?");
+            statement.setString(1, uuid);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                wins = result.getInt("wins");
+            }
+            result.close();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return wins;
+    }
     public void DisableDatabase(){
         try {
             connection.close();

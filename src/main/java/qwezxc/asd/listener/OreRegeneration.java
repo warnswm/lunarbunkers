@@ -23,9 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 public class OreRegeneration implements Listener {
     private Asd main;
-    private static ConcurrentHashMap<Integer, Material> blockType = new ConcurrentHashMap<Integer, Material>();    //ID > BLOCK - They type of block to regenerate.
-    private static ConcurrentHashMap<Integer, Integer> blockTimeLeft = new ConcurrentHashMap<Integer, Integer>(); //ID > Respawn TimeLeft
-    private static ConcurrentHashMap<Integer, Location> blockLoc = new ConcurrentHashMap<Integer, Location>();       //ID > Block Location
 
     public OreRegeneration(final Asd main) {
         this.main = main;
