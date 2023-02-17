@@ -11,9 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import qwezxc.asd.Asd;
-import qwezxc.asd.Team;
-import qwezxc.asd.Teams;
+import qwezxc.asd.core.Team;
+import qwezxc.asd.core.Teams;
 import java.util.UUID;
 public class TeamMenuListener implements Listener {
     private Teams teams;

@@ -1,7 +1,6 @@
 package qwezxc.asd.core;
 
 import qwezxc.asd.Data.Database;
-import qwezxc.asd.Teams;
 
 public class PluginManager {
     private static PluginManager instance;
@@ -10,6 +9,8 @@ public class PluginManager {
 
     private Teams teams;
     private Economy economy;
+    private PlayerLivesManager playerLivesManager;
+
 
     private KOTH koth;
     private PluginManager() {
@@ -17,6 +18,7 @@ public class PluginManager {
         this.teams = new Teams();
         this.database = new Database();
         this.economy = new Economy();
+        this.playerLivesManager = new PlayerLivesManager();
         this.pluginScoreboardManager = new PluginScoreboardManager();
     }
 
@@ -34,5 +36,6 @@ public class PluginManager {
     }
 
     public Economy getEconomy(){return this.economy;}
+    public PlayerLivesManager getPlayerLivesManager(){return this.playerLivesManager;}
 
 }

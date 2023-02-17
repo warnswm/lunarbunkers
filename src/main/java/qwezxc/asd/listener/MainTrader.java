@@ -59,8 +59,8 @@ public class MainTrader implements Listener {
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
                             Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid, 10);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8226));
-                            Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
-                            score2.setScore(2);
+                            Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                            score1.setScore(1);
                             player.setScoreboard(scoreboard);
                         }
                     }
@@ -83,8 +83,8 @@ public class MainTrader implements Listener {
                             Objective objective = scoreboard.getObjective("Bunkers");
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
                             Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid, 5 * rmbhill);
-                            Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
-                            score2.setScore(2);
+                            Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                            score1.setScore(1);
                             player.setScoreboard(scoreboard);
                         } else {
                             Scoreboard scoreboard = player.getScoreboard();
@@ -92,8 +92,8 @@ public class MainTrader implements Listener {
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
                             Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid, 5);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
-                            Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
-                            score2.setScore(2);
+                            Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                            score1.setScore(1);
                             player.setScoreboard(scoreboard);
                         }
                     }
@@ -109,8 +109,8 @@ public class MainTrader implements Listener {
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
                             Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid, 25);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8195));
-                            Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
-                            score2.setScore(2);
+                            Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                            score1.setScore(1);
                             player.setScoreboard(scoreboard);
                         }
                     }
@@ -126,8 +126,8 @@ public class MainTrader implements Listener {
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
                             Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid, 50);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16394));
-                            Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
-                            score2.setScore(2);
+                            Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                            score1.setScore(1);
                             player.setScoreboard(scoreboard);
                         }
                     }

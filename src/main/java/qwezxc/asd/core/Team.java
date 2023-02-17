@@ -1,4 +1,4 @@
-package qwezxc.asd;
+package qwezxc.asd.core;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

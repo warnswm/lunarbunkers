@@ -9,14 +9,10 @@ import org.bukkit.*;
 
 import java.util.*;
 
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -37,10 +33,7 @@ import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
 import qwezxc.asd.command.teamcmd;
 import qwezxc.asd.command.testcmd;
-import qwezxc.asd.core.Economy;
-import qwezxc.asd.core.KOTH;
-import qwezxc.asd.core.PluginManager;
-import qwezxc.asd.core.PluginScoreboardManager;
+import qwezxc.asd.core.*;
 import qwezxc.asd.listener.*;
 
 
@@ -48,13 +41,14 @@ public final class Asd extends JavaPlugin implements Listener {
     private static Asd instance;
     private Database database;
     private Economy economy;
-    private PluginScoreboardManager scoreboardManager;
     public World world;
+    private PlayerLivesManager playerLivesManager;
 
     private Map<UUID, Integer> minutesInCenter = new HashMap<>();
     private PluginManager pluginManager;
     public KOTH koth;
-    public double kothRadius = 5.0;
+    private PlayerLives playerLives;
+    private PlayerLivesListener playerLivesListener;
 
     private OreRegeneration oreRegen;
     private Teams teams = new Teams();
@@ -77,6 +71,9 @@ public final class Asd extends JavaPlugin implements Listener {
 
         koth = new KOTH(this,teams);
 
+        playerLivesManager = new PlayerLivesManager();
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this,playerLivesManager), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerLivesListener(playerLivesManager),this);
 
         Bukkit.getPluginManager().registerEvents(this, this);
         oreRegen = new OreRegeneration(this);
@@ -91,7 +88,7 @@ public final class Asd extends JavaPlugin implements Listener {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             oreRegen.regenerateBrokenOres();
         }));
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+
 
 
         saveDefaultConfig();
@@ -381,6 +378,7 @@ public final class Asd extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        PlayerLives other = new PlayerLives(0);
         Asd.getInstance().getPluginManager().getDatabase().DisableDatabase();
     }
 }

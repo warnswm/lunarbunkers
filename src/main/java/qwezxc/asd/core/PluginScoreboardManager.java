@@ -1,25 +1,19 @@
 package qwezxc.asd.core;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import qwezxc.asd.Asd;
-import qwezxc.asd.Team;
 
 import java.util.UUID;
 
 public class PluginScoreboardManager {
-    private Scoreboard scoreboard;
-    private Objective objective;
 
+    private PlayerLivesManager playerLivesManager;
     public PluginScoreboardManager() {
+        playerLivesManager = new PlayerLivesManager();
     }
 
-    public void updateScore(String playerName, int score) {
-        Score playerScore = objective.getScore(playerName);
-        playerScore.setScore(score);
-    }
 
     public void createScoreboard(Player player){
         UUID uuid = player.getUniqueId();
@@ -29,24 +23,30 @@ public class PluginScoreboardManager {
         objective.setDisplayName("Bunkers");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         Score score =  objective.getScore("Classic: " + String.format("%d:%02d", 5,0));
-        score.setScore(8);
-        Score score7 = objective.getScore("");
-        score7.setScore(7);
+        score.setScore(7);
+        Score score7 = objective.getScore(" " + "" + " ");
+        score7.setScore(6);
         Score score6 = objective.getScore("Team: Выбери команду!" );
-        score6.setScore(6);
-        score7.setScore(4);
+        score6.setScore(5);
+
+        // дада это надо менять
+        // getRemainingLives dasn't work idk
+        Score score5 = objective.getScore("Осталось жизней: " + 3);
+        score5.setScore(4);
+        Score score4 = objective.getScore(" ");
+        score4.setScore(3);
         Score score3 = objective.getScore("Kills: " + Asd.getInstance().getPluginManager().getDatabase().getWins(String.valueOf(uuid)));
         if(score3 == null){
             objective.getScore("Kills: null Сообщите об этом админу");
         }
-        score3.setScore(3);
+        score3.setScore(2);
         Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
         if(score2 == null){
             objective.getScore("Balance: null Сообщите об этом админу");
         }
-        score2.setScore(2);
+        score2.setScore(1);
         Score score1 = objective.getScore("―――――――――――――");
-        score1.setScore(1);
+        score1.setScore(0);
         player.setScoreboard(scoreboard);
     }
 
@@ -61,8 +61,4 @@ public class PluginScoreboardManager {
         }
     }
 
-    public Scoreboard getScoreboard() {
-        return this.scoreboard;
-    }
-    public Objective getObjective(){return this.objective;}
 }
