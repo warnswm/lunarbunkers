@@ -10,13 +10,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.*;
 import qwezxc.asd.Asd;
 import qwezxc.asd.Data.Database;
+import qwezxc.asd.core.PluginScoreboardManager;
 
 public class PlayerJoinListener implements Listener {
 
-    public Database database;
 
     public Asd main;
-    private Scoreboard board;
     public PlayerJoinListener(final Asd main) {
         this.main = main;
     }
@@ -31,9 +30,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
-        Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
-        player.setScoreboard(scoreboard);
+        main.getPluginManager().getScoreboardManager().removeScoreboard(player);
     }
 
 }

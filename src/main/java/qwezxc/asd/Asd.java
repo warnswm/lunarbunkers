@@ -41,9 +41,7 @@ import qwezxc.asd.core.Economy;
 import qwezxc.asd.core.KOTH;
 import qwezxc.asd.core.PluginManager;
 import qwezxc.asd.core.PluginScoreboardManager;
-import qwezxc.asd.listener.OreRegeneration;
-import qwezxc.asd.listener.PlayerJoinListener;
-import qwezxc.asd.listener.TeamMenuListener;
+import qwezxc.asd.listener.*;
 
 
 public final class Asd extends JavaPlugin implements Listener {
@@ -59,7 +57,7 @@ public final class Asd extends JavaPlugin implements Listener {
     public double kothRadius = 5.0;
 
     private OreRegeneration oreRegen;
-    Teams teams = new Teams();
+    private Teams teams = new Teams();
     public Map<UUID, Team> playerTeams = teams.getPlayers();
     @Override
     public void onLoad() {
@@ -75,7 +73,6 @@ public final class Asd extends JavaPlugin implements Listener {
         this.database = new Database();
         this.economy = new Economy();
         this.teams = new Teams();
-        this.scoreboardManager = new PluginScoreboardManager();
         getServer().getPluginManager().registerEvents(new TeamMenuListener(teams), this);
 
         koth = new KOTH(this,teams);
@@ -83,7 +80,17 @@ public final class Asd extends JavaPlugin implements Listener {
 
         Bukkit.getPluginManager().registerEvents(this, this);
         oreRegen = new OreRegeneration(this);
-        getServer().getPluginManager().registerEvents(oreRegen, this);
+        Bukkit.getPluginManager().registerEvents(oreRegen, this);
+        Bukkit.getPluginManager().registerEvents(new MainTrader(this),this);
+        Bukkit.getPluginManager().registerEvents(new SellerListener(this),this);
+
+
+        oreRegen.regenerateBrokenOres();
+
+        // Add shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            oreRegen.regenerateBrokenOres();
+        }));
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
 
@@ -136,8 +143,6 @@ public final class Asd extends JavaPlugin implements Listener {
         Player player = event.getClicker();
         Inventory plinv = player.getInventory();
         if (npc.getName().equals("Trader")) {
-
-
             Inventory inventory = Bukkit.createInventory(null, 54, "Trader Menu");
 
             ItemStack speedPotion = new ItemStack(Material.POTION);
@@ -287,149 +292,6 @@ public final class Asd extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        UUID uuid = player.getUniqueId();
-        ItemStack item = event.getCurrentItem();
-        Inventory inventory = event.getInventory();
-        int emptySlots = -1;
-        for (ItemStack i : player.getInventory().getStorageContents()) {
-            if (i == null || i.getType() == Material.AIR) {
-                emptySlots++;
-            }
-        }
-        if (inventory.getTitle().equals("Trader Menu")) {
-
-            event.setCancelled(true);
-
-
-
-            if (item == null) return;
-
-            if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II")) {
-                if(player.isOnline()) {
-                    if (Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(uuid,10)) {
-                        if (emptySlots == -1) {
-                            player.sendMessage("Inventory is full");
-                        } else {
-                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,10);
-                            player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8226));
-                            player.sendMessage("You exchanged 1 gold for 1 diamond.");
-                        }
-                    }
-                }
-            }
-            else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
-                if(player.isOnline()) {
-                    if (Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(uuid,5)) {
-                        if (emptySlots == -1) {
-                            player.sendMessage("Inventory is full");
-                        } else if (event.getClick() == ClickType.RIGHT) {
-                            int rmbhill=0;
-                            for (ItemStack i : player.getInventory().getStorageContents()) {
-                                if (i == null || i.getType() == Material.AIR) {
-                                    player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
-                                    player.sendMessage(String.valueOf(emptySlots));
-                                    rmbhill++;
-                                }
-                            }
-                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,5*rmbhill);
-                        } else {
-                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,5);
-                            player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
-                            player.sendMessage("You exchanged 1 gold for 1 diamond.");
-                        }
-                    }
-                }
-            }
-            else if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)")) {
-                if(player.isOnline()) {
-                    if (Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(uuid,25)) {
-                        if (emptySlots == -1) {
-                            player.sendMessage("Inventory is full");
-                        } else {
-                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,25);
-                            player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8195));
-                            player.sendMessage("You exchanged 1 gold for 1 diamond.");
-                        }
-                    }
-                }
-            }
-            else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Slowness Potion (1:07)")) {
-                if(player.isOnline()) {
-                    if (Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(uuid,50)) {
-                        if (emptySlots == -1) {
-                            player.sendMessage("Inventory is full");
-                        } else {
-                            Asd.getInstance().getPluginManager().getEconomy().removeBalance(uuid,50);
-                            player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16394));
-                            player.sendMessage("You exchanged 1 gold for 1 diamond.");
-                        }
-                    }
-                }
-            }
-            else if (item.getItemMeta().getDisplayName() == null){
-                return;
-            }
-            else{
-                return;
-            }
-            if(player.isOnline()){
-                player.sendMessage("PROVERKA TI ONLINE");
-            }
-        }
-        if (inventory.getTitle().equals("Seller Menu")) {
-            event.setCancelled(true);
-            if (item == null) return;
-            if (player.isOnline()) {
-                if (item.getType() == Material.COAL) {
-                    if (player.getInventory().contains(Material.COAL)) {
-                        if (event.getClick() == ClickType.RIGHT) {
-                            int coalcountinsellerforrightclick = 0;
-                            for (ItemStack itemStack : player.getInventory().getContents()) {
-                                if (itemStack != null && itemStack.getType() == Material.COAL) {
-                                    coalcountinsellerforrightclick += itemStack.getAmount();
-                                }
-                            }
-                            player.getInventory().removeItem(new ItemStack(Material.COAL, coalcountinsellerforrightclick));
-                            int addcoalbalance = coalcountinsellerforrightclick * 10;
-                            Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addcoalbalance);
-                            player.sendMessage(String.valueOf(addcoalbalance));
-                        } else if (event.getClick() == ClickType.LEFT) {
-                            player.getInventory().removeItem(new ItemStack(Material.COAL, 1));
-                            int addcoalbalance = 10;
-                            Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addcoalbalance);
-                            player.sendMessage(String.valueOf(addcoalbalance));
-                        }
-                    }
-                }
-                if (item.getType() == Material.IRON_INGOT) {
-                    if (player.getInventory().contains(Material.IRON_INGOT)) {
-                        if (event.getClick() == ClickType.RIGHT) {
-                            int ironcount = 0;
-                            for (ItemStack itemStack : player.getInventory().getContents()) {
-                                if (itemStack != null && itemStack.getType() == Material.IRON_INGOT) {
-                                    ironcount += itemStack.getAmount();
-                                }
-                            }
-                            player.getInventory().removeItem(new ItemStack(Material.IRON_INGOT, ironcount));
-                            int addironbalance = ironcount * 15;
-                            Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addironbalance);
-                            player.sendMessage(String.valueOf(addironbalance));
-                        } else if (event.getClick() == ClickType.LEFT) {
-                            player.getInventory().removeItem(new ItemStack(Material.IRON_INGOT, 1));
-                            int addironbalance = 15;
-                            Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addironbalance);
-                            player.sendMessage(String.valueOf(addironbalance));
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -460,7 +322,9 @@ public final class Asd extends JavaPlugin implements Listener {
         UUID attackerUUID = attacker.getUniqueId();
         UUID defenderUUID = target.getUniqueId();
 
-        if (playerTeams.get(attackerUUID) == playerTeams.get(defenderUUID)) {
+
+        if (teams.getTeam(attacker)== teams.getTeam(target)) {
+            attacker.sendMessage(String.valueOf( playerTeams.get(attackerUUID) + " " + playerTeams.get(defenderUUID)));
             event.setCancelled(true);
             attacker.sendMessage("You can't attack players from the same team.");
         }

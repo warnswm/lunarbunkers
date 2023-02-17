@@ -1,8 +1,5 @@
 package qwezxc.asd.core;
 
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.Teams;
 

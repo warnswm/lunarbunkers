@@ -3,10 +3,7 @@ package qwezxc.asd.core;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.*;
 import qwezxc.asd.Asd;
 import qwezxc.asd.Team;
 
@@ -17,10 +14,6 @@ public class PluginScoreboardManager {
     private Objective objective;
 
     public PluginScoreboardManager() {
-        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        this.objective = scoreboard.registerNewObjective("score", "dummy");
-        objective.setDisplayName("Score");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
     public void updateScore(String playerName, int score) {
@@ -30,12 +23,18 @@ public class PluginScoreboardManager {
 
     public void createScoreboard(Player player){
         UUID uuid = player.getUniqueId();
+        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
+        Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
+        Objective objective = scoreboard.registerNewObjective("Bunkers", "dummy");
         objective.setDisplayName("Bunkers");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         Score score =  objective.getScore("Classic: " + String.format("%d:%02d", 5,0));
-        score.setScore(7);
-        Score score5 = objective.getScore("Team: " + Asd.getInstance().getPluginManager().getTeams().getTeam(player));
-        score5.setScore(5);
+        score.setScore(8);
+        Score score7 = objective.getScore("");
+        score7.setScore(7);
+        Score score6 = objective.getScore("Team: Выбери команду!" );
+        score6.setScore(6);
+        score7.setScore(4);
         Score score3 = objective.getScore("Kills: " + Asd.getInstance().getPluginManager().getDatabase().getWins(String.valueOf(uuid)));
         if(score3 == null){
             objective.getScore("Kills: null Сообщите об этом админу");
@@ -52,8 +51,16 @@ public class PluginScoreboardManager {
     }
 
     public void removeScoreboard(Player player) {
-        player.setScoreboard(null);
+        Scoreboard scoreboard = player.getScoreboard();
+        if (scoreboard != null) {
+            Objective objective = scoreboard.getObjective("Bunkers");
+            if (objective != null) {
+                objective.unregister();
+            }
+            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        }
     }
+
     public Scoreboard getScoreboard() {
         return this.scoreboard;
     }

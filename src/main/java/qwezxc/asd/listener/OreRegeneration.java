@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import qwezxc.asd.Asd;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 public class OreRegeneration implements Listener {
     private Asd main;
+
+    private List<Location> brokenOreLocations = new ArrayList<>();
+
 
     public OreRegeneration(final Asd main) {
         this.main = main;
@@ -42,8 +46,12 @@ public class OreRegeneration implements Listener {
 
         Material blockType = event.getBlock().getType();
 
-        //Cancel experience drops
+
         event.setExpToDrop(0);
+
+        if (blockType == Material.COAL_ORE || blockType == Material.GOLD_ORE || blockType == Material.DIAMOND_ORE || blockType == Material.IRON_ORE) {
+            brokenOreLocations.add(location);
+        }
 
         switch (blockType) {
             case COAL_ORE:
@@ -109,4 +117,18 @@ public class OreRegeneration implements Listener {
                 }
         }
     }
+
+
+    public void regenerateBrokenOres() {
+        for (Location location : brokenOreLocations) {
+            Block block = location.getBlock();
+            Material blockType = block.getType();
+            if (blockType == Material.COAL_ORE || blockType == Material.GOLD_ORE || blockType == Material.DIAMOND_ORE || blockType == Material.IRON_ORE) {
+                block.setType(Material.COBBLESTONE);
+                block.removeMetadata("RegenBlock", main);
+            }
+        }
+        brokenOreLocations.clear();
+    }
+
 }

@@ -40,12 +40,10 @@ public class Teams {
 
     public void addPlayerToTeam(Player player, Team team) {
         players.put(player.getUniqueId(), team);
-        player.sendMessage(team.getName() + " team selected");
     }
 
     public void removePlayerFromTeam(Player player) {
         players.remove(player.getUniqueId());
-        player.sendMessage("You have left the team");
     }
     public Team getTeam(Player player) {
         return this.players.get(player.getUniqueId());

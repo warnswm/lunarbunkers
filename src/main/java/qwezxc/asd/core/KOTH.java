@@ -66,29 +66,29 @@ public class KOTH {
                     minutes = timeLeft / 60;
                     seconds = timeLeft % 60;
                     Player player = capturingPlayers.get(0);
-
-                    scoreboard = Asd.getInstance().getPluginManager().getScoreboardManager().getScoreboard();
-                    Objective objective = Asd.getInstance().getPluginManager().getScoreboardManager().getObjective();
-                    Score score = objective.getScore("Classic: " + String.format("%d:%02d", minutes, seconds));
-                    if(minutes == 4 && seconds == 59) {
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 5:00"));
+                    for (Player players : Bukkit.getOnlinePlayers()) {
+                        Scoreboard scoreboard = players.getScoreboard();
+                        Objective objective = scoreboard.getObjective("Bunkers");
+                        Score score = objective.getScore("Classic: " + String.format("%d:%02d", minutes, seconds));
+                        if (minutes == 4 && seconds == 59) {
+                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 5:00"));
+                        }
+                        if (minutes == 3 && seconds == 59) {
+                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 4:00"));
+                        }
+                        if (minutes == 2 && seconds == 59) {
+                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 3:00"));
+                        }
+                        if (minutes == 1 && seconds == 59) {
+                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 2:00"));
+                        }
+                        if (minutes == 0 && seconds == 59) {
+                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 1:00"));
+                        }
+                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds + 1)));
+                        score.setScore(7);
+                        players.setScoreboard(scoreboard);
                     }
-                    if(minutes == 3 && seconds == 59) {
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 4:00"));
-                    }
-                    if(minutes == 2 && seconds == 59) {
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 3:00"));
-                    }
-                    if(minutes == 1 && seconds == 59) {
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 2:00"));
-                    }
-                    if(minutes == 0 && seconds == 59) {
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 1:00"));
-                    }
-                    player.sendMessage(String.valueOf(minutes + ":" + seconds));
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds+1)));
-                    score.setScore(7);
-                    player.setScoreboard(scoreboard);
 
                     // Check if the time has run out
                     if (timeLeft == 0) {
@@ -161,18 +161,20 @@ public class KOTH {
         capturingPlayers.remove(offlinePlayer);
         capturingPlayers.remove(offlinePlayer);
         // If no players from any team are on the capture point, reset the capture timer
-        //тут проблема
-        player.sendMessage(String.valueOf(capturingPlayers));
+
         if (capturingPlayers.isEmpty() && captureTimer != null) {
             captureTimer.cancel();
             captureTimer = null;
             Bukkit.broadcastMessage(ChatColor.RED + "Capture of " + "" + " has been reset!");
-            scoreboard = Asd.getInstance().getPluginManager().getScoreboardManager().getScoreboard();
-            Objective objective = Asd.getInstance().getPluginManager().getScoreboardManager().getObjective();
-            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds)));
-            Score score = objective.getScore("Classic: " + String.format("%d:%02d", 5, 0));
-            score.setScore(7);
-            player.setScoreboard(scoreboard);
+            for (Player players : Bukkit.getOnlinePlayers()) {
+                Scoreboard scoreboard = players.getScoreboard();
+                Objective objective = scoreboard.getObjective("Bunkers");
+                scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds)));
+                scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds+1)));
+                Score score = objective.getScore("Classic: " + String.format("%d:%02d", 5, 0));
+                score.setScore(7);
+                players.setScoreboard(scoreboard);
+            }
             minutes = 5;
             seconds = 0;
         }
