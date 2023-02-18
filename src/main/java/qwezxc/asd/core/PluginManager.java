@@ -8,8 +8,9 @@ public class PluginManager {
     private Database database;
 
     private Teams teams;
-    private Economy economy;
+    private EconomyDataBaseOld economyDataBaseOld;
     private PlayerLivesManager playerLivesManager;
+    private Economy economy;
 
 
     private KOTH koth;
@@ -17,9 +18,10 @@ public class PluginManager {
         // Initialize the managers and utilities
         this.teams = new Teams();
         this.database = new Database();
-        this.economy = new Economy();
+        this.economyDataBaseOld = new EconomyDataBaseOld();
         this.playerLivesManager = new PlayerLivesManager();
         this.pluginScoreboardManager = new PluginScoreboardManager();
+        this.economy = new Economy();
     }
 
     public static PluginManager getInstance() {
@@ -29,13 +31,14 @@ public class PluginManager {
         return instance;
     }
 
+    public Economy getnewEconomy(){return this.economy;}
     public Teams getTeams(){return this.teams;}
     public PluginScoreboardManager getScoreboardManager(){return this.pluginScoreboardManager;}
     public Database getDatabase() {
         return this.database;
     }
 
-    public Economy getEconomy(){return this.economy;}
+    public EconomyDataBaseOld getEconomy(){return this.economyDataBaseOld;}
     public PlayerLivesManager getPlayerLivesManager(){return this.playerLivesManager;}
 
 }

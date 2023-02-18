@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.trait.GameModeTrait;
 import org.bukkit.*;
 
 
@@ -31,6 +32,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.potion.*;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
+import qwezxc.asd.command.start;
 import qwezxc.asd.command.teamcmd;
 import qwezxc.asd.command.testcmd;
 import qwezxc.asd.core.*;
@@ -40,15 +42,15 @@ import qwezxc.asd.listener.*;
 public final class Asd extends JavaPlugin implements Listener {
     private static Asd instance;
     private Database database;
-    private Economy economy;
+    private EconomyDataBaseOld economyDataBaseOld;
     public World world;
     private PlayerLivesManager playerLivesManager;
 
     private Map<UUID, Integer> minutesInCenter = new HashMap<>();
     private PluginManager pluginManager;
     public KOTH koth;
-    private PlayerLives playerLives;
-    private PlayerLivesListener playerLivesListener;
+    public Economy economy;
+    public GameManager gameManager;
 
     private OreRegeneration oreRegen;
     private Teams teams = new Teams();
@@ -65,14 +67,16 @@ public final class Asd extends JavaPlugin implements Listener {
         world = Bukkit.getWorld("world");
         this.pluginManager = PluginManager.getInstance();
         this.database = new Database();
-        this.economy = new Economy();
+        this.economyDataBaseOld = new EconomyDataBaseOld();
         this.teams = new Teams();
+        this.gameManager = new GameManager(this,teams);
+        this.economy = new Economy();
         getServer().getPluginManager().registerEvents(new TeamMenuListener(teams), this);
 
         koth = new KOTH(this,teams);
 
         playerLivesManager = new PlayerLivesManager();
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this,playerLivesManager), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this,playerLivesManager,gameManager), this);
         Bukkit.getPluginManager().registerEvents(new PlayerLivesListener(playerLivesManager),this);
 
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -82,21 +86,14 @@ public final class Asd extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new SellerListener(this),this);
 
 
-        oreRegen.regenerateBrokenOres();
-
-        // Add shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            oreRegen.regenerateBrokenOres();
-        }));
-
-
-
-        saveDefaultConfig();
-
-
         getCommand("balance").setExecutor(new BalanceCommand(this));
         getCommand("pickaxe").setExecutor(new teamcmd(this));
         getCommand("testcmd").setExecutor(new testcmd(this));
+        getCommand("start").setExecutor(new start(this,gameManager));
+
+        saveDefaultConfig();
+
+        //REWRITE
         boolean npcinworldtrader = getConfig().getBoolean("npcinworldtrader");
         for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
             if (!npc.getName().equals("Trader")) {
@@ -107,7 +104,9 @@ public final class Asd extends JavaPlugin implements Listener {
         }
         if (npcinworldtrader == false) {
             NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Trader");
-            npc.spawn(new Location(Bukkit.getWorld("world"), 0, 41, 80));
+            npc.spawn(new Location(Bukkit.getWorld("world"), -45, 64, 1));
+            npc.getOrAddTrait(GameModeTrait.class).setGameMode(GameMode.SURVIVAL);
+            npc.setProtected(false);
             getConfig().set("npcinworldtrader", true);
         }
         boolean npcinworldseller = getConfig().getBoolean("npcsellerinworld");
@@ -120,10 +119,12 @@ public final class Asd extends JavaPlugin implements Listener {
         }
         if (npcinworldseller == false) {
             NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Seller");
-            npc.spawn(new Location(Bukkit.getWorld("world"), 0, 41, 70));
+            npc.spawn(new Location(Bukkit.getWorld("world"), -45, 64, 3));
             getConfig().set("npcsellerinworld", true);
         }
         saveConfig();
+        world.setGameRuleValue("doDaylightCycle", "false");
+        world.setTime(6000);
 
     }
 
@@ -150,7 +151,7 @@ public final class Asd extends JavaPlugin implements Listener {
             speedlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
             speedlore.add(ChatColor.GRAY + "x1 Speed II Potion");
             speedlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            speedlore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$10");
+            speedlore.add(ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$10");
             speedPotionItemMeta.setLore(speedlore);
             speedPotion.setItemMeta(speedPotionItemMeta);
 
@@ -163,7 +164,7 @@ public final class Asd extends JavaPlugin implements Listener {
             heallore.add(ChatColor.GRAY + "x1 Health Splash Potion");
             heallore.add(ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to fill your inventory");
             heallore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            heallore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$5");
+            heallore.add(ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$5");
             healPotionItemMeta.setLore(heallore);
             healPotion.setItemMeta(healPotionItemMeta);
 
@@ -175,7 +176,7 @@ public final class Asd extends JavaPlugin implements Listener {
             firelore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
             firelore.add(ChatColor.GRAY + "x1 Fire Resistance Potion");
             firelore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            firelore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$25");
+            firelore.add(ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$25");
             firePotionItemMeta.setLore(firelore);
             firePotion.setItemMeta(firePotionItemMeta);
 
@@ -187,12 +188,36 @@ public final class Asd extends JavaPlugin implements Listener {
             slownesslore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
             slownesslore.add(ChatColor.GRAY + "x1 Slowness Splash Potion");
             slownesslore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            slownesslore.add(ChatColor.WHITE + "Price: " + ChatColor.GREEN + "$50");
+            slownesslore.add(ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$50");
 
             slownesspotionItemMeta.setLore(slownesslore);
             slownesspotion.setItemMeta(slownesspotionItemMeta);
 
-            //Diamond set + sword = 850$
+            ItemStack fullset = new ItemStack(Material.DIAMOND);
+            ItemMeta fullsetmeta = fullset.getItemMeta();
+            List<String> fullsetlore = new ArrayList<>();
+            fullsetlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Sword");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Helmet");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Chestplate");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Leggings");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Boots");
+            fullsetlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            fullsetlore.add(ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$850");
+            fullsetmeta.setLore(fullsetlore);
+            fullset.setItemMeta(fullsetmeta);
+
+            ItemStack Sword = new ItemStack(Material.DIAMOND_SWORD);
+            ItemMeta Swordmeta = Sword.getItemMeta();
+            List<String> swordlore = new ArrayList<>();
+            swordlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            swordlore.add(ChatColor.GRAY + "1x Diamond Sword");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Helmet");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Chestplate");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Leggings");
+            fullsetlore.add(ChatColor.GRAY + "1x Diamond Boots");
+            fullsetlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            fullsetlore.add(ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$850");
             //Diamond sword 100$
             //Diamond Chestplate 275$
             //Diamond leggings 250
@@ -349,8 +374,8 @@ public final class Asd extends JavaPlugin implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         Location playerLoc = player.getLocation();
-        double captureRadius = 4.5;
-        Location capturePoint = new Location( Bukkit.getWorld("world"), 10.5, 41.5, 10.5);
+        double captureRadius = 3.5;
+        Location capturePoint = new Location( Bukkit.getWorld("world"), -50.5, 63.5, 50.5);
         if (Math.abs(playerLoc.getX()- capturePoint.getX()) <= captureRadius  &&
                 Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius  &&
                 Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius ) {
@@ -378,7 +403,6 @@ public final class Asd extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        PlayerLives other = new PlayerLives(0);
         Asd.getInstance().getPluginManager().getDatabase().DisableDatabase();
     }
 }

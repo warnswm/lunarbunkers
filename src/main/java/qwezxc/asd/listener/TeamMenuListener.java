@@ -1,11 +1,13 @@
 package qwezxc.asd.listener;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Objective;
@@ -35,6 +37,10 @@ public class TeamMenuListener implements Listener {
             if (item == null) return;
             for (Team team : teams.getTeams().values()) {
                 if (item.getType() == team.getWoolBlock()) {
+                    if(teams.getNumPlayersInTeam(team) >= team.getMaxPlayers()){
+                        player.sendMessage("Max player in team");
+                        return;
+                    }
                     Scoreboard scoreboard = player.getScoreboard();
                     Objective objective = scoreboard.getObjective("Bunkers");
                     scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
@@ -49,9 +55,28 @@ public class TeamMenuListener implements Listener {
                     Score score5 = objective.getScore("Team: " + teamafterr);
                     score5.setScore(5);
                     player.sendMessage("You joined the " + team.getName() + " team!");
+                    ChatColor colorteam = team.getChatColor();
+                    player.setPlayerListName("[" + colorteam + team.getName() + ChatColor.RESET + "]" + " " + player.getName());
                     break;
                 }
             }
+        }
+    }
+
+
+
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        Team team = teams.getTeam(player);
+        ChatColor colorteam = ChatColor.WHITE;
+        if(team != null) {
+            colorteam = team.getChatColor();
+        }
+        // Add the player's team name before their username in the chat
+        if (team != null) {
+            String message = String.format("[%s] %s: %s", colorteam + team.getName() + ChatColor.RESET, player.getName(), event.getMessage());
+            event.setFormat(message);
         }
     }
 }

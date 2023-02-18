@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import qwezxc.asd.Asd;
+import qwezxc.asd.Items.DiamodPick;
 
 import java.util.Collections;
 
@@ -21,13 +22,10 @@ public class teamcmd implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        ItemStack specialPickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
-        ItemMeta specialPickaxeMeta = specialPickaxe.getItemMeta();
-        specialPickaxeMeta.addEnchant(Enchantment.DIG_SPEED, 1, true);
-        specialPickaxeMeta.setLore(Collections.singletonList("Special Pickaxe"));
-        specialPickaxe.setItemMeta(specialPickaxeMeta);
+
         Player player = (Player) sender;
-        player.getInventory().addItem(specialPickaxe);
+        player.getInventory().addItem(DiamodPick.createDiamondPickaxe());
+        player.getInventory().addItem(DiamodPick.createStonePickaxe());
         return false;
     }
 }

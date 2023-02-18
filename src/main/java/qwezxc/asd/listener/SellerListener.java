@@ -14,11 +14,15 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
+import qwezxc.asd.core.Economy;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class SellerListener implements Listener {
     private Asd main;
+
+    private HashMap<UUID, Double> balances;
 
     public SellerListener(final Asd main){
         this.main = main;
@@ -53,9 +57,9 @@ public class SellerListener implements Listener {
                                 int addcoalbalance = coalcountinsellerforrightclick * 10;
                                 Scoreboard scoreboard = player.getScoreboard();
                                 Objective objective = scoreboard.getObjective("Bunkers");
-                                scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
-                                Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addcoalbalance);
-                                Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                                scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
+                                Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player, addcoalbalance);
+                                Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
                                 score2.setScore(2);
                                 player.setScoreboard(scoreboard);
                             } else if (event.getClick() == ClickType.LEFT) {
@@ -63,9 +67,9 @@ public class SellerListener implements Listener {
                                 int addcoalbalance = 10;
                                 Scoreboard scoreboard = player.getScoreboard();
                                 Objective objective = scoreboard.getObjective("Bunkers");
-                                scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
-                                Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addcoalbalance);
-                                Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                                scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
+                                Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player, addcoalbalance);
+                                Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
                                 score2.setScore(2);
                                 player.setScoreboard(scoreboard);
                             }
@@ -86,9 +90,9 @@ public class SellerListener implements Listener {
                                 int addironbalance = ironcount * 15;
                                 Scoreboard scoreboard = player.getScoreboard();
                                 Objective objective = scoreboard.getObjective("Bunkers");
-                                scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
-                                Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addironbalance);
-                                Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                                scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
+                                Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player, addironbalance);
+                                Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
                                 score2.setScore(2);
                                 player.setScoreboard(scoreboard);
                             } else if (event.getClick() == ClickType.LEFT) {
@@ -96,9 +100,9 @@ public class SellerListener implements Listener {
                                 int addironbalance = 15;
                                 Scoreboard scoreboard = player.getScoreboard();
                                 Objective objective = scoreboard.getObjective("Bunkers");
-                                scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid)));
-                                Asd.getInstance().getPluginManager().getEconomy().addBalance(uuid, addironbalance);
-                                Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(uuid));
+                                scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
+                                Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player, addironbalance);
+                                Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
                                 score2.setScore(2);
                                 player.setScoreboard(scoreboard);
                                 player.sendMessage(String.valueOf(addironbalance));

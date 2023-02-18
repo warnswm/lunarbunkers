@@ -1,5 +1,6 @@
 package qwezxc.asd.core;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import qwezxc.asd.core.Team;
@@ -13,10 +14,10 @@ public class Teams {
     private Map<String, Team> teams = new HashMap<>();
 
     public Teams() {
-        teams.put("Red", new Team("Red", Material.RED_GLAZED_TERRACOTTA));
-        teams.put("Blue", new Team("Blue", Material.BLUE_GLAZED_TERRACOTTA));
-        teams.put("Green", new Team("Green", Material.GREEN_GLAZED_TERRACOTTA));
-        teams.put("Yellow", new Team("Yellow", Material.YELLOW_GLAZED_TERRACOTTA));
+        teams.put("Red", new Team("Red", ChatColor.RED ,Material.RED_GLAZED_TERRACOTTA,1));
+        teams.put("Blue", new Team("Blue",ChatColor.BLUE , Material.BLUE_GLAZED_TERRACOTTA,1));
+        teams.put("Green", new Team("Green",ChatColor.GREEN , Material.GREEN_GLAZED_TERRACOTTA,1));
+        teams.put("Yellow", new Team("Yellow",ChatColor.YELLOW , Material.YELLOW_GLAZED_TERRACOTTA,1));
     }
 
     public Map<String, Team> getTeams() {
@@ -37,6 +38,16 @@ public class Teams {
     public Team getTeam(Player player) {
         return this.players.get(player.getUniqueId());
     }
+    public int getNumPlayersInTeam(Team team) {
+        int count = 0;
+        for (Team t : players.values()) {
+            if (t.equals(team)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 }
 
 

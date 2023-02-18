@@ -6,43 +6,37 @@ import org.bukkit.Material;
 public class Team {
     private String name;
     private Material woolBlock;
-
-    public Team(String name, Material woolBlock) {
+    private int maxPlayers;
+    private ChatColor chatColor;
+    private String prefix;
+    public Team(String name,ChatColor chatColor, Material woolBlock, int maxPlayers) {
         this.name = name;
+        this.chatColor = chatColor;
         this.woolBlock = woolBlock;
+        this.maxPlayers = maxPlayers;
     }
 
     public String getName() {
         return name;
     }
 
+    public ChatColor getChatColor() {
+        return chatColor;
+    }
+
     public Material getWoolBlock() {
         return woolBlock;
     }
-
-    public void setPrefix() {
-        ChatColor color = ChatColor.WHITE;
-        if (woolBlock == Material.YELLOW_GLAZED_TERRACOTTA) {
-            color = ChatColor.YELLOW;
-        } else if (woolBlock == Material.BLUE_GLAZED_TERRACOTTA) {
-            color = ChatColor.BLUE;
-        } else if (woolBlock == Material.GREEN_GLAZED_TERRACOTTA) {
-            color = ChatColor.DARK_GREEN;
-        } else if (woolBlock == Material.RED_GLAZED_TERRACOTTA) {
-            color = ChatColor.RED;
-        }
-        String teamName = color + "[" + name + "] ";
-        this.name = teamName;
+    public int getMaxPlayers() {
+        return maxPlayers;
     }
+
     public String getPrefix() {
-        String[] split = this.name.split("\\[");
-        if (split.length > 1) {
-            String prefix = split[1].split("\\]")[0];
-            return prefix;
-        } else {
-            return "";
-        }
+        return prefix;
     }
 
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
 
 }
