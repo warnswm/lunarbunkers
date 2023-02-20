@@ -60,7 +60,7 @@ public class SellerListener implements Listener {
                                 scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                                 Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player, addcoalbalance);
                                 Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
-                                score2.setScore(2);
+                                score2.setScore(1);
                                 player.setScoreboard(scoreboard);
                             } else if (event.getClick() == ClickType.LEFT) {
                                 player.getInventory().removeItem(new ItemStack(Material.COAL, 1));
@@ -70,7 +70,7 @@ public class SellerListener implements Listener {
                                 scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                                 Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player, addcoalbalance);
                                 Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
-                                score2.setScore(2);
+                                score2.setScore(1);
                                 player.setScoreboard(scoreboard);
                             }
                         }
@@ -93,7 +93,7 @@ public class SellerListener implements Listener {
                                 scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                                 Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player, addironbalance);
                                 Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
-                                score2.setScore(2);
+                                score2.setScore(1);
                                 player.setScoreboard(scoreboard);
                             } else if (event.getClick() == ClickType.LEFT) {
                                 player.getInventory().removeItem(new ItemStack(Material.IRON_INGOT, 1));
@@ -103,7 +103,7 @@ public class SellerListener implements Listener {
                                 scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                                 Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player, addironbalance);
                                 Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
-                                score2.setScore(2);
+                                score2.setScore(1);
                                 player.setScoreboard(scoreboard);
                                 player.sendMessage(String.valueOf(addironbalance));
                             }

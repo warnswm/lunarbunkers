@@ -84,6 +84,7 @@ public final class Asd extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(oreRegen, this);
         Bukkit.getPluginManager().registerEvents(new MainTrader(this),this);
         Bukkit.getPluginManager().registerEvents(new SellerListener(this),this);
+        Bukkit.getPluginManager().registerEvents(new TeamTerritory(this,teams),this);
 
 
         getCommand("balance").setExecutor(new BalanceCommand(this));
@@ -375,7 +376,7 @@ public final class Asd extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         Location playerLoc = player.getLocation();
         double captureRadius = 3.5;
-        Location capturePoint = new Location( Bukkit.getWorld("world"), -50.5, 63.5, 50.5);
+        Location capturePoint = new Location( Bukkit.getWorld("world"), 1.5, 63.5, 0.5);
         if (Math.abs(playerLoc.getX()- capturePoint.getX()) <= captureRadius  &&
                 Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius  &&
                 Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius ) {
