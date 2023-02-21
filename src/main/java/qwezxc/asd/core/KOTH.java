@@ -107,18 +107,17 @@ public class KOTH {
 
     // Method to start the capture point capture for a player
     public void startCapture(Player player) {
-        if (capturingPlayers.contains(player.getUniqueId())) return;
+        UUID uuid = player.getUniqueId();
+        if (capturingPlayers.contains(uuid)) return;
 
         Team playerTeam = teams.getTeam(player);
 
-        UUID uuid = player.getUniqueId();
         if (playerTeam != null) {
-            if (capturingPlayers.stream().count() == 0) {
+            if (capturingPlayers.isEmpty()) {
                 capturingPlayers.add(uuid);
                 Bukkit.broadcastMessage(ChatColor.GOLD + player.getName() + " from the " + playerTeam.getName() + " team is capturing " + "name" + "!");
                 startCaptureTimer();
-            }
-            if (!capturingPlayers.isEmpty()) {
+            } else {
                 Team capturingTeam = teams.getTeam(capturingPlayers.get(0));
 
                 if (capturingTeam == playerTeam) {
