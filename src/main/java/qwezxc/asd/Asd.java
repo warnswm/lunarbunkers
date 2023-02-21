@@ -2,8 +2,11 @@ package qwezxc.asd;
 
 import com.google.common.collect.Lists;
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.event.NPCDamageByEntityEvent;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.npc.CitizensNPC;
+import net.citizensnpcs.npc.CitizensNPCRegistry;
 import net.citizensnpcs.trait.GameModeTrait;
 import org.bukkit.*;
 
@@ -30,6 +33,11 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.potion.*;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
 import qwezxc.asd.command.start;
@@ -51,7 +59,7 @@ public final class Asd extends JavaPlugin implements Listener {
     public KOTH koth;
     public Economy economy;
     public GameManager gameManager;
-
+    public TeamNPC teamNPC;
     private OreRegeneration oreRegen;
     private Teams teams = new Teams();
     public Map<UUID, Team> playerTeams = teams.getPlayers();
@@ -69,7 +77,8 @@ public final class Asd extends JavaPlugin implements Listener {
         this.database = new Database();
         this.economyDataBaseOld = new EconomyDataBaseOld();
         this.teams = new Teams();
-        this.gameManager = new GameManager(this,teams);
+        this.teamNPC = new TeamNPC(teams);
+        this.gameManager = new GameManager(this,teams,teamNPC);
         this.economy = new Economy();
         getServer().getPluginManager().registerEvents(new TeamMenuListener(teams), this);
 
@@ -85,46 +94,17 @@ public final class Asd extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new MainTrader(this),this);
         Bukkit.getPluginManager().registerEvents(new SellerListener(this),this);
         Bukkit.getPluginManager().registerEvents(new TeamTerritory(this,teams),this);
-
+        getServer().getPluginManager().registerEvents(teamNPC, this);
 
         getCommand("balance").setExecutor(new BalanceCommand(this));
         getCommand("pickaxe").setExecutor(new teamcmd(this));
         getCommand("testcmd").setExecutor(new testcmd(this));
         getCommand("start").setExecutor(new start(this,gameManager));
 
-        saveDefaultConfig();
 
-        //REWRITE
-        boolean npcinworldtrader = getConfig().getBoolean("npcinworldtrader");
-        for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
-            if (!npc.getName().equals("Trader")) {
-                getConfig().set("npcinworldtrader", false);
-            } else {
-                getConfig().set("npcinworldtrader", true);
-            }
-        }
-        if (npcinworldtrader == false) {
-            NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Trader");
-            npc.spawn(new Location(Bukkit.getWorld("world"), -45, 64, 1));
-            npc.getOrAddTrait(GameModeTrait.class).setGameMode(GameMode.SURVIVAL);
-            npc.setProtected(false);
-            getConfig().set("npcinworldtrader", true);
-        }
-        boolean npcinworldseller = getConfig().getBoolean("npcsellerinworld");
-        for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
-            if (!npc.getName().equals("Seller")) {
-                getConfig().set("npcsellerinworld", false);
-            } else {
-                getConfig().set("npcsellerinworld", true);
-            }
-        }
-        if (npcinworldseller == false) {
-            NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Seller");
-            npc.spawn(new Location(Bukkit.getWorld("world"), -45, 64, 3));
-            getConfig().set("npcsellerinworld", true);
-        }
-        saveConfig();
         world.setGameRuleValue("doDaylightCycle", "false");
+        world.setThundering(false);
+        world.setWeatherDuration(0);
         world.setTime(6000);
 
     }
@@ -342,17 +322,11 @@ public final class Asd extends JavaPlugin implements Listener {
         Player target = (Player) event.getEntity();
         Player attacker = (Player) event.getDamager();
 
-        UUID attackerUUID = attacker.getUniqueId();
-        UUID defenderUUID = target.getUniqueId();
-
 
         if (teams.getTeam(attacker)== teams.getTeam(target)) {
-            attacker.sendMessage(String.valueOf( playerTeams.get(attackerUUID) + " " + playerTeams.get(defenderUUID)));
             event.setCancelled(true);
             attacker.sendMessage("You can't attack players from the same team.");
         }
-
-
     }
 
     public World getWorld(String name) {
@@ -370,6 +344,7 @@ public final class Asd extends JavaPlugin implements Listener {
 
         return null;
     }
+
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
@@ -404,6 +379,8 @@ public final class Asd extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+
         Asd.getInstance().getPluginManager().getDatabase().DisableDatabase();
     }
+
 }

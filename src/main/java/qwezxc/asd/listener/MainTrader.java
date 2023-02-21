@@ -55,6 +55,10 @@ public class MainTrader implements Listener {
                         } else {
                             Scoreboard scoreboard = player.getScoreboard();
                             Objective objective = scoreboard.getObjective("Bunkers");
+                            if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,10)){
+                                player.sendMessage(ChatColor.RED +  "У вас не дстаточно денег чтобы купить это зелье");
+                                return;
+                            }
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                             Asd.getInstance().getPluginManager().getnewEconomy().removeBalance(player, 10);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8226));
@@ -71,21 +75,32 @@ public class MainTrader implements Listener {
                             int rmbhill = 0;
                             for (ItemStack i : player.getInventory().getStorageContents()) {
                                 if (i == null || i.getType() == Material.AIR) {
-                                    player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
-                                    player.sendMessage(String.valueOf(emptySlots));
                                     rmbhill++;
                                 }
                             }
                             Scoreboard scoreboard = player.getScoreboard();
                             Objective objective = scoreboard.getObjective("Bunkers");
+                            if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,5*rmbhill)){
+                                player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы заполнить инвентарь зельями");
+                                return;
+                            }
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
-                            Asd.getInstance().getPluginManager().getnewEconomy().removeBalance(player, 5 * rmbhill);
+                            Asd.getInstance().getPluginManager().getnewEconomy().removeBalance(player,5*rmbhill);
                             Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
                             score1.setScore(1);
                             player.setScoreboard(scoreboard);
+                            for (ItemStack i : player.getInventory().getStorageContents()) {
+                                if (i == null || i.getType() == Material.AIR) {
+                                    player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
+                                }
+                            }
                         } else {
                             Scoreboard scoreboard = player.getScoreboard();
                             Objective objective = scoreboard.getObjective("Bunkers");
+                            if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,5)){
+                                player.sendMessage(ChatColor.RED +  "У вас не дстаточно денег чтобы купить это зелье");
+                                return;
+                            }
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                             Asd.getInstance().getPluginManager().getnewEconomy().removeBalance(player, 5);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16421));
@@ -102,6 +117,10 @@ public class MainTrader implements Listener {
                         } else {
                             Scoreboard scoreboard = player.getScoreboard();
                             Objective objective = scoreboard.getObjective("Bunkers");
+                            if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,25)){
+                                player.sendMessage(ChatColor.RED +  "У вас не дстаточно денег чтобы купить это зелье");
+                                return;
+                            }
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                             Asd.getInstance().getPluginManager().getnewEconomy().removeBalance(player, 25);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 8195));
@@ -117,6 +136,10 @@ public class MainTrader implements Listener {
                         } else {
                             Scoreboard scoreboard = player.getScoreboard();
                             Objective objective = scoreboard.getObjective("Bunkers");
+                            if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,50)){
+                                player.sendMessage(ChatColor.RED +  "У вас не дстаточно денег чтобы купить это зелье");
+                                return;
+                            }
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                             Asd.getInstance().getPluginManager().getnewEconomy().removeBalance(player, 50);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16394));

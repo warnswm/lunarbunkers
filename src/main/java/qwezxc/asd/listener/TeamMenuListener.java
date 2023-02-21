@@ -41,6 +41,10 @@ public class TeamMenuListener implements Listener {
                         player.sendMessage("Max player in team");
                         return;
                     }
+                    if(team == teams.getTeam(player)){
+                        player.sendMessage("Ты уже находишься в этой команде");
+                        return;
+                    }
                     Scoreboard scoreboard = player.getScoreboard();
                     Objective objective = scoreboard.getObjective("Bunkers");
                     scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));

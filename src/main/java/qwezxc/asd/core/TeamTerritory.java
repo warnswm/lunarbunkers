@@ -27,10 +27,10 @@ public class TeamTerritory implements Listener {
     public TeamTerritory(Asd main,Teams teams){
         this.teams = teams;
         this.main = main;
-        baseTerritories.put("Red", new Location(Bukkit.getWorld("world"), 85.5, 64.5, 0.5));
+        baseTerritories.put("Red", new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5));
         baseTerritories.put("Blue", new Location(Bukkit.getWorld("world"), 1.5,64.5,-85.5));
         baseTerritories.put("Green", new Location(Bukkit.getWorld("world"), -85.5, 64.5, 0.5));
-        baseTerritories.put("Yellow", new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5));
+        baseTerritories.put("Yellow", new Location(Bukkit.getWorld("world"), 85.5, 64.5, 0.5));
     }
 
 
@@ -73,6 +73,34 @@ public class TeamTerritory implements Listener {
             }
 
             // If the player is not within any base territory, allow them to open the gate
+            if (!isInBaseTerritory) {
+                event.setCancelled(false);
+            }
+        }else if(block != null && block.getType() == Material.CHEST){
+            Team playerTeam = teams.getTeam(player);
+            if(playerTeam==null){
+                return;
+            }
+            // Check if the player is within any base territory
+            boolean isInBaseTerritory = false;
+            for (Map.Entry<String, Location> entry : baseTerritories.entrySet()) {
+                String teamName = entry.getKey();
+                Location baseLocation = entry.getValue();
+                if (Math.abs(player.getLocation().getX() - baseLocation.getX()) <= baseRadius &&
+                        Math.abs(player.getLocation().getY() - baseLocation.getY()) <= baseRadius &&
+                        Math.abs(player.getLocation().getZ() - baseLocation.getZ()) <= baseRadius) {
+                    isInBaseTerritory = true;
+
+                    if (playerTeam.getName().equals(teamName)) {
+                        event.setCancelled(false);
+                    } else {
+                        event.setCancelled(true);
+                        player.sendMessage(ChatColor.RED + "You cannot open gates in the base territory of other teams!");
+                    }
+                    break;
+                }
+            }
+
             if (!isInBaseTerritory) {
                 event.setCancelled(false);
             }

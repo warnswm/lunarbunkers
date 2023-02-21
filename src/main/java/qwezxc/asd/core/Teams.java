@@ -14,7 +14,7 @@ public class Teams {
     private Map<String, Team> teams = new HashMap<>();
 
     public Teams() {
-        teams.put("Red", new Team("Red", ChatColor.RED ,Material.RED_GLAZED_TERRACOTTA,1));
+        teams.put("Red", new Team("Red", ChatColor.RED ,Material.RED_GLAZED_TERRACOTTA,2));
         teams.put("Blue", new Team("Blue",ChatColor.BLUE , Material.BLUE_GLAZED_TERRACOTTA,1));
         teams.put("Green", new Team("Green",ChatColor.GREEN , Material.GREEN_GLAZED_TERRACOTTA,1));
         teams.put("Yellow", new Team("Yellow",ChatColor.YELLOW , Material.YELLOW_GLAZED_TERRACOTTA,1));
@@ -31,7 +31,6 @@ public class Teams {
     public void addPlayerToTeam(Player player, Team team) {
         players.put(player.getUniqueId(), team);
     }
-
     public void removePlayerFromTeam(Player player) {
         players.remove(player.getUniqueId());
     }

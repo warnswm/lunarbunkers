@@ -19,9 +19,10 @@ public class GameManager {
     private Team yellowTeam;
     private Teams teams;
     private BukkitRunnable gameStartTimer;
+    private TeamNPC teamNPC;
 
     private int gameTime;
-    public GameManager(Asd main, Teams teams) {
+    public GameManager(Asd main, Teams teams,TeamNPC teamNPC) {
         this.teams = teams;
         for (Team team : teams.getTeams().values()) {
             switch (team.getName()) {
@@ -44,6 +45,7 @@ public class GameManager {
         }
         this.main = main;
         this.gameTime = 0;
+        this.teamNPC=teamNPC;
     }
     public void execute() {
         int numPlayers = Bukkit.getOnlinePlayers().size();
@@ -62,6 +64,18 @@ public class GameManager {
                 if (countdown == 0) {
                     // Start the game
                     startGame();
+                    for (Player player1 : Bukkit.getOnlinePlayers()){
+                        Scoreboard scoreboard = player1.getScoreboard();
+                        Objective objective = scoreboard.getObjective("Bunkers");
+                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player1)));
+                        Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player1,100);
+                        Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player1));
+                        if(score2 == null){
+                            objective.getScore("Balance: null Сообщите об этом разработчику");
+                        }
+                        score2.setScore(1);
+
+                    }
                     cancel();
                 } else {
                     // Countdown message
@@ -77,10 +91,10 @@ public class GameManager {
         //updateScoreboard();
 
         // Teleport players to their bases
-        Location redBase = new Location(Bukkit.getWorlds().get(0), 0, 65, 100);
-        Location greenBase = new Location(Bukkit.getWorlds().get(0), -100, 65, 0);
-        Location blueBase = new Location(Bukkit.getWorlds().get(0), -100, 65, 100);
-        Location yellowBase = new Location(Bukkit.getWorlds().get(0), 0, 65, 0);
+        Location redBase = new Location(Bukkit.getWorlds().get(0), 1.5, 64.5, 85.5);
+        Location greenBase = new Location(Bukkit.getWorlds().get(0), -85.5, 64.5, 0.5);
+        Location blueBase = new Location(Bukkit.getWorlds().get(0), 1.5,64.5,-85.5);
+        Location yellowBase = new Location(Bukkit.getWorlds().get(0), 85.5, 64.5, 0.5);
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             Team playerTeam = teams.getTeam(player);
@@ -171,13 +185,22 @@ public class GameManager {
                     if(seconds == 0) {
                         scoreboard.resetScores(Bukkit.getOfflinePlayer("Game Time: " + String.format("%02d:%02d", minutes-1, 59)));
                     }
+                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
+                    Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player,1);
+                    Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
+                    if(score2 == null){
+                        objective.getScore("Balance: null Сообщите об этом разработчику");
+                    }
+                    score2.setScore(1);
                     scoreboard.resetScores(Bukkit.getOfflinePlayer("Game Time: " + String.format("%02d:%02d", minutes, seconds-1)));
                     Score score =  objective.getScore("Game Time: " + String.format("%02d:%02d", minutes, seconds));
                     score.setScore(8);
                     player.setScoreboard(scoreboard);
                 }
+
             }
         }.runTaskTimer(main, 20L, 20L);
+        teamNPC.spawnAll(redBase,blueBase,greenBase,yellowBase);
     }
 
     public void stopGameStartTimer() {

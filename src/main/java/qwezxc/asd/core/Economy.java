@@ -34,12 +34,7 @@ public class Economy {
     }
 
     public void removeBalance(Player player, double amount) {
-        if (hasEnoughMoney(player, amount)) {
-            addBalance(player, -amount);
-        }else{
-            player.sendMessage("Не достаточно денег");
-            player.closeInventory();
-        }
+        addBalance(player, -amount);
     }
 }
 
