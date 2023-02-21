@@ -7,12 +7,12 @@ import org.bukkit.entity.Player;
 import qwezxc.asd.Asd;
 import qwezxc.asd.core.GameManager;
 
-public class start implements CommandExecutor {
+public class StartCommand implements CommandExecutor {
 
     private Asd main;
     private GameManager gameManager;
 
-    public start(Asd main,GameManager gameManager){
+    public StartCommand(Asd main, GameManager gameManager){
         this.gameManager = gameManager;
         this.main = main;
     }

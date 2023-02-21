@@ -21,6 +21,7 @@ import org.bukkit.potion.PotionType;
 import qwezxc.asd.Asd;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class NPCInteract implements Listener {
@@ -106,25 +107,21 @@ public class NPCInteract implements Listener {
             fullsetmeta.setLore(fullsetlore);
             fullset.setItemMeta(fullsetmeta);
 
-            ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
-            ItemMeta swordmeta = sword.getItemMeta();
-            List<String> swordlore = new ArrayList<>();
-            swordlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            swordlore.add(ChatColor.GRAY + "1x Diamond Sword");
-            swordlore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            swordlore.add(ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$100");
-            swordmeta.setLore(swordlore);
-            sword.setItemMeta(swordmeta);
 
-            ItemStack chestplate = new ItemStack(Material.DIAMOND_CHESTPLATE);
-            ItemMeta chestplatemeta = chestplate.getItemMeta();
-            List<String> chestplatelore = new ArrayList<>();
-            chestplatelore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            chestplatelore.add(ChatColor.GRAY + "1x Diamond Chestplate");
-            chestplatelore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            chestplatelore.add(ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$275");
-            chestplatemeta.setLore(chestplatelore);
-            chestplate.setItemMeta(chestplatemeta);
+            ItemStack sword = getItem(Material.DIAMOND_SWORD, Arrays.asList(
+                    ChatColor.GRAY + "1x Diamond Sword",
+                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$100"
+            ));
+
+
+            ItemStack chestplate = getItem(Material.DIAMOND_CHESTPLATE, Arrays.asList(
+                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                    ChatColor.GRAY + "1x Diamond Chestplate",
+                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$275"
+            ));
+
 
             ItemStack leggings = new ItemStack(Material.DIAMOND_LEGGINGS);
             ItemMeta leggingsmeta = leggings.getItemMeta();
@@ -279,5 +276,14 @@ public class NPCInteract implements Listener {
             inventory.setItem(7, gold);
             player.openInventory(inventory);
         }
+    }
+
+    public ItemStack getItem(Material material, List<String> lore) {
+        ItemStack itemStack = new ItemStack(material);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setLore(lore);
+        itemStack.setItemMeta(itemMeta);
+
+        return itemStack;
     }
 }

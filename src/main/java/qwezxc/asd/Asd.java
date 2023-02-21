@@ -20,9 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
-import qwezxc.asd.command.start;
-import qwezxc.asd.command.teamcmd;
-import qwezxc.asd.command.testcmd;
+import qwezxc.asd.command.StartCommand;
+import qwezxc.asd.command.TeamCommand;
+import qwezxc.asd.command.TestCommand;
 import qwezxc.asd.core.*;
 import qwezxc.asd.listener.*;
 
@@ -80,9 +80,9 @@ public final class Asd extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(teamNPC, this);
 
         getCommand("balance").setExecutor(new BalanceCommand(this));
-        getCommand("pickaxe").setExecutor(new teamcmd(this));
-        getCommand("testcmd").setExecutor(new testcmd(this));
-        getCommand("start").setExecutor(new start(this, gameManager));
+        getCommand("pickaxe").setExecutor(new TeamCommand(this));
+        getCommand("testcmd").setExecutor(new TestCommand(this));
+        getCommand("start").setExecutor(new StartCommand(this, gameManager));
 
 
         world.setGameRuleValue("doDaylightCycle", "false");
