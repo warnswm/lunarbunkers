@@ -191,6 +191,10 @@ public final class Asd extends JavaPlugin implements Listener {
             npc.destroy();
         }
         Asd.getInstance().getPluginManager().getDatabase().DisableDatabase();
+
+        for (Location loc: OreRegeneration.breakBlocks.keySet()) {
+            loc.getBlock().setType(OreRegeneration.breakBlocks.get(loc));
+        }
     }
 
 }
