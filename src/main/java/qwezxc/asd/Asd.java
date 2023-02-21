@@ -5,18 +5,12 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
@@ -29,7 +23,7 @@ import qwezxc.asd.listener.*;
 import java.util.*;
 
 
-public final class Asd extends JavaPlugin implements Listener {
+public final class Asd extends JavaPlugin {
     private static Asd instance;
     private Database database;
     private EconomyDataBaseOld economyDataBaseOld;
@@ -44,7 +38,7 @@ public final class Asd extends JavaPlugin implements Listener {
     public GameManager gameManager;
     public TeamNPC teamNPC;
     private OreRegeneration oreRegen;
-    private Teams teams = new Teams();
+    public Teams teams = new Teams();
     public Map<UUID, Team> playerTeams = teams.getPlayers();
     @Override
     public void onLoad() {
@@ -70,14 +64,17 @@ public final class Asd extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this, playerLivesManager, gameManager), this);
         koth = new KOTH(this, teams);
 
-        Bukkit.getPluginManager().registerEvents(this, this);
         oreRegen = new OreRegeneration(this);
-        Bukkit.getPluginManager().registerEvents(oreRegen, this);
-        Bukkit.getPluginManager().registerEvents(new MainTrader(this), this);
-        Bukkit.getPluginManager().registerEvents(new SellerListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new TeamTerritory(this, teams), this);
-        Bukkit.getPluginManager().registerEvents(new NPCInteract(this), this);
-        Bukkit.getPluginManager().registerEvents(teamNPC, this);
+
+        registerListeners(Arrays.asList(
+                new MainTrader(this),
+                new SellerListener(this),
+                new TeamTerritory(this, teams),
+                new NPCInteract(this),
+                new DefaultListener(this),
+                oreRegen,
+                teamNPC
+        ));
 
         getCommand("balance").setExecutor(new BalanceCommand(this));
         getCommand("pickaxe").setExecutor(new TeamCommand(this));
@@ -92,48 +89,16 @@ public final class Asd extends JavaPlugin implements Listener {
 
     }
 
+    public void registerListeners(List<Listener> listeners) {
+        for (Listener listener : listeners) {
+            Bukkit.getPluginManager().registerEvents(listener, this);
+        }
+    }
+
     public void checkWorldsOnServer() {
         List<World> worlds = getServer().getWorlds();
         for (World world : worlds) {
             System.out.println("World on server: " + world.getName());
-        }
-    }
-
-
-
-
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        ItemStack item = player.getInventory().getItemInMainHand();
-
-        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if(item.getType() == Material.DIAMOND_BLOCK ) {
-                event.setCancelled(true);
-                Inventory menu = Bukkit.createInventory(null, 9, "Team Select");
-
-                for (Team team : teams.getTeams().values()) {
-                    menu.addItem(new ItemStack(team.getWoolBlock(), 1));
-                }
-                player.openInventory(menu);
-            }
-        }
-    }
-    @EventHandler
-    public void onPlayerDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) {
-            return;
-        }
-
-        Player target = (Player) event.getEntity();
-        Player attacker = (Player) event.getDamager();
-
-        UUID targetuuid = target.getUniqueId();
-        UUID attackeruuid = attacker.getUniqueId();
-
-        if (teams.getTeam(attackeruuid) == teams.getTeam(targetuuid)) {
-            event.setCancelled(true);
-            attacker.sendMessage("You can't attack players from the same team.");
         }
     }
 
