@@ -1,9 +1,10 @@
 package qwezxc.asd.core;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import qwezxc.asd.core.Team;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,10 +15,10 @@ public class Teams {
     private Map<String, Team> teams = new HashMap<>();
 
     public Teams() {
-        teams.put("Red", new Team("Red", ChatColor.RED ,Material.RED_GLAZED_TERRACOTTA,2));
-        teams.put("Blue", new Team("Blue",ChatColor.BLUE , Material.BLUE_GLAZED_TERRACOTTA,1));
-        teams.put("Green", new Team("Green",ChatColor.GREEN , Material.GREEN_GLAZED_TERRACOTTA,1));
-        teams.put("Yellow", new Team("Yellow",ChatColor.YELLOW , Material.YELLOW_GLAZED_TERRACOTTA,1));
+        teams.put("Red", new Team("Red", ChatColor.RED, Material.RED_GLAZED_TERRACOTTA, 2, new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5)));
+        teams.put("Blue", new Team("Blue", ChatColor.BLUE, Material.BLUE_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 1.5, 64.5, -85.5)));
+        teams.put("Green", new Team("Green", ChatColor.GREEN, Material.GREEN_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), -85.5, 64.5, 0.5)));
+        teams.put("Yellow", new Team("Yellow", ChatColor.YELLOW, Material.YELLOW_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 85.5, 64.5, 0.5)));
     }
 
     public Map<String, Team> getTeams() {
@@ -31,12 +32,19 @@ public class Teams {
     public void addPlayerToTeam(Player player, Team team) {
         players.put(player.getUniqueId(), team);
     }
+
     public void removePlayerFromTeam(Player player) {
         players.remove(player.getUniqueId());
     }
+
     public Team getTeam(Player player) {
-        return this.players.get(player.getUniqueId());
+        return getTeam(player.getUniqueId());
     }
+
+    public Team getTeam(UUID uuid) {
+        return this.players.get(uuid);
+    }
+
     public int getNumPlayersInTeam(Team team) {
         int count = 0;
         for (Team t : players.values()) {

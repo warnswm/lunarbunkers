@@ -1,6 +1,5 @@
 package qwezxc.asd.core;
 
-import com.comphenix.protocol.PacketType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -90,23 +89,18 @@ public class GameManager {
     private void startGame() {
         //updateScoreboard();
 
-        // Teleport players to their bases
-        Location redBase = new Location(Bukkit.getWorlds().get(0), 1.5, 64.5, 85.5);
-        Location greenBase = new Location(Bukkit.getWorlds().get(0), -85.5, 64.5, 0.5);
-        Location blueBase = new Location(Bukkit.getWorlds().get(0), 1.5,64.5,-85.5);
-        Location yellowBase = new Location(Bukkit.getWorlds().get(0), 85.5, 64.5, 0.5);
-
         for (Player player : Bukkit.getOnlinePlayers()) {
+
             Team playerTeam = teams.getTeam(player);
 
             if (playerTeam == null) {
-                // Put the player on the team with the fewest players
+                Scoreboard scoreboard = player.getScoreboard();
+                Objective objective = scoreboard.getObjective("Bunkers");
                 if (teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(greenTeam) &&
                         teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(blueTeam) &&
                         teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
-                    Scoreboard scoreboard = player.getScoreboard();
-                    Objective objective = scoreboard.getObjective("Bunkers");
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
+
+                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!"));
                     teams.addPlayerToTeam(player, redTeam);
                     Team teamafter = teams.getTeam(player);
                     String teamafterr = teamafter.getName();
@@ -117,8 +111,6 @@ public class GameManager {
                     player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
                 } else if (teams.getNumPlayersInTeam(greenTeam) < teams.getNumPlayersInTeam(blueTeam) &&
                         teams.getNumPlayersInTeam(greenTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
-                    Scoreboard scoreboard = player.getScoreboard();
-                    Objective objective = scoreboard.getObjective("Bunkers");
                     scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
                     teams.addPlayerToTeam(player, greenTeam);
                     Team teamafter = teams.getTeam(player);
@@ -129,8 +121,6 @@ public class GameManager {
                     ChatColor colorteam = playerTeamafter.getChatColor();
                     player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
                 } else if (teams.getNumPlayersInTeam(blueTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
-                    Scoreboard scoreboard = player.getScoreboard();
-                    Objective objective = scoreboard.getObjective("Bunkers");
                     scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
                     teams.addPlayerToTeam(player, blueTeam);
                     Team teamafter = teams.getTeam(player);
@@ -142,8 +132,6 @@ public class GameManager {
                     ChatColor colorteam = playerTeamafter.getChatColor();
                     player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
                 } else {
-                    Scoreboard scoreboard = player.getScoreboard();
-                    Objective objective = scoreboard.getObjective("Bunkers");
                     scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
                     teams.addPlayerToTeam(player, yellowTeam);
                     Team teamafter = teams.getTeam(player);
@@ -161,13 +149,13 @@ public class GameManager {
 
             // Teleport the player to their team's base
             if (playerTeam == redTeam) {
-                player.teleport(redBase);
+                player.teleport(playerTeam.getBase());
             } else if (playerTeam == greenTeam) {
-                player.teleport(greenBase);
+                player.teleport(playerTeam.getBase());
             } else if (playerTeam == blueTeam) {
-                player.teleport(blueBase);
+                player.teleport(playerTeam.getBase());
             } else if (playerTeam == yellowTeam) {
-                player.teleport(yellowBase);
+                player.teleport(playerTeam.getBase());
             }
 
             // Start the game
@@ -192,15 +180,15 @@ public class GameManager {
                         objective.getScore("Balance: null Сообщите об этом разработчику");
                     }
                     score2.setScore(1);
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Game Time: " + String.format("%02d:%02d", minutes, seconds-1)));
-                    Score score =  objective.getScore("Game Time: " + String.format("%02d:%02d", minutes, seconds));
+                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Game Time: " + String.format("%02d:%02d", minutes, seconds - 1)));
+                    Score score = objective.getScore("Game Time: " + String.format("%02d:%02d", minutes, seconds));
                     score.setScore(8);
                     player.setScoreboard(scoreboard);
                 }
 
             }
         }.runTaskTimer(main, 20L, 20L);
-        teamNPC.spawnAll(redBase,blueBase,greenBase,yellowBase);
+        teamNPC.spawnAll(new Location(Bukkit.getWorld("world"), 1.5, 64.5, 95.5), new Location(Bukkit.getWorld("world"), 1.5, 65.5, -95.5), new Location(Bukkit.getWorld("world"), -95.5, 64.5, 0.5), new Location(Bukkit.getWorld("world"), 95.5, 65.5, 0.5));
     }
 
     public void stopGameStartTimer() {

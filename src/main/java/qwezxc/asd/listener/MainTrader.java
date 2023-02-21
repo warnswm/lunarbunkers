@@ -2,7 +2,6 @@ package qwezxc.asd.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,8 +15,6 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class MainTrader implements Listener {
@@ -41,6 +38,8 @@ public class MainTrader implements Listener {
                 emptySlots++;
             }
         }
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective objective = scoreboard.getObjective("Bunkers");
         if (inventory.getTitle().equals("Trader Menu")) {
 
             event.setCancelled(true);
@@ -53,8 +52,6 @@ public class MainTrader implements Listener {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
-                            Scoreboard scoreboard = player.getScoreboard();
-                            Objective objective = scoreboard.getObjective("Bunkers");
                             if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,10)){
                                 player.sendMessage(ChatColor.RED +  "У вас не дстаточно денег чтобы купить это зелье");
                                 return;
@@ -78,8 +75,6 @@ public class MainTrader implements Listener {
                                     rmbhill++;
                                 }
                             }
-                            Scoreboard scoreboard = player.getScoreboard();
-                            Objective objective = scoreboard.getObjective("Bunkers");
                             if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,5*rmbhill)){
                                 player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы заполнить инвентарь зельями");
                                 return;
@@ -95,8 +90,6 @@ public class MainTrader implements Listener {
                                 }
                             }
                         } else {
-                            Scoreboard scoreboard = player.getScoreboard();
-                            Objective objective = scoreboard.getObjective("Bunkers");
                             if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,5)){
                                 player.sendMessage(ChatColor.RED +  "У вас не дстаточно денег чтобы купить это зелье");
                                 return;
@@ -115,8 +108,6 @@ public class MainTrader implements Listener {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
-                            Scoreboard scoreboard = player.getScoreboard();
-                            Objective objective = scoreboard.getObjective("Bunkers");
                             if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,25)){
                                 player.sendMessage(ChatColor.RED +  "У вас не дстаточно денег чтобы купить это зелье");
                                 return;
@@ -134,15 +125,36 @@ public class MainTrader implements Listener {
                         if (emptySlots == -1) {
                             player.sendMessage("Inventory is full");
                         } else {
-                            Scoreboard scoreboard = player.getScoreboard();
-                            Objective objective = scoreboard.getObjective("Bunkers");
-                            if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player,50)){
-                                player.sendMessage(ChatColor.RED +  "У вас не дстаточно денег чтобы купить это зелье");
+                            if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player, 50)) {
+                                player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы купить это зелье");
                                 return;
                             }
                             scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
                             Asd.getInstance().getPluginManager().getnewEconomy().removeBalance(player, 50);
                             player.getInventory().addItem(new ItemStack(Material.POTION, 1, (short) 16394));
+                            Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
+                            score1.setScore(1);
+                            player.setScoreboard(scoreboard);
+                        }
+                    }
+                } else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_RED + "Diamond Boots")) {
+                    if (player.isOnline()) {
+                        if (emptySlots == -1) {
+                            player.sendMessage("Inventory is full");
+                        } else {
+                            if (!Asd.getInstance().getPluginManager().getnewEconomy().hasEnoughMoney(player, 125)) {
+                                player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы купить алмазные ботинки");
+                                return;
+                            }
+                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
+                            Asd.getInstance().getPluginManager().getnewEconomy().removeBalance(player, 125);
+                            ItemStack boots = player.getInventory().getBoots();
+                            if (boots == null || boots.getType() == Material.AIR) {
+                                player.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+                            } else {
+                                player.getInventory().addItem(boots);
+                                player.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+                            }
                             Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
                             score1.setScore(1);
                             player.setScoreboard(scoreboard);

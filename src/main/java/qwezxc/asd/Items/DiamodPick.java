@@ -4,11 +4,10 @@ import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagList;
 import net.minecraft.server.v1_12_R1.NBTTagString;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import qwezxc.asd.Asd;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.List;
 public class DiamodPick {
     public static ItemStack createDiamondPickaxe() {
         ItemStack pickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+        ItemMeta pickaxemeta = pickaxe.getItemMeta();
 
 
         List<String> canBreak = new ArrayList<>();
@@ -40,6 +40,8 @@ public class DiamodPick {
         nmsItemStack.getTag().setInt("HideFlags", 3);
         nmsItemStack.getTag().setInt("HideFlags", 4);
         pickaxe = CraftItemStack.asBukkitCopy(nmsItemStack);
+        pickaxemeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+        pickaxe.setItemMeta(pickaxemeta);
 
         return pickaxe;
 
@@ -48,6 +50,7 @@ public class DiamodPick {
     public static ItemStack createStonePickaxe() {
         // Create a new ItemStack for a diamond pickaxe
         ItemStack pickaxe = new ItemStack(Material.STONE_PICKAXE);
+        ItemMeta pickaxemeta = pickaxe.getItemMeta();
 
 
         List<String> canBreak = new ArrayList<>();
@@ -72,6 +75,8 @@ public class DiamodPick {
         nmsItemStack.getTag().setInt("HideFlags", 3);
         nmsItemStack.getTag().setInt("HideFlags", 4);
         pickaxe = CraftItemStack.asBukkitCopy(nmsItemStack);
+        pickaxemeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+        pickaxe.setItemMeta(pickaxemeta);
 
         return pickaxe;
 

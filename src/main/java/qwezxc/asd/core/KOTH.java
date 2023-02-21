@@ -1,5 +1,8 @@
 package qwezxc.asd.core;
 
+import com.google.common.collect.Lists;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,13 +24,13 @@ public class KOTH {
     private Scoreboard scoreboard;
     private Map<Team, Integer> captureTimers = new HashMap<>();
     private final Map<Team, Integer> scores;
-    private List<Player> capturingPlayers;
+    private final List<UUID> capturingPlayers;
     private BukkitRunnable captureTimer;
     private int minutes;
     private int seconds;
 
 
-    public KOTH(Asd main, Teams teams){
+    public KOTH(Asd main, Teams teams) {
         this.main = main;
         this.teams = teams;
         this.scores = new HashMap<>();
@@ -36,16 +39,18 @@ public class KOTH {
 
     private boolean isBeingCaptured(Player playeri) {
         Team playerTeam = teams.getTeam(playeri);
-        for (Player player : capturingPlayers) {
+        for (UUID uuid : capturingPlayers) {
+            Player player = Bukkit.getPlayer(uuid);
             Location playerLoc = player.getLocation();
-            if (Math.abs(playerLoc.getX()- capturePoint.getX()) <= 5  &&
+            if (Math.abs(playerLoc.getX() - capturePoint.getX()) <= 5 &&
                     Math.abs(playerLoc.getY() - capturePoint.getY()) <= 5 &&
-                    Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= 5 && teams.getTeam(player) == playerTeam){
+                    Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= 5 && teams.getTeam(player) == playerTeam) {
                 return true;
             }
         }
         return false;
     }
+
     private void startCaptureTimer() {
         // Only start the timer if it isn't already running
         if (captureTimer == null) {
@@ -57,7 +62,7 @@ public class KOTH {
                     timeLeft--;
                     minutes = timeLeft / 60;
                     seconds = timeLeft % 60;
-                    Player player = capturingPlayers.get(0);
+                    UUID uuidplayer = capturingPlayers.get(0);
                     for (Player players : Bukkit.getOnlinePlayers()) {
                         Scoreboard scoreboard = players.getScoreboard();
                         Objective objective = scoreboard.getObjective("Bunkers");
@@ -89,6 +94,9 @@ public class KOTH {
                         capturingPlayers.clear();
                         captureTimer.cancel();
                         captureTimer = null;
+                        for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
+                            npc.destroy();
+                        }
                     }
                 }
             };
@@ -96,20 +104,25 @@ public class KOTH {
         }
     }
 
+
     // Method to start the capture point capture for a player
     public void startCapture(Player player) {
+        if (capturingPlayers.contains(player.getUniqueId())) return;
+
         Team playerTeam = teams.getTeam(player);
+
+        UUID uuid = player.getUniqueId();
         if (playerTeam != null) {
-            if(capturingPlayers.stream().count() == 0) {
-                capturingPlayers.add(player);
+            if (capturingPlayers.stream().count() == 0) {
+                capturingPlayers.add(uuid);
                 Bukkit.broadcastMessage(ChatColor.GOLD + player.getName() + " from the " + playerTeam.getName() + " team is capturing " + "name" + "!");
                 startCaptureTimer();
             }
-            if(!capturingPlayers.isEmpty()) {
+            if (!capturingPlayers.isEmpty()) {
                 Team capturingTeam = teams.getTeam(capturingPlayers.get(0));
 
                 if (capturingTeam == playerTeam) {
-                    capturingPlayers.add(player);
+                    capturingPlayers.add(uuid);
                 }
             }
         }
@@ -120,39 +133,12 @@ public class KOTH {
     public void stopCapture(Player player) {
         //pizdec
         OfflinePlayer offlinePlayer = player.getPlayer();
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
-        capturingPlayers.remove(player);
+        player.sendMessage(String.valueOf(capturingPlayers));
 
+        capturingPlayers.remove(player.getUniqueId());
 
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        capturingPlayers.remove(offlinePlayer);
-        // If no players from any team are on the capture point, reset the capture timer
+        player.sendMessage(String.valueOf(capturingPlayers));
+        capturingPlayers.remove(offlinePlayer.getUniqueId());
 
         if (capturingPlayers.isEmpty() && captureTimer != null) {
             captureTimer.cancel();
@@ -162,7 +148,7 @@ public class KOTH {
                 Scoreboard scoreboard = players.getScoreboard();
                 Objective objective = scoreboard.getObjective("Bunkers");
                 scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds)));
-                scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds+1)));
+                scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds + 1)));
                 Score score = objective.getScore("Classic: " + String.format("%d:%02d", 5, 0));
                 score.setScore(7);
                 players.setScoreboard(scoreboard);
@@ -172,66 +158,6 @@ public class KOTH {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //            if (!capturingPlayers.containsKey(player.getUniqueId())) {
@@ -275,22 +201,6 @@ public class KOTH {
 //        }.runTaskTimer(Asd.getInstance(), 0, 20);
 //    }
 //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //    private Map<UUID, PluginTeam> players;

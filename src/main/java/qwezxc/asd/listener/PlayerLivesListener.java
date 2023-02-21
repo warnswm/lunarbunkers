@@ -1,21 +1,14 @@
 package qwezxc.asd.listener;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import qwezxc.asd.Asd;
-import qwezxc.asd.core.PlayerLives;
 import qwezxc.asd.core.PlayerLivesManager;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class PlayerLivesListener implements Listener {
     private PlayerLivesManager playerLivesManager;
@@ -32,12 +25,14 @@ public class PlayerLivesListener implements Listener {
         Objective objective = scoreboard.getObjective("Bunkers");
         scoreboard.resetScores(Bukkit.getOfflinePlayer("Осталось жизней: " + 3));
         //хахах что я сделал короч n = пред значение p = скок жизей сейчас
-        int n = playerLivesManager.getRemainingLives(player)+1;
+        int n = playerLivesManager.getRemainingLives(player) + 1;
         int p = playerLivesManager.getRemainingLives(player);
         scoreboard.resetScores(Bukkit.getOfflinePlayer("Осталось жизней: " + n));
         Score score5 = objective.getScore("Осталось жизней: " + p);
         score5.setScore(5);
         player.setScoreboard(scoreboard);
+        player.spigot().respawn();
+
     }
 
 //

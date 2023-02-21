@@ -1,19 +1,15 @@
 package qwezxc.asd.listener;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import qwezxc.asd.Asd;
-import qwezxc.asd.Items.DiamodPick;
 import qwezxc.asd.core.GameManager;
-import qwezxc.asd.core.PlayerLives;
 import qwezxc.asd.core.PlayerLivesManager;
-
-import java.util.Map;
 
 public class PlayerJoinListener implements Listener {
 
@@ -21,6 +17,7 @@ public class PlayerJoinListener implements Listener {
     public Asd main;
     private PlayerLivesManager playerLivesManager;
     private GameManager gameManager;
+    private World world;
     public PlayerJoinListener(final Asd main,PlayerLivesManager playerLivesManager,GameManager gameManager) {
         this.main = main;
         this.playerLivesManager = playerLivesManager;
@@ -38,7 +35,9 @@ public class PlayerJoinListener implements Listener {
         if (Bukkit.getOnlinePlayers().size() == 2) {
             gameManager.execute();
         }
+        world = player.getWorld();
     }
+
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
@@ -48,4 +47,7 @@ public class PlayerJoinListener implements Listener {
         }
     }
 
+    public World getWorld() {
+        return this.world;
+    }
 }

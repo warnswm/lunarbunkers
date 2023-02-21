@@ -1,6 +1,7 @@
 package qwezxc.asd.core;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class Team {
@@ -9,11 +10,18 @@ public class Team {
     private int maxPlayers;
     private ChatColor chatColor;
     private String prefix;
-    public Team(String name,ChatColor chatColor, Material woolBlock, int maxPlayers) {
+    private final Location base;
+
+    public Team(String name, ChatColor chatColor, Material woolBlock, int maxPlayers, Location base) {
         this.name = name;
         this.chatColor = chatColor;
         this.woolBlock = woolBlock;
         this.maxPlayers = maxPlayers;
+        this.base = base;
+    }
+
+    public Location getBase() {
+        return base;
     }
 
     public String getName() {
