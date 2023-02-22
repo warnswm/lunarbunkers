@@ -5,12 +5,18 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
@@ -23,7 +29,7 @@ import qwezxc.asd.listener.*;
 import java.util.*;
 
 
-public final class Asd extends JavaPlugin {
+public final class Asd extends JavaPlugin{
     private static Asd instance;
     private Database database;
     private EconomyDataBaseOld economyDataBaseOld;
@@ -58,12 +64,8 @@ public final class Asd extends JavaPlugin {
         this.gameManager = new GameManager(this, teams, teamNPC);
         this.economy = new Economy();
         playerJoinListener = new PlayerJoinListener(this, playerLivesManager, gameManager);
-        playerLivesManager = new PlayerLivesManager();
-        getServer().getPluginManager().registerEvents(new TeamMenuListener(teams), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerLivesListener(playerLivesManager), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this, playerLivesManager, gameManager), this);
+        this.playerLivesManager = new PlayerLivesManager();
         koth = new KOTH(this, teams);
-
         oreRegen = new OreRegeneration(this);
 
         registerListeners(Arrays.asList(
@@ -73,7 +75,10 @@ public final class Asd extends JavaPlugin {
                 new NPCInteract(this),
                 new DefaultListener(this),
                 oreRegen,
-                teamNPC
+                teamNPC,
+                new TeamMenuListener(teams),
+                new PlayerLivesListener(playerLivesManager),
+                new PlayerJoinListener(this, playerLivesManager, gameManager)
         ));
 
         getCommand("balance").setExecutor(new BalanceCommand(this));
@@ -89,12 +94,6 @@ public final class Asd extends JavaPlugin {
 
     }
 
-    public void registerListeners(List<Listener> listeners) {
-        for (Listener listener : listeners) {
-            Bukkit.getPluginManager().registerEvents(listener, this);
-        }
-    }
-
     public void checkWorldsOnServer() {
         List<World> worlds = getServer().getWorlds();
         for (World world : worlds) {
@@ -102,44 +101,11 @@ public final class Asd extends JavaPlugin {
         }
     }
 
-    public World getWorld(String name) {
-        Iterator<World> worlds = Bukkit.getServer().getWorlds().iterator();
-        while(worlds.hasNext()) {
-            World w = worlds.next();
-            String wName = w.getName().toLowerCase().trim();
-            System.out.print(wName);
-            System.out.print(name);
-            if(wName.equalsIgnoreCase(name.toLowerCase().trim())) {
-                System.out.print("debug");
-                return w;
-            }
-        }
-
-        return null;
-    }
-
-
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        Location playerLoc = player.getLocation();
-        double captureRadius = 3.5;
-        Location capturePoint = new Location( Bukkit.getWorld("world"), 1.5, 63.5, 0.5);
-        if (Math.abs(playerLoc.getX()- capturePoint.getX()) <= captureRadius  &&
-                Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius  &&
-                Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius ) {
-            koth.startCapture(player);
-        }else{
-            koth.stopCapture(player);
+    private void registerListeners(List<Listener> listeners) {
+        for (Listener listener : listeners) {
+            Bukkit.getPluginManager().registerEvents(listener, this);
         }
     }
-
-    @EventHandler
-    public void onPlayerLeave(PlayerQuitEvent event){
-        Player player = event.getPlayer();
-        koth.stopCapture(player);
-    }
-
 
     public static Asd getInstance() {
         return instance;

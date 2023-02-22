@@ -18,6 +18,7 @@ import java.util.HashMap;
 public class OreRegeneration implements Listener {
     private Asd main;
 
+
     public OreRegeneration(final Asd main) {
         this.main = main;
     }
@@ -80,7 +81,8 @@ public class OreRegeneration implements Listener {
             default:
                 if (!player.isOp()) {
                     event.setCancelled(true);
-                } else if (player.isOp() && player.getGameMode().equals(GameMode.CREATIVE) && player.getName().equals("nayl_l_lnik")){
+                } else if (player.isOp() && player.getGameMode().equals(GameMode.CREATIVE)){
+                    breakBlocks.remove(block.getLocation());
                     event.setCancelled(false);
                 }
         }

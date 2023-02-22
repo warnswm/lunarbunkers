@@ -17,7 +17,6 @@ public class PlayerJoinListener implements Listener {
     public Asd main;
     private PlayerLivesManager playerLivesManager;
     private GameManager gameManager;
-    private World world;
     public PlayerJoinListener(final Asd main,PlayerLivesManager playerLivesManager,GameManager gameManager) {
         this.main = main;
         this.playerLivesManager = playerLivesManager;
@@ -29,25 +28,21 @@ public class PlayerJoinListener implements Listener {
         event.setJoinMessage(null);
         Player player = event.getPlayer();
         main.getPluginManager().getDatabase().addPlayertoDatabase(player);
-        main.getPluginManager().getEconomy().addPlayer(player.getUniqueId(),player.getName());
-        main.getPluginManager().getScoreboardManager().createScoreboard(player);
+        main.getPluginManager().getEconomyDataBaseOld().addPlayer(player.getUniqueId(),player.getName());
+        main.getPluginManager().getPluginScoreboardManager().createScoreboard(player);
         playerLivesManager.givePlayerLives(player, 3);
         if (Bukkit.getOnlinePlayers().size() == 2) {
             gameManager.execute();
         }
-        world = player.getWorld();
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        main.getPluginManager().getScoreboardManager().removeScoreboard(player);
+        main.getPluginManager().getPluginScoreboardManager().removeScoreboard(player);
         if (Bukkit.getOnlinePlayers().size() != 4) {
             gameManager.stopGameStartTimer();
         }
     }
 
-    public World getWorld() {
-        return this.world;
-    }
 }

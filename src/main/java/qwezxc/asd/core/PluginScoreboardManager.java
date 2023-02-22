@@ -40,7 +40,7 @@ public class PluginScoreboardManager {
             objective.getScore("Kills: null Сообщите об этом админу");
         }
         score3.setScore(2);
-        Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
+        Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player));
         if(score2 == null){
             objective.getScore("Balance: null Сообщите об этом админу");
         }

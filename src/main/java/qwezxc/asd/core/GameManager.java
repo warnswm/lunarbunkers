@@ -66,9 +66,9 @@ public class GameManager {
                     for (Player player1 : Bukkit.getOnlinePlayers()){
                         Scoreboard scoreboard = player1.getScoreboard();
                         Objective objective = scoreboard.getObjective("Bunkers");
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player1)));
-                        Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player1,100);
-                        Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player1));
+                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player1)));
+                        Asd.getInstance().getPluginManager().getEconomy().addBalance(player1,100);
+                        Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player1));
                         if(score2 == null){
                             objective.getScore("Balance: null Сообщите об этом разработчику");
                         }
@@ -173,9 +173,9 @@ public class GameManager {
                     if(seconds == 0) {
                         scoreboard.resetScores(Bukkit.getOfflinePlayer("Game Time: " + String.format("%02d:%02d", minutes-1, 59)));
                     }
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player)));
-                    Asd.getInstance().getPluginManager().getnewEconomy().addBalance(player,1);
-                    Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getnewEconomy().getBalance(player));
+                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player)));
+                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player,1);
+                    Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player));
                     if(score2 == null){
                         objective.getScore("Balance: null Сообщите об этом разработчику");
                     }

@@ -1,9 +1,14 @@
 package qwezxc.asd.core;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+@Getter
+@Setter
 public class Team {
     private String name;
     private Material woolBlock;
@@ -20,31 +25,5 @@ public class Team {
         this.base = base;
     }
 
-    public Location getBase() {
-        return base;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public ChatColor getChatColor() {
-        return chatColor;
-    }
-
-    public Material getWoolBlock() {
-        return woolBlock;
-    }
-    public int getMaxPlayers() {
-        return maxPlayers;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
 
 }

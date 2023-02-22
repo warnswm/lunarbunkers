@@ -132,12 +132,9 @@ public class KOTH {
     public void stopCapture(Player player) {
         //pizdec
         OfflinePlayer offlinePlayer = player.getPlayer();
-        player.sendMessage(String.valueOf(capturingPlayers));
 
         capturingPlayers.remove(player.getUniqueId());
 
-        player.sendMessage(String.valueOf(capturingPlayers));
-        capturingPlayers.remove(offlinePlayer.getUniqueId());
 
         if (capturingPlayers.isEmpty() && captureTimer != null) {
             captureTimer.cancel();
@@ -151,7 +148,7 @@ public class KOTH {
                 Score score = objective.getScore("Classic: " + String.format("%d:%02d", 5, 0));
                 score.setScore(7);
                 players.setScoreboard(scoreboard);
-            }
+            } 
             minutes = 5;
             seconds = 0;
         }

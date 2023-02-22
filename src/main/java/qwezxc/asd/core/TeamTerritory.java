@@ -40,10 +40,12 @@ public class TeamTerritory implements Listener {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
 
+
         if (block != null && block.getType() == Material.FENCE_GATE) {
 
             // Get the player's team
             Team playerTeam = teams.getTeam(player);
+
             if(playerTeam==null){
                 return;
             }

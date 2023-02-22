@@ -1,12 +1,13 @@
 package qwezxc.asd.core;
 
+import lombok.Getter;
 import qwezxc.asd.Data.Database;
 
+@Getter
 public class PluginManager {
     private static PluginManager instance;
     private PluginScoreboardManager pluginScoreboardManager;
     private Database database;
-
     private Teams teams;
     private EconomyDataBaseOld economyDataBaseOld;
     private PlayerLivesManager playerLivesManager;
@@ -30,15 +31,5 @@ public class PluginManager {
         }
         return instance;
     }
-
-    public Economy getnewEconomy(){return this.economy;}
-    public Teams getTeams(){return this.teams;}
-    public PluginScoreboardManager getScoreboardManager(){return this.pluginScoreboardManager;}
-    public Database getDatabase() {
-        return this.database;
-    }
-
-    public EconomyDataBaseOld getEconomy(){return this.economyDataBaseOld;}
-    public PlayerLivesManager getPlayerLivesManager(){return this.playerLivesManager;}
 
 }

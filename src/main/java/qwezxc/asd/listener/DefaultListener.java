@@ -1,6 +1,7 @@
 package qwezxc.asd.listener;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,6 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import qwezxc.asd.Asd;
@@ -17,6 +20,7 @@ import java.util.UUID;
 
 public class DefaultListener implements Listener {
     private Asd main;
+
 
     public DefaultListener(final Asd main) {
         this.main = main;
@@ -55,5 +59,25 @@ public class DefaultListener implements Listener {
             event.setCancelled(true);
             attacker.sendMessage("You can't attack players from the same team.");
         }
+    }
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        Location playerLoc = player.getLocation();
+        double captureRadius = 3.5;
+        Location capturePoint = new Location( Bukkit.getWorld("world"), 1.5, 63.5, 0.5);
+        if (Math.abs(playerLoc.getX()- capturePoint.getX()) <= captureRadius  &&
+                Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius  &&
+                Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius ) {
+            main.koth.startCapture(player);
+        }else{
+            main.koth.stopCapture(player);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event){
+        Player player = event.getPlayer();
+        main.koth.stopCapture(player);
     }
 }
