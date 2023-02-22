@@ -55,4 +55,16 @@ public class Utils {
         return armor;
     }
 
+    public String getTimeFormat(int _time) {
+        int time = _time;
+        boolean plus = time < 0;
+        if (time < 0) time = Math.abs(time);
+        String first = "";
+        if (!plus) first = "-";
+        int sec = 0;
+        if (time % 60 >= 10) sec = time % 60;
+
+        return first + time/60 + ":" + sec;
+    }
+
 }

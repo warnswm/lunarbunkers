@@ -18,66 +18,51 @@ import qwezxc.asd.Asd;
 import java.util.UUID;
 
 public class MainTrader implements Listener {
-    private Asd main;
-
-
-    public MainTrader(final Asd main) {
-        this.main = main;
-    }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        UUID uuid = player.getUniqueId();
         ItemStack item = event.getCurrentItem();
         Inventory inventory = event.getInventory();
-        int availableSlots = -1;
-        availableSlots = player.getInventory().firstEmpty();
         Scoreboard scoreboard = player.getScoreboard();
-        Objective objective = scoreboard.getObjective("Bunkers");
-        if (inventory.getTitle().equals("Combat Shop")) {
 
-            event.setCancelled(true);
+        if (!inventory.getTitle().equals("Combat Shop")) return;
 
+        event.setCancelled(true);
 
-            if (item == null) return;
-            if (item.getItemMeta().getDisplayName() != null) {
-                if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II")) {
-                    buyPotion(player, new ItemStack(Material.POTION, 1, (short) 8226), 10);
-                } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
-                    if (event.getClick() == ClickType.RIGHT) {
-                        int count = 0;
-                        for (ItemStack i : player.getInventory().getStorageContents()) {
-                            if (i == null || i.getType() == Material.AIR) {
-                                count++;
-                            }
+        if (item == null) return;
+        if (item.getItemMeta().getDisplayName() != null) {
+            if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II")) {
+                buyPotion(player, new ItemStack(Material.POTION, 1, (short) 8226), 10);
+            } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
+                if (event.getClick() == ClickType.RIGHT) {
+                    int count = 0;
+                    for (ItemStack i : player.getInventory().getStorageContents()) {
+                        if (i == null || i.getType() == Material.AIR) {
+                            count++;
                         }
-                        buyPotion(player, new ItemStack(Material.POTION, count, (short) 16421), 5 * count);
-                    } else {
-                        buyPotion(player, new ItemStack(Material.POTION, 1, (short) 16421), 5);
                     }
-                } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)")) {
-                    buyPotion(player, new ItemStack(Material.POTION, 1, (short) 8195), 25);
-                }else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Slowness Potion (1:07)")) {
-                    buyPotion(player, new ItemStack(Material.POTION, 1, (short) 16394), 25);
-                } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Boots")) {
-                    purchaseItem(player,new ItemStack(Material.DIAMOND_BOOTS), 125, "алмазные ботинки");
-                } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Leggings")) {
-                    purchaseItem(player,new ItemStack(Material.DIAMOND_LEGGINGS), 250, "алмазные поножи");
-                }else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Chestplate")) {
-                    purchaseItem(player,new ItemStack(Material.DIAMOND_CHESTPLATE), 275, "алмазный нагрудник");
-                }else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Helmet")) {
-                    purchaseItem(player,new ItemStack(Material.DIAMOND_HELMET), 275, "алмазный шлем");
-                }else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Full set")) {
-                    purchaseItem(player,new ItemStack(Material.DIAMOND), 850, "фулл сет и меч");
-                }
-                else if (item.getItemMeta().getDisplayName() == null) {
-                    return;
+                    buyPotion(player, new ItemStack(Material.POTION, count, (short) 16421), 5 * count);
                 } else {
-                    return;
+                    buyPotion(player, new ItemStack(Material.POTION, 1, (short) 16421), 5);
                 }
+            } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)")) {
+                buyPotion(player, new ItemStack(Material.POTION, 1, (short) 8195), 25);
+            } else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Slowness Potion (1:07)")) {
+                buyPotion(player, new ItemStack(Material.POTION, 1, (short) 16394), 25);
+            } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Boots")) {
+                purchaseItem(player, new ItemStack(Material.DIAMOND_BOOTS), 125, "алмазные ботинки");
+            } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Leggings")) {
+                purchaseItem(player, new ItemStack(Material.DIAMOND_LEGGINGS), 250, "алмазные поножи");
+            } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Chestplate")) {
+                purchaseItem(player, new ItemStack(Material.DIAMOND_CHESTPLATE), 275, "алмазный нагрудник");
+            } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Helmet")) {
+                purchaseItem(player, new ItemStack(Material.DIAMOND_HELMET), 275, "алмазный шлем");
+            } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Full set")) {
+                purchaseItem(player, new ItemStack(Material.DIAMOND), 850, "фулл сет и меч");
             }
         }
+
     }
 
 

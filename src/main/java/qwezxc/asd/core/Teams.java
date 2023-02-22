@@ -6,24 +6,18 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Teams {
     private Map<UUID, Team> players = new HashMap<>();
-    private Map<String, Team> teams = new HashMap<>();
+    private List<Team> teams = Arrays.asList(
+            new Team("Red", ChatColor.RED, Material.RED_GLAZED_TERRACOTTA, 2, new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5)),
+            new Team("Blue", ChatColor.BLUE, Material.BLUE_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 1.5, 64.5, -85.5)),
+            new Team("Green", ChatColor.GREEN, Material.GREEN_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), -85.5, 64.5, 0.5)),
+            new Team("Yellow", ChatColor.YELLOW, Material.YELLOW_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 85.5, 64.5, 0.5))
+    );
 
-    public Teams() {
-        teams.put("Red", new Team("Red", ChatColor.RED, Material.RED_GLAZED_TERRACOTTA, 2, new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5)));
-        teams.put("Blue", new Team("Blue", ChatColor.BLUE, Material.BLUE_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 1.5, 64.5, -85.5)));
-        teams.put("Green", new Team("Green", ChatColor.GREEN, Material.GREEN_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), -85.5, 64.5, 0.5)));
-        teams.put("Yellow", new Team("Yellow", ChatColor.YELLOW, Material.YELLOW_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 85.5, 64.5, 0.5)));
-    }
-
-    public Map<String, Team> getTeams() {
-        return teams;
-    }
+    public List<Team> getTeams() {return teams;}
 
     public Map<UUID, Team> getPlayers() {
         return players;

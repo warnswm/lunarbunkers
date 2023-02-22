@@ -36,7 +36,7 @@ public class DefaultListener implements Listener {
                 event.setCancelled(true);
                 Inventory menu = Bukkit.createInventory(null, 9, "Team Select");
 
-                for (Team team : main.teams.getTeams().values()) {
+                for (Team team : main.teams.getTeams()) {
                     menu.addItem(new ItemStack(team.getWoolBlock(), 1));
                 }
                 player.openInventory(menu);

@@ -3,7 +3,7 @@
  */
 package qwezxc.asd.util;
 
-public class DoubleFormater {
+public class DoubleFormatter {
     public static double maxDecimalPlaces(double number, int decimalPlaces) {
         return (double)((int)(number * Math.pow(10.0, decimalPlaces))) / Math.pow(10.0, decimalPlaces);
     }

@@ -19,163 +19,71 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import qwezxc.asd.Asd;
+import qwezxc.asd.Items.RegisterItems;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// ToDo: Какого хера, ты каждый раз создаешь инвентари? Если можешь просто открыть нужны? У тебя контент в них не меняется.
+// ToDo: Создай два инвентаря и открывай их, когда тебе нужно.
 public class NPCInteract implements Listener {
-    private final Asd main;
     final int COAL_PRICE = 10;
     final int IRON_INGOT_PRICE = 15;
     final int DIAMOND_PRICE = 20;
     final int GOLD_INGOT_PRICE = 20;
-    public NPCInteract(Asd main) {
-        this.main = main;
+
+    public Inventory combat = Bukkit.createInventory(null, 54, "Combat Shop");
+
+    public NPCInteract() {
+
+        ItemStack invisibility = new ItemStack(Material.SPLASH_POTION);
+        PotionMeta invisibilitymeta = (PotionMeta) invisibility.getItemMeta();
+        invisibilitymeta.setDisplayName(ChatColor.RED + "Invisibility Splash Potion (1:30)");
+        invisibilitymeta.addCustomEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 90 * 20, 0), false);
+        invisibilitymeta.setColor(Color.GRAY);
+        invisibilitymeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        List<String> invisibilitylore = new ArrayList<>();
+        invisibilitylore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+        invisibilitylore.add(ChatColor.GRAY + "x1 Invisibility Splash Potion");
+        invisibilitylore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+        invisibilitylore.add(ChatColor.YELLOW + "Price: " + ChatColor.RED + "$1250");
+        invisibilitymeta.setLore(invisibilitylore);
+        invisibility.setItemMeta(invisibilitymeta);
+
+        //Invisiblity  Splash при дамаге не снимать инвиз = 1250$
+        //Poison 50$ 33 sec
+        //Lesser Invisiblite Potion 5 00 min 100$ при дамаге снять инвиз
+        //Antidote 150$ 5 sec удаляет все негативные баффы идает имунитет
+        combat.setItem(18, RegisterItems.sword);
+        combat.setItem(14, invisibility);
+        combat.setItem(15, RegisterItems.speedPotion);
+        combat.setItem(16, RegisterItems.firePotion);
+        combat.setItem(23, RegisterItems.healPotion);
+        combat.setItem(34, RegisterItems.slownesspotion);
+        combat.setItem(37, RegisterItems.boots);
+        combat.setItem(28, RegisterItems.leggings);
+        combat.setItem(19, RegisterItems.chestplate);
+        combat.setItem(20, RegisterItems.fullset);
+        combat.setItem(21, RegisterItems.enderperl);
     }
+
 
     @EventHandler
     public void onNPCInteract(NPCRightClickEvent event) {
         NPC npc = event.getNPC();
         Player player = event.getClicker();
-        Inventory plinv = player.getInventory();
         if (npc.getName().equals("Combat Shop")) {
-            Inventory inventory = Bukkit.createInventory(null, 54, "Combat Shop");
-
-            ItemStack speedPotion = getPotion(Material.POTION,ChatColor.AQUA + "Speed Potion II",PotionType.SPEED, false, true,Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "x1 Speed II Potion",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$10"
-            ));
-
-            ItemStack healPotion = getPotion(Material.SPLASH_POTION,ChatColor.GREEN + "Health Potion II",PotionType.INSTANT_HEAL, false, true,Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "x1 Health Splash Potion",
-                    ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to fill your inventory",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$5"
-            ));
-
-
-            ItemStack firePotion = getPotion(Material.POTION,ChatColor.GOLD + "Fire Resistance Potion (3:00)",PotionType.FIRE_RESISTANCE,false,false, Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "x1 Fire Resistance Potion",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$25"
-            ));
-
-
-            ItemStack slownesspotion = getPotion(Material.SPLASH_POTION,ChatColor.DARK_GRAY + "Slowness Potion (1:07)",PotionType.SLOWNESS,false,false,Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "x1 Slowness Splash Potion",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$50"
-            ));
-
-
-            ItemStack fullset = getItem(Material.DIAMOND, ChatColor.RED + "Full set", Arrays.asList(
-                ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                ChatColor.GRAY + "1x Diamond Sword",
-                ChatColor.GRAY + "1x Diamond Helmet",
-                ChatColor.GRAY + "1x Diamond Chestplate",
-                ChatColor.GRAY + "1x Diamond Leggings",
-                ChatColor.GRAY + "1x Diamond Boots",
-                ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$850"
-            ));
-
-
-            ItemStack sword = getItem(Material.DIAMOND_SWORD, ChatColor.GREEN + "Diamond Sword", Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "1x Diamond Sword",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$100"
-            ));
-
-            ItemStack chestplate = getItem(Material.DIAMOND_CHESTPLATE, ChatColor.RED + "Diamond Chestplate", Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "1x Diamond Chestplate",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$275"
-            ));
-
-
-            ItemStack leggings = getItem(Material.DIAMOND_LEGGINGS, ChatColor.RED + "Diamond Leggings", Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "1x Diamond Leggings",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$250"
-            ));
-
-
-            ItemStack boots = getItem(Material.DIAMOND_BOOTS, ChatColor.RED + "Diamond Boots", Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "1x Diamond Boots",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$125"
-            ));
-
-
-            ItemStack enderperl = getItem(Material.ENDER_PEARL,ChatColor.GREEN + "Ender Pearl", Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "x1 Ender Pearl",
-                    ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to buy x16 Ender Pearl",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$25"
-            ));
-
-
-
-            ItemStack steak = getItem(Material.COOKED_BEEF,ChatColor.GREEN + "Steak", Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.GRAY + "x16 Steak",
-                    ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to buy x64 Steak",
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "75"
-            ));
-
-
-            ItemStack invisibility = new ItemStack(Material.SPLASH_POTION);
-            PotionMeta invisibilitymeta = (PotionMeta) invisibility.getItemMeta();
-            invisibilitymeta.setDisplayName(ChatColor.RED + "Invisibility Splash Potion (1:30)");
-            invisibilitymeta.addCustomEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 90 * 20, 0), false);
-            invisibilitymeta.setColor(Color.GRAY);
-            invisibilitymeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-            List<String> invisibilitylore = new ArrayList<>();
-            invisibilitylore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            invisibilitylore.add(ChatColor.GRAY + "x1 Invisibility Splash Potion");
-            invisibilitylore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            invisibilitylore.add(ChatColor.YELLOW + "Price: " + ChatColor.RED + "$1250");
-            invisibilitymeta.setLore(invisibilitylore);
-            invisibility.setItemMeta(invisibilitymeta);
-
-            //Invisiblity  Splash при дамаге не снимать инвиз = 1250$
-            //Poison 50$ 33 sec
-            //Lesser Invisiblite Potion 5 00 min 100$ при дамаге снять инвиз
-            //Antidote 150$ 5 sec удаляет все негативные баффы идает имунитет
-            inventory.setItem(18, sword);
-            inventory.setItem(14, invisibility);
-            inventory.setItem(15, speedPotion);
-            inventory.setItem(16, firePotion);
-            inventory.setItem(23, healPotion);
-            inventory.setItem(34, slownesspotion);
-            inventory.setItem(37, boots);
-            inventory.setItem(28, leggings);
-            inventory.setItem(19, chestplate);
-            inventory.setItem(20, fullset);
-            inventory.setItem(21, enderperl);
-
-            player.openInventory(inventory);
+            player.openInventory(combat);
         }
         if (npc.getName().equals("Seller")) {
             // Create a new inventory with a size of 27 and a title
             Inventory inventory = Bukkit.createInventory(null, 9, "Seller Shop");
 
-            ItemStack coal = createSellItem(Material.COAL, "Sell Coal", 10, player);
-            ItemStack iron = createSellItem(Material.IRON_INGOT, "Sell Iron Ingot", 15, player);
-            ItemStack diamond = createSellItem(Material.DIAMOND, "Sell Diamond", 50, player);
-            ItemStack gold = createSellItem(Material.GOLD_INGOT, "Sell Gold Ingot", 20, player);
+            ItemStack coal = createSellItem(Material.COAL, "Sell Coal", COAL_PRICE, player);
+            ItemStack iron = createSellItem(Material.IRON_INGOT, "Sell Iron Ingot", IRON_INGOT_PRICE, player);
+            ItemStack diamond = createSellItem(Material.DIAMOND, "Sell Diamond", DIAMOND_PRICE, player);
+            ItemStack gold = createSellItem(Material.GOLD_INGOT, "Sell Gold Ingot", GOLD_INGOT_PRICE, player);
 
             inventory.setItem(7, coal);
             inventory.setItem(5, iron);
@@ -184,27 +92,6 @@ public class NPCInteract implements Listener {
 
             player.openInventory(inventory);
         }
-    }
-
-    public ItemStack getItem(Material material, String name, List<String> lore) {
-        ItemStack itemStack = new ItemStack(material);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(name);
-        itemMeta.setLore(lore);
-        itemStack.setItemMeta(itemMeta);
-
-        return itemStack;
-    }
-    public ItemStack getPotion(Material material,String name,PotionType potionType,boolean extander,boolean upgraded, List<String> lore){
-        ItemStack itemStack = new ItemStack(material);
-        PotionMeta itemMeta = (PotionMeta) itemStack.getItemMeta();
-        itemMeta.setDisplayName(name);
-        itemMeta.setBasePotionData(new PotionData(potionType,extander,upgraded));
-        itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-        itemMeta.setLore(lore);
-        itemStack.setItemMeta(itemMeta);
-
-        return itemStack;
     }
 
     private ItemStack createSellItem(Material material, String displayName, int price, Player player) {

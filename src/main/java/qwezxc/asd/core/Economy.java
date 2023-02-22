@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 public class Economy {
+    // ToDo: change to Integer
     private HashMap<UUID, Double> balances;
 
     public Economy() {

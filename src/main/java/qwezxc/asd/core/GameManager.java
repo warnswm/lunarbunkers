@@ -23,7 +23,7 @@ public class GameManager {
     private int gameTime;
     public GameManager(Asd main, Teams teams,TeamNPC teamNPC) {
         this.teams = teams;
-        for (Team team : teams.getTeams().values()) {
+        for (Team team : teams.getTeams()) {
             switch (team.getName()) {
                 case "Red":
                     redTeam = team;

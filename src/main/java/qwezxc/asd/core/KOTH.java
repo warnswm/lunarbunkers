@@ -62,7 +62,6 @@ public class KOTH {
                     timeLeft--;
                     minutes = timeLeft / 60;
                     seconds = timeLeft % 60;
-                    UUID uuidplayer = capturingPlayers.get(0);
                     for (Player players : Bukkit.getOnlinePlayers()) {
                         Scoreboard scoreboard = players.getScoreboard();
                         Objective objective = scoreboard.getObjective("Bunkers");

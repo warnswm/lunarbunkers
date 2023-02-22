@@ -35,7 +35,7 @@ public class TeamMenuListener implements Listener {
         if (inventory.getTitle().equals("Team Select")) {
             event.setCancelled(true);
             if (item == null) return;
-            for (Team team : teams.getTeams().values()) {
+            for (Team team : teams.getTeams()) {
                 if (item.getType() == team.getWoolBlock()) {
                     if(teams.getNumPlayersInTeam(team) >= team.getMaxPlayers()){
                         player.sendMessage("Max player in team");

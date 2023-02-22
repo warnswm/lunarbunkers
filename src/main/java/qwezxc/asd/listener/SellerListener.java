@@ -1,7 +1,6 @@
 package qwezxc.asd.listener;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,20 +13,16 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
-import qwezxc.asd.core.Economy;
+import qwezxc.asd.Items.RegisterItems;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class SellerListener implements Listener {
-    private Asd main;
 
     private HashMap<UUID, Double> balances;
 
-    public SellerListener(final Asd main){
-        this.main = main;
-    }
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
@@ -40,88 +35,86 @@ public class SellerListener implements Listener {
                 emptySlots++;
             }
         }
-        if (inventory.getName().equals("Seller Shop")) {
-            event.setCancelled(true);
-            if (item == null) return;
+        if (!inventory.getName().equalsIgnoreCase("seller shop")) return;
 
-            if (item.getType() == Material.COAL && item.getItemMeta().hasLore()) {
-                int coalCount = player.getInventory().all(Material.COAL).values().stream()
-                        .mapToInt(ItemStack::getAmount).sum();
-                int addCoalBalance = 0;
-                if (event.getClick() == ClickType.RIGHT) {
-                    if (coalCount > 0) {
-                        addCoalBalance = coalCount * 10;
-                        removeItemFromInventory(player.getInventory(), Material.COAL, coalCount);
-                    }
-                } else {
-                    if (coalCount > 0) {
-                        addCoalBalance = 10;
-                        removeItemFromInventory(player.getInventory(), Material.COAL, 1);
-                    }
+        event.setCancelled(true);
+        if (item == null) return;
+
+        // ToDo: Меняй на нормальное решение. Должна быть одна функция, в которую передавая аргументы будет происходить тоже самое, нахер копипаст
+        if (item.getType() == Material.COAL && item.getItemMeta().hasLore()) {
+            int coalCount = player.getInventory().all(Material.COAL).values().stream().mapToInt(ItemStack::getAmount).sum();
+            int addCoalBalance = 0;
+            if (event.getClick() == ClickType.RIGHT) {
+                if (coalCount > 0) {
+                    addCoalBalance = coalCount * 10;
+                    removeItemFromInventory(player.getInventory(), Material.COAL, coalCount);
                 }
-                if (addCoalBalance > 0) {
-                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addCoalBalance);
-                    updateScoreboard(player, addCoalBalance);
-                }
-            }  else if (item.getType() == Material.IRON_INGOT && item.getItemMeta().hasLore()) {
-                int ironCount = player.getInventory().all(Material.IRON_INGOT).values().stream()
-                        .mapToInt(ItemStack::getAmount).sum();
-                int addIronBalance = 0;
-                if (event.getClick() == ClickType.RIGHT) {
-                    if (ironCount > 0) {
-                        addIronBalance = ironCount * 15;
-                        removeItemFromInventory(player.getInventory(), Material.IRON_INGOT, ironCount);
-                    }
-                } else {
-                    if (ironCount > 0) {
-                        addIronBalance = 15;
-                        removeItemFromInventory(player.getInventory(), Material.IRON_INGOT, 1);
-                    }
-                }
-                if (addIronBalance > 0) {
-                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addIronBalance);
-                    updateScoreboard(player, addIronBalance);
-                }
-            }else if (item.getType() == Material.GOLD_INGOT && item.getItemMeta().hasLore()) {
-                int goldCount = player.getInventory().all(Material.GOLD_INGOT).values().stream()
-                        .mapToInt(ItemStack::getAmount).sum();
-                int addGoldBalance = 0;
-                if (event.getClick() == ClickType.RIGHT) {
-                    if (goldCount > 0) {
-                        addGoldBalance = goldCount * 20;
-                        removeItemFromInventory(player.getInventory(), Material.GOLD_INGOT, goldCount);
-                    }
-                } else {
-                    if (goldCount > 0) {
-                        addGoldBalance = 20;
-                        removeItemFromInventory(player.getInventory(), Material.GOLD_INGOT, 1);
-                    }
-                }
-                if (addGoldBalance > 0) {
-                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addGoldBalance);
-                    updateScoreboard(player, addGoldBalance);
-                }
-            }else if (item.getType() == Material.DIAMOND && item.getItemMeta().hasLore()) {
-                int diamondCount = player.getInventory().all(Material.DIAMOND).values().stream()
-                        .mapToInt(ItemStack::getAmount).sum();
-                int addDiamondBalance = 0;
-                if (event.getClick() == ClickType.RIGHT) {
-                    if (diamondCount > 0) {
-                        addDiamondBalance = diamondCount * 50;
-                        removeItemFromInventory(player.getInventory(), Material.DIAMOND, diamondCount);
-                    }
-                } else {
-                    if (diamondCount > 0) {
-                        addDiamondBalance = 50;
-                        removeItemFromInventory(player.getInventory(), Material.DIAMOND, 1);
-                    }
-                }
-                if (addDiamondBalance > 0) {
-                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addDiamondBalance);
-                    updateScoreboard(player, addDiamondBalance);
+            } else {
+                if (coalCount > 0) {
+                    addCoalBalance = 10;
+                    removeItemFromInventory(player.getInventory(), Material.COAL, 1);
                 }
             }
+            if (addCoalBalance > 0) {
+                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addCoalBalance);
+                updateScoreboard(player, addCoalBalance);
+            }
+        } else if (item.getType() == Material.IRON_INGOT && item.getItemMeta().hasLore()) {
+            int ironCount = player.getInventory().all(Material.IRON_INGOT).values().stream().mapToInt(ItemStack::getAmount).sum();
+            int addIronBalance = 0;
+            if (event.getClick() == ClickType.RIGHT) {
+                if (ironCount > 0) {
+                    addIronBalance = ironCount * 15;
+                    removeItemFromInventory(player.getInventory(), Material.IRON_INGOT, ironCount);
+                }
+            } else {
+                if (ironCount > 0) {
+                    addIronBalance = 15;
+                    removeItemFromInventory(player.getInventory(), Material.IRON_INGOT, 1);
+                }
+            }
+            if (addIronBalance > 0) {
+                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addIronBalance);
+                updateScoreboard(player, addIronBalance);
+            }
+        } else if (item.getType() == Material.GOLD_INGOT && item.getItemMeta().hasLore()) {
+            int goldCount = player.getInventory().all(Material.GOLD_INGOT).values().stream().mapToInt(ItemStack::getAmount).sum();
+            int addGoldBalance = 0;
+            if (event.getClick() == ClickType.RIGHT) {
+                if (goldCount > 0) {
+                    addGoldBalance = goldCount * 20;
+                    removeItemFromInventory(player.getInventory(), Material.GOLD_INGOT, goldCount);
+                }
+            } else {
+                if (goldCount > 0) {
+                    addGoldBalance = 20;
+                    removeItemFromInventory(player.getInventory(), Material.GOLD_INGOT, 1);
+                }
+            }
+            if (addGoldBalance > 0) {
+                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addGoldBalance);
+                updateScoreboard(player, addGoldBalance);
+            }
+        } else if (item.getType() == Material.DIAMOND && item.getItemMeta().hasLore()) {
+            int diamondCount = player.getInventory().all(Material.DIAMOND).values().stream().mapToInt(ItemStack::getAmount).sum();
+            int addDiamondBalance = 0;
+            if (event.getClick() == ClickType.RIGHT) {
+                if (diamondCount > 0) {
+                    addDiamondBalance = diamondCount * 50;
+                    removeItemFromInventory(player.getInventory(), Material.DIAMOND, diamondCount);
+                }
+            } else {
+                if (diamondCount > 0) {
+                    addDiamondBalance = 50;
+                    removeItemFromInventory(player.getInventory(), Material.DIAMOND, 1);
+                }
+            }
+            if (addDiamondBalance > 0) {
+                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addDiamondBalance);
+                updateScoreboard(player, addDiamondBalance);
+            }
         }
+
     }
 
     private void updateScoreboard(Player player, int balanceToAdd) {

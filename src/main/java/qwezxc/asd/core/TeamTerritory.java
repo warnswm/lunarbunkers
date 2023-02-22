@@ -5,48 +5,40 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.Gate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import qwezxc.asd.Asd;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class TeamTerritory implements Listener {
-    private Asd main;
     private Teams teams;
 
     private Map<String, Location> baseTerritories = new HashMap<>();
     private double baseRadius = 14.5;
-    public TeamTerritory(Asd main,Teams teams){
+    public TeamTerritory(Teams teams) {
         this.teams = teams;
-        this.main = main;
         baseTerritories.put("Red", new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5));
-        baseTerritories.put("Blue", new Location(Bukkit.getWorld("world"), 1.5,64.5,-85.5));
+        baseTerritories.put("Blue", new Location(Bukkit.getWorld("world"), 1.5, 64.5, -85.5));
         baseTerritories.put("Green", new Location(Bukkit.getWorld("world"), -85.5, 64.5, 0.5));
         baseTerritories.put("Yellow", new Location(Bukkit.getWorld("world"), 85.5, 64.5, 0.5));
     }
-
-
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
 
+        if (block == null) return;
 
-        if (block != null && block.getType() == Material.FENCE_GATE) {
+        if (block.getType() == Material.FENCE_GATE) {
 
             // Get the player's team
             Team playerTeam = teams.getTeam(player);
 
-            if(playerTeam==null){
+            if (playerTeam == null) {
                 return;
             }
             // Check if the player is within any base territory
@@ -78,9 +70,9 @@ public class TeamTerritory implements Listener {
             if (!isInBaseTerritory) {
                 event.setCancelled(false);
             }
-        }else if(block != null && block.getType() == Material.CHEST){
+        } else if (block.getType() == Material.CHEST) {
             Team playerTeam = teams.getTeam(player);
-            if(playerTeam==null){
+            if (playerTeam == null) {
                 return;
             }
             // Check if the player is within any base territory

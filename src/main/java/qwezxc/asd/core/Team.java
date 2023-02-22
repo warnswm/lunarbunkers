@@ -1,6 +1,5 @@
 package qwezxc.asd.core;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;

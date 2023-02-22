@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -17,7 +18,7 @@ public class PlayerLivesListener implements Listener {
         this.playerLivesManager = playerLivesManager;
     }
 
-    @EventHandler
+    @EventHandler // ToDo Нахкй удалить
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         playerLivesManager.takePlayerLives(player, 1);
@@ -35,7 +36,9 @@ public class PlayerLivesListener implements Listener {
 
     }
 
-//
-
+    @EventHandler
+    public void damage(EntityDamageByEntityEvent event) {
+        // ToDo: Когда (хп игрока - finalDamage) < 0 -> отмена ивента тп на респу и выдача хп
+    }
 }
 

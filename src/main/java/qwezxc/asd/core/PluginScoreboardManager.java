@@ -14,7 +14,6 @@ public class PluginScoreboardManager {
         playerLivesManager = new PlayerLivesManager();
     }
 
-
     public void createScoreboard(Player player){
         UUID uuid = player.getUniqueId();
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();

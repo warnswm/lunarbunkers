@@ -69,10 +69,10 @@ public final class Asd extends JavaPlugin{
         oreRegen = new OreRegeneration(this);
 
         registerListeners(Arrays.asList(
-                new MainTrader(this),
-                new SellerListener(this),
-                new TeamTerritory(this, teams),
-                new NPCInteract(this),
+                new MainTrader(),
+                new SellerListener(),
+                new TeamTerritory(teams),
+                new NPCInteract(),
                 new DefaultListener(this),
                 oreRegen,
                 teamNPC,
