@@ -1,7 +1,9 @@
 package qwezxc.asd.listener;
 
+import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,9 +16,10 @@ import qwezxc.asd.core.PlayerLivesManager;
 public class PlayerJoinListener implements Listener {
 
 
-    public Asd main;
+    public final Asd main;
     private PlayerLivesManager playerLivesManager;
     private GameManager gameManager;
+    private final Location lobby = new Location(Bukkit.getWorld("world"),0.5,65,206.5);
     public PlayerJoinListener(final Asd main,PlayerLivesManager playerLivesManager,GameManager gameManager) {
         this.main = main;
         this.playerLivesManager = playerLivesManager;
@@ -27,12 +30,17 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event){
         event.setJoinMessage(null);
         Player player = event.getPlayer();
+        player.teleport(lobby);
+        player.setGameMode(GameMode.SURVIVAL);
         main.getPluginManager().getDatabase().addPlayertoDatabase(player);
         main.getPluginManager().getEconomyDataBaseOld().addPlayer(player.getUniqueId(),player.getName());
         main.getPluginManager().getPluginScoreboardManager().createScoreboard(player);
         playerLivesManager.givePlayerLives(player, 3);
         if (Bukkit.getOnlinePlayers().size() == 2) {
             gameManager.execute();
+        }
+        if (Bukkit.getOnlinePlayers().isEmpty()){
+            Bukkit.getScheduler().runTaskLater(main, CitizensAPI.getNPCRegistry()::deregisterAll, 2);
         }
     }
 

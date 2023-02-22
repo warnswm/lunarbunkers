@@ -4,25 +4,16 @@ import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
-import qwezxc.asd.Asd;
-import qwezxc.asd.Items.RegisterItems;
+import qwezxc.asd.Items.RegisterInventory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 // ToDo: Какого хера, ты каждый раз создаешь инвентари? Если можешь просто открыть нужны? У тебя контент в них не меняется.
@@ -33,39 +24,8 @@ public class NPCInteract implements Listener {
     final int DIAMOND_PRICE = 20;
     final int GOLD_INGOT_PRICE = 20;
 
-    public Inventory combat = Bukkit.createInventory(null, 54, "Combat Shop");
-
     public NPCInteract() {
 
-        ItemStack invisibility = new ItemStack(Material.SPLASH_POTION);
-        PotionMeta invisibilitymeta = (PotionMeta) invisibility.getItemMeta();
-        invisibilitymeta.setDisplayName(ChatColor.RED + "Invisibility Splash Potion (1:30)");
-        invisibilitymeta.addCustomEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 90 * 20, 0), false);
-        invisibilitymeta.setColor(Color.GRAY);
-        invisibilitymeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-        List<String> invisibilitylore = new ArrayList<>();
-        invisibilitylore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-        invisibilitylore.add(ChatColor.GRAY + "x1 Invisibility Splash Potion");
-        invisibilitylore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-        invisibilitylore.add(ChatColor.YELLOW + "Price: " + ChatColor.RED + "$1250");
-        invisibilitymeta.setLore(invisibilitylore);
-        invisibility.setItemMeta(invisibilitymeta);
-
-        //Invisiblity  Splash при дамаге не снимать инвиз = 1250$
-        //Poison 50$ 33 sec
-        //Lesser Invisiblite Potion 5 00 min 100$ при дамаге снять инвиз
-        //Antidote 150$ 5 sec удаляет все негативные баффы идает имунитет
-        combat.setItem(18, RegisterItems.sword);
-        combat.setItem(14, invisibility);
-        combat.setItem(15, RegisterItems.speedPotion);
-        combat.setItem(16, RegisterItems.firePotion);
-        combat.setItem(23, RegisterItems.healPotion);
-        combat.setItem(34, RegisterItems.slownesspotion);
-        combat.setItem(37, RegisterItems.boots);
-        combat.setItem(28, RegisterItems.leggings);
-        combat.setItem(19, RegisterItems.chestplate);
-        combat.setItem(20, RegisterItems.fullset);
-        combat.setItem(21, RegisterItems.enderperl);
     }
 
 
@@ -74,10 +34,9 @@ public class NPCInteract implements Listener {
         NPC npc = event.getNPC();
         Player player = event.getClicker();
         if (npc.getName().equals("Combat Shop")) {
-            player.openInventory(combat);
+            player.openInventory(RegisterInventory.combatShop);
         }
         if (npc.getName().equals("Seller")) {
-            // Create a new inventory with a size of 27 and a title
             Inventory inventory = Bukkit.createInventory(null, 9, "Seller Shop");
 
             ItemStack coal = createSellItem(Material.COAL, "Sell Coal", COAL_PRICE, player);

@@ -73,7 +73,6 @@ public class GameManager {
                             objective.getScore("Balance: null Сообщите об этом разработчику");
                         }
                         score2.setScore(1);
-
                     }
                     cancel();
                 } else {
@@ -94,53 +93,22 @@ public class GameManager {
             Team playerTeam = teams.getTeam(player);
 
             if (playerTeam == null) {
-                Scoreboard scoreboard = player.getScoreboard();
-                Objective objective = scoreboard.getObjective("Bunkers");
                 if (teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(greenTeam) &&
                         teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(blueTeam) &&
                         teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
 
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!"));
                     teams.addPlayerToTeam(player, redTeam);
-                    Team teamafter = teams.getTeam(player);
-                    String teamafterr = teamafter.getName();
-                    Score score5 = objective.getScore("Team: " + teamafterr);
-                    score5.setScore(5);
-                    Team playerTeamafter = teams.getTeam(player);
-                    ChatColor colorteam = playerTeamafter.getChatColor();
-                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
+                    updateScoreborad(player);
                 } else if (teams.getNumPlayersInTeam(greenTeam) < teams.getNumPlayersInTeam(blueTeam) &&
                         teams.getNumPlayersInTeam(greenTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
                     teams.addPlayerToTeam(player, greenTeam);
-                    Team teamafter = teams.getTeam(player);
-                    String teamafterr = teamafter.getName();
-                    Score score5 = objective.getScore("Team: " + teamafterr);
-                    score5.setScore(5);
-                    Team playerTeamafter = teams.getTeam(player);
-                    ChatColor colorteam = playerTeamafter.getChatColor();
-                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
+                    updateScoreborad(player);
                 } else if (teams.getNumPlayersInTeam(blueTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
                     teams.addPlayerToTeam(player, blueTeam);
-                    Team teamafter = teams.getTeam(player);
-                    String teamafterr = teamafter.getName();
-                    Score score5 = objective.getScore("Team: " + teamafterr);
-                    score5.setScore(5);
-
-                    Team playerTeamafter = teams.getTeam(player);
-                    ChatColor colorteam = playerTeamafter.getChatColor();
-                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
+                    updateScoreborad(player);
                 } else {
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
                     teams.addPlayerToTeam(player, yellowTeam);
-                    Team teamafter = teams.getTeam(player);
-                    String teamafterr = teamafter.getName();
-                    Score score5 = objective.getScore("Team: " + teamafterr);
-                    score5.setScore(5);
-                    Team playerTeamafter = teams.getTeam(player);
-                    ChatColor colorteam = playerTeamafter.getChatColor();
-                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() +  ChatColor.RESET + "]" + " " + player.getName());
+                    updateScoreborad(player);
                 }
             }
         }
@@ -197,4 +165,15 @@ public class GameManager {
         }
     }
 
+    public void updateScoreborad(Player player){
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective objective = scoreboard.getObjective("Bunkers");
+        scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!"));
+        String  teamafter = teams.getTeam(player).getName();
+        Score score5 = objective.getScore("Team: " + teamafter);
+        score5.setScore(5);
+        Team playerTeamafter = teams.getTeam(player);
+        ChatColor colorteam = playerTeamafter.getChatColor();
+        player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
+    }
 }

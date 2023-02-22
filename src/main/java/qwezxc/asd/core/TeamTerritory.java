@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TeamTerritory implements Listener {
-    private Teams teams;
+    private final Teams teams;
 
-    private Map<String, Location> baseTerritories = new HashMap<>();
-    private double baseRadius = 14.5;
+    private final  Map<String, Location> baseTerritories = new HashMap<>();
+
     public TeamTerritory(Teams teams) {
         this.teams = teams;
         baseTerritories.put("Red", new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5));
@@ -30,8 +30,9 @@ public class TeamTerritory implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-
+        double baseRadius = 14.5;
         if (block == null) return;
+
 
         if (block.getType() == Material.FENCE_GATE) {
 
@@ -47,20 +48,18 @@ public class TeamTerritory implements Listener {
                 String teamName = entry.getKey();
                 Location baseLocation = entry.getValue();
                 if (Math.abs(player.getLocation().getX() - baseLocation.getX()) <= baseRadius &&
-                        Math.abs(player.getLocation().getY() - baseLocation.getY()) <= baseRadius &&
+                        Math.abs(player.getLocation().getY() - baseLocation.getY()) <= baseRadius +200 &&
                         Math.abs(player.getLocation().getZ() - baseLocation.getZ()) <= baseRadius) {
 
-                    // The player is within a base territory
+
                     isInBaseTerritory = true;
 
-                    // Check if the player is in their own base territory
+
                     if (playerTeam.getName().equals(teamName)) {
-                        // Allow the player to open the gate
                         event.setCancelled(false);
                     } else {
-                        // Prevent the player from opening the gate
                         event.setCancelled(true);
-                        player.sendMessage(ChatColor.RED + "You cannot open gates in the base territory of other teams!");
+                        player.sendMessage(ChatColor.RED + "Вы не можете открывать каликти на территории базы других команд!");
                     }
                     break;
                 }
@@ -89,7 +88,7 @@ public class TeamTerritory implements Listener {
                         event.setCancelled(false);
                     } else {
                         event.setCancelled(true);
-                        player.sendMessage(ChatColor.RED + "You cannot open gates in the base territory of other teams!");
+                        player.sendMessage(ChatColor.RED + "Вы не можете открывать сундук на территории базы других команд!");
                     }
                     break;
                 }

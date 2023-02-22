@@ -19,43 +19,28 @@ import java.util.*;
 public class KOTH {
     private Asd main;
     private Teams teams;
-    private final Map<Player, Integer> playerPoints = new HashMap<>();
-    private Location capturePoint = new Location(Bukkit.getWorld("world"), 10.5, 41.5, 10.5);
-    private Scoreboard scoreboard;
-    private Map<Team, Integer> captureTimers = new HashMap<>();
-    private final Map<Team, Integer> scores;
     private final List<UUID> capturingPlayers;
     private BukkitRunnable captureTimer;
     private int minutes;
     private int seconds;
-
+    private static final Map<Integer, String> TIMES_TO_CLEAR = Map.of(
+            299, "Classic: 5:00",
+            239, "Classic: 4:00",
+            179, "Classic: 3:00",
+            119, "Classic: 2:00",
+            59, "Classic: 1:00"
+    );
 
     public KOTH(Asd main, Teams teams) {
         this.main = main;
         this.teams = teams;
-        this.scores = new HashMap<>();
         this.capturingPlayers = new ArrayList<>();
     }
 
-    private boolean isBeingCaptured(Player playeri) {
-        Team playerTeam = teams.getTeam(playeri);
-        for (UUID uuid : capturingPlayers) {
-            Player player = Bukkit.getPlayer(uuid);
-            Location playerLoc = player.getLocation();
-            if (Math.abs(playerLoc.getX() - capturePoint.getX()) <= 5 &&
-                    Math.abs(playerLoc.getY() - capturePoint.getY()) <= 5 &&
-                    Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= 5 && teams.getTeam(player) == playerTeam) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void startCaptureTimer() {
-        // Only start the timer if it isn't already running
         if (captureTimer == null) {
             captureTimer = new BukkitRunnable() {
-                int timeLeft = 300; // 5 minutes in ticks
+                int timeLeft = 300;
 
                 @Override
                 public void run() {
@@ -66,21 +51,7 @@ public class KOTH {
                         Scoreboard scoreboard = players.getScoreboard();
                         Objective objective = scoreboard.getObjective("Bunkers");
                         Score score = objective.getScore("Classic: " + String.format("%d:%02d", minutes, seconds));
-                        if (minutes == 4 && seconds == 59) {
-                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 5:00"));
-                        }
-                        if (minutes == 3 && seconds == 59) {
-                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 4:00"));
-                        }
-                        if (minutes == 2 && seconds == 59) {
-                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 3:00"));
-                        }
-                        if (minutes == 1 && seconds == 59) {
-                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 2:00"));
-                        }
-                        if (minutes == 0 && seconds == 59) {
-                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: 1:00"));
-                        }
+                        clearPreviousScores(scoreboard,minutes,seconds);
                         scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds + 1)));
                         score.setScore(7);
                         players.setScoreboard(scoreboard);
@@ -93,13 +64,11 @@ public class KOTH {
                         capturingPlayers.clear();
                         captureTimer.cancel();
                         captureTimer = null;
-                        for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
-                            npc.destroy();
-                        }
+                        endGame();
                     }
                 }
             };
-            captureTimer.runTaskTimer(main, 0L, 20L); // Start the timer to run every second
+            captureTimer.runTaskTimer(main, 0L, 20L);
         }
     }
 
@@ -129,8 +98,6 @@ public class KOTH {
 
     // Method to stop the capture point capture for a player
     public void stopCapture(Player player) {
-        //pizdec
-        OfflinePlayer offlinePlayer = player.getPlayer();
 
         capturingPlayers.remove(player.getUniqueId());
 
@@ -151,6 +118,16 @@ public class KOTH {
             minutes = 5;
             seconds = 0;
         }
+    }
+    private void clearPreviousScores(Scoreboard scoreboard, int minutes, int seconds) {
+        int timeLeft = minutes * 60 + seconds;
+        if (TIMES_TO_CLEAR.containsKey(timeLeft)) {
+            scoreboard.resetScores(Bukkit.getOfflinePlayer(TIMES_TO_CLEAR.get(timeLeft)));
+        }
+    }
+
+    private void endGame(){
+        Bukkit.getScheduler().runTaskLater(main, CitizensAPI.getNPCRegistry()::deregisterAll, 2);
     }
 }
 

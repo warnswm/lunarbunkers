@@ -1,9 +1,11 @@
 package qwezxc.asd.core;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.StandardException;
 
+@Getter
+@Setter
 public class PlayerLives {
     private int lives;
 

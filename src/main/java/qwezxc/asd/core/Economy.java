@@ -1,26 +1,25 @@
 package qwezxc.asd.core;
 
+import org.bukkit.entity.Player;
+
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.bukkit.entity.Player;
-
 public class Economy {
-    // ToDo: change to Integer
-    private HashMap<UUID, Double> balances;
+    private HashMap<UUID, Integer> balances;
 
     public Economy() {
         balances = new HashMap<>();
     }
 
-    public void addBalance(Player player, double amount) {
+    public void addBalance(Player player, int amount) {
         UUID uuid = player.getUniqueId();
-        double balance = getBalance(player);
+        int balance = getBalance(player);
         balance += amount;
         balances.put(uuid, balance);
     }
 
-    public double getBalance(Player player) {
+    public int getBalance(Player player) {
         UUID uuid = player.getUniqueId();
         if (balances.containsKey(uuid)) {
             return balances.get(uuid);
@@ -29,12 +28,12 @@ public class Economy {
         }
     }
 
-    public boolean hasEnoughMoney(Player player, double amount) {
-        double balance = getBalance(player);
+    public boolean hasEnoughMoney(Player player, int amount) {
+        int balance = getBalance(player);
         return balance >= amount;
     }
 
-    public void removeBalance(Player player, double amount) {
+    public void removeBalance(Player player, int amount) {
         addBalance(player, -amount);
     }
 }

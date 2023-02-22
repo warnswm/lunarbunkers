@@ -13,15 +13,20 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
 import qwezxc.asd.core.Team;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class DefaultListener implements Listener {
     private Asd main;
-
-
+    private HashMap<UUID,Long> cooldown = new HashMap<UUID,Long>();
+    private final int cooldowntime = 15;
     public DefaultListener(final Asd main) {
         this.main = main;
     }
@@ -40,6 +45,32 @@ public class DefaultListener implements Listener {
                     menu.addItem(new ItemStack(team.getWoolBlock(), 1));
                 }
                 player.openInventory(menu);
+            }
+        }
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (event.getItem() != null && event.getItem().getType() == Material.ENDER_PEARL) {
+                if(cooldown.containsKey(player.getUniqueId())) {
+                    long secondleft = ((cooldown.get(player.getUniqueId()) / 1000) + cooldowntime) - (System.currentTimeMillis() / 1000);
+                    if (secondleft > 0) {
+                        event.setCancelled(true);
+                    }
+                }
+                else{
+                    cooldown.put(player.getUniqueId(),System.currentTimeMillis());
+//                    new BukkitRunnable() {
+//                        @Override
+//                        public void run() {
+//                            long secondleft = ((cooldown.get(player.getUniqueId()) / 1000) + cooldowntime) - (System.currentTimeMillis() / 1000);
+//                            Scoreboard scoreboard = player.getScoreboard();
+//                            Objective objective = scoreboard.getObjective("Bunkers");
+//                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Ender Pearl: " + secondleft+1));
+//                            Score score = objective.getScore("Ender Pearl: " + secondleft);
+//                            score.setScore(1);
+//                            player.setScoreboard(scoreboard);
+//                        }
+//                    }.runTaskTimer(Asd.getInstance(),1L,1L);
+                }
+
             }
         }
     }
@@ -80,4 +111,6 @@ public class DefaultListener implements Listener {
         Player player = event.getPlayer();
         main.koth.stopCapture(player);
     }
+
+
 }

@@ -9,11 +9,6 @@ import java.util.UUID;
 
 public class PluginScoreboardManager {
 
-    private PlayerLivesManager playerLivesManager;
-    public PluginScoreboardManager() {
-        playerLivesManager = new PlayerLivesManager();
-    }
-
     public void createScoreboard(Player player){
         UUID uuid = player.getUniqueId();
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
@@ -35,14 +30,8 @@ public class PluginScoreboardManager {
         Score score4 = objective.getScore(" ");
         score4.setScore(3);
         Score score3 = objective.getScore("Kills: " + Asd.getInstance().getPluginManager().getDatabase().getWins(String.valueOf(uuid)));
-        if(score3 == null){
-            objective.getScore("Kills: null Сообщите об этом админу");
-        }
         score3.setScore(2);
         Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player));
-        if(score2 == null){
-            objective.getScore("Balance: null Сообщите об этом админу");
-        }
         score2.setScore(1);
         Score score1 = objective.getScore("―――――――――――――");
         score1.setScore(0);

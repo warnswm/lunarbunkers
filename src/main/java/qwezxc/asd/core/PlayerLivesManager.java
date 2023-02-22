@@ -30,7 +30,6 @@ public class PlayerLivesManager {
         PlayerLives playerLives = getPlayerLives(player);
         playerLives.removeLives(amount);
         int remainingLives = playerLives.getLives();
-        player.sendMessage(String.valueOf(remainingLives));
         if (remainingLives <= 0) {
             player.setGameMode(GameMode.SPECTATOR);
         }

@@ -3,20 +3,15 @@ package qwezxc.asd;
 import com.google.common.collect.Lists;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.npc.NPCRegistry;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
@@ -77,7 +72,7 @@ public final class Asd extends JavaPlugin{
                 oreRegen,
                 teamNPC,
                 new TeamMenuListener(teams),
-                new PlayerLivesListener(playerLivesManager),
+                new PlayerLivesListener(playerLivesManager,teams),
                 new PlayerJoinListener(this, playerLivesManager, gameManager)
         ));
 
@@ -85,11 +80,9 @@ public final class Asd extends JavaPlugin{
         getCommand("pickaxe").setExecutor(new TeamCommand(this));
         getCommand("testcmd").setExecutor(new TestCommand(this));
         getCommand("start").setExecutor(new StartCommand(this, gameManager));
-
-
+        Bukkit.getScheduler().runTaskLater(this, CitizensAPI.getNPCRegistry()::deregisterAll, 2);
         world.setGameRuleValue("doDaylightCycle", "false");
         world.setThundering(false);
-        world.setWeatherDuration(0);
         world.setTime(6000);
 
     }
@@ -118,14 +111,17 @@ public final class Asd extends JavaPlugin{
 
     @Override
     public void onDisable() {
-        for (NPC npc : Lists.newArrayList(CitizensAPI.getNPCRegistry())) {
-            npc.destroy();
-        }
-        Asd.getInstance().getPluginManager().getDatabase().DisableDatabase();
 
+        Asd.getInstance().getPluginManager().getDatabase().DisableDatabase();
         for (Location loc: OreRegeneration.breakBlocks.keySet()) {
             loc.getBlock().setType(OreRegeneration.breakBlocks.get(loc));
         }
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof ArmorStand) {
+                    entity.remove();
+                }
+            }
+        }
     }
-
 }

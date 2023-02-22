@@ -4,7 +4,6 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.GameModeTrait;
 import net.citizensnpcs.trait.LookClose;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -33,21 +32,22 @@ public class TeamNPC implements Listener {
     }
 
     public void spawnAll(Location redLoc, Location blueLoc, Location greenLoc, Location yellowLoc) {
-        spawnNPCs("Red", redLoc);
-        spawnNPCs("Blue", blueLoc);
-        spawnNPCs("Green", greenLoc);
-        spawnNPCs("Yellow", yellowLoc);
+        spawnCombatShop(teams.getTeams().get(0), redLoc);
+        spawnCombatShop(teams.getTeams().get(1), blueLoc);
+        spawnCombatShop(teams.getTeams().get(2), greenLoc);
+        spawnCombatShop(teams.getTeams().get(3), yellowLoc);
     }
 
-    public void spawnNPCs(String team, Location loc) {
+    public void spawnCombatShop(Team team, Location loc) {
         NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "CombatShop");
         npc.spawn(loc);
-        npc.setName(ChatColor.valueOf(team.toUpperCase()) + "Combat Shop");
+        npc.setName(team.getChatColor() + "Combat Shop");
         npc.getOrAddTrait(GameModeTrait.class).setGameMode(GameMode.SURVIVAL);
         npc.getOrAddTrait(LookClose.class).lookClose(true);
-        npc.data().setPersistent(NPC.Metadata.RESPAWN_DELAY, 300*20);
-        npcTeams.put(npc.getId(), teams.getTeams().get(team));
+        npc.data().setPersistent(NPC.Metadata.RESPAWN_DELAY, 300 * 20);
+        npcTeams.put(npc.getId(), team);
     }
+
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
@@ -79,20 +79,17 @@ public class TeamNPC implements Listener {
                 as.setCanPickupItems(false);
                 as.setCustomNameVisible(true);
                 as.setVisible(false);
+                as.setCustomName("Возрождение через 5:00");
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         time--;
                         int minutes = time / 60;
                         int seconds = time % 60;
-                        as.setCustomName("Возраждение через " + String.format("%02d:%02d", minutes, seconds));
-                        if(time == 0){
-                            as.remove();
-                        }
+                        as.setCustomName("Возрождение через " + String.format("%02d:%02d", minutes, seconds));
+                        if (time == 0) as.remove();
                     }
-                    }
-                    .runTaskTimer(Asd.getInstance(),20L,20L);
-
+                }.runTaskTimer(Asd.getInstance(),20L,20L);
             }
         }
     }
