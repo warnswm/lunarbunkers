@@ -1,6 +1,7 @@
 package qwezxc.asd;
 
 import com.google.common.collect.Lists;
+import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
@@ -40,7 +41,8 @@ public final class Asd extends JavaPlugin{
     public TeamNPC teamNPC;
     private OreRegeneration oreRegen;
     public Teams teams = new Teams();
-    public Map<UUID, Team> playerTeams = teams.getPlayers();
+    private ScoreBoardLib scoreBoardLib;
+    private PlayerKillsManager playerKillsManager;
     @Override
     public void onLoad() {
 
@@ -50,6 +52,7 @@ public final class Asd extends JavaPlugin{
     @Override
     public void onEnable() {
         checkWorldsOnServer();
+        ScoreboardLib.setPluginInstance(this);
         world = Bukkit.getWorld("world");
         this.pluginManager = PluginManager.getInstance();
         this.database = new Database();
@@ -58,8 +61,9 @@ public final class Asd extends JavaPlugin{
         this.teamNPC = new TeamNPC(teams);
         this.gameManager = new GameManager(this, teams, teamNPC);
         this.economy = new Economy();
-        playerJoinListener = new PlayerJoinListener(this, playerLivesManager, gameManager);
+        this.scoreBoardLib = new ScoreBoardLib();
         this.playerLivesManager = new PlayerLivesManager();
+        this.playerKillsManager = new PlayerKillsManager();
         koth = new KOTH(this, teams);
         oreRegen = new OreRegeneration(this);
 
@@ -68,12 +72,12 @@ public final class Asd extends JavaPlugin{
                 new SellerListener(),
                 new TeamTerritory(teams),
                 new NPCInteract(),
-                new DefaultListener(this),
+                new DefaultListener(this,scoreBoardLib),
                 oreRegen,
                 teamNPC,
                 new TeamMenuListener(teams),
-                new PlayerLivesListener(playerLivesManager,teams),
-                new PlayerJoinListener(this, playerLivesManager, gameManager)
+                new PlayerLivesListener(playerLivesManager,teams,playerKillsManager),
+                new PlayerJoinListener(this, playerLivesManager, gameManager,scoreBoardLib,koth)
         ));
 
         getCommand("balance").setExecutor(new BalanceCommand(this));

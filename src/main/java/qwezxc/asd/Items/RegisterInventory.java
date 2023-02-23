@@ -45,5 +45,10 @@ public class RegisterInventory {
         combatShop.setItem(20, RegisterItems.fullset);
         combatShop.setItem(21, RegisterItems.enderperl);
     }
+    public static Inventory builderShop = Bukkit.createInventory(null, 54, "Builder Shop");
 
+    static {
+        builderShop.setItem(49,DiamodPick.createDiamondPickaxe());
+        builderShop.setItem(50,DiamodPick.createDiamondAxe());
+    }
 }

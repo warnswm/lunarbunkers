@@ -2,25 +2,21 @@ package qwezxc.asd.core;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
 
 public class GameManager {
-    private Asd  main;
+    private final Asd  main;
     private Team redTeam;
     private Team greenTeam;
     private Team blueTeam;
     private Team yellowTeam;
-    private Teams teams;
+    private final Teams teams;
     private BukkitRunnable gameStartTimer;
-    private TeamNPC teamNPC;
+    private final TeamNPC teamNPC;
 
-    private int gameTime;
+    public static int gameTime = 0;
     public GameManager(Asd main, Teams teams,TeamNPC teamNPC) {
         this.teams = teams;
         for (Team team : teams.getTeams()) {
@@ -43,17 +39,16 @@ public class GameManager {
             }
         }
         this.main = main;
-        this.gameTime = 0;
         this.teamNPC=teamNPC;
     }
     public void execute() {
         int numPlayers = Bukkit.getOnlinePlayers().size();
-        if(numPlayers < 2){
-            for (Player player : Bukkit.getOnlinePlayers()){
-                player.sendMessage("Для запуска нужно 2 человека");
-            }
-            return;
-        }
+//        if(numPlayers < 2){
+//            for (Player player : Bukkit.getOnlinePlayers()){
+//                player.sendMessage("Для запуска нужно 2 человека");
+//            }
+//            return;
+//        }
         // Start the game after a 5 second countdown
         gameStartTimer = new BukkitRunnable() {
             int countdown = 5;
@@ -64,15 +59,7 @@ public class GameManager {
                     // Start the game
                     startGame();
                     for (Player player1 : Bukkit.getOnlinePlayers()){
-                        Scoreboard scoreboard = player1.getScoreboard();
-                        Objective objective = scoreboard.getObjective("Bunkers");
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player1)));
                         Asd.getInstance().getPluginManager().getEconomy().addBalance(player1,100);
-                        Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player1));
-                        if(score2 == null){
-                            objective.getScore("Balance: null Сообщите об этом разработчику");
-                        }
-                        score2.setScore(1);
                     }
                     cancel();
                 } else {
@@ -98,17 +85,25 @@ public class GameManager {
                         teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
 
                     teams.addPlayerToTeam(player, redTeam);
-                    updateScoreborad(player);
+                    Team playerTeamafter = teams.getTeam(player);
+                    ChatColor colorteam = playerTeamafter.getChatColor();
+                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
                 } else if (teams.getNumPlayersInTeam(greenTeam) < teams.getNumPlayersInTeam(blueTeam) &&
                         teams.getNumPlayersInTeam(greenTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
                     teams.addPlayerToTeam(player, greenTeam);
-                    updateScoreborad(player);
+                    Team playerTeamafter = teams.getTeam(player);
+                    ChatColor colorteam = playerTeamafter.getChatColor();
+                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
                 } else if (teams.getNumPlayersInTeam(blueTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
                     teams.addPlayerToTeam(player, blueTeam);
-                    updateScoreborad(player);
+                    Team playerTeamafter = teams.getTeam(player);
+                    ChatColor colorteam = playerTeamafter.getChatColor();
+                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
                 } else {
                     teams.addPlayerToTeam(player, yellowTeam);
-                    updateScoreborad(player);
+                    Team playerTeamafter = teams.getTeam(player);
+                    ChatColor colorteam = playerTeamafter.getChatColor();
+                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
                 }
             }
         }
@@ -133,47 +128,17 @@ public class GameManager {
             @Override
             public void run() {
                 gameTime++;
-                int minutes = gameTime / 60;
-                int seconds = gameTime % 60;
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    Scoreboard scoreboard = player.getScoreboard();
-                    Objective objective = scoreboard.getObjective("Bunkers");
-                    if(seconds == 0) {
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Game Time: " + String.format("%02d:%02d", minutes-1, 59)));
-                    }
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player)));
-                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player,1);
-                    Score score2 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player));
-                    if(score2 == null){
-                        objective.getScore("Balance: null Сообщите об этом разработчику");
-                    }
-                    score2.setScore(1);
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Game Time: " + String.format("%02d:%02d", minutes, seconds - 1)));
-                    Score score = objective.getScore("Game Time: " + String.format("%02d:%02d", minutes, seconds));
-                    score.setScore(8);
-                    player.setScoreboard(scoreboard);
+                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player, 1);
                 }
-
             }
         }.runTaskTimer(main, 20L, 20L);
-        teamNPC.spawnAll(new Location(Bukkit.getWorld("world"), 1.5, 64.5, 95.5), new Location(Bukkit.getWorld("world"), 1.5, 65.5, -95.5), new Location(Bukkit.getWorld("world"), -95.5, 64.5, 0.5), new Location(Bukkit.getWorld("world"), 95.5, 65.5, 0.5));
+        teamNPC.spawnAll();
     }
 
     public void stopGameStartTimer() {
         if (gameStartTimer != null) {
             gameStartTimer.cancel();
         }
-    }
-
-    public void updateScoreborad(Player player){
-        Scoreboard scoreboard = player.getScoreboard();
-        Objective objective = scoreboard.getObjective("Bunkers");
-        scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!"));
-        String  teamafter = teams.getTeam(player).getName();
-        Score score5 = objective.getScore("Team: " + teamafter);
-        score5.setScore(5);
-        Team playerTeamafter = teams.getTeam(player);
-        ChatColor colorteam = playerTeamafter.getChatColor();
-        player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
     }
 }

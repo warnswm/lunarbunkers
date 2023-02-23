@@ -46,19 +46,7 @@ public class TeamMenuListener implements Listener {
                     player.sendMessage("Ты уже находишься в этой команде");
                     return;
                 }
-                Scoreboard scoreboard = player.getScoreboard();
-                Objective objective = scoreboard.getObjective("Bunkers");
-                scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: Выбери команду!" ));
-                Team teamdo = teams.getTeam(player);
-                if(teamdo != null) {
-                    String teamdoo = teamdo.getName();
-                    scoreboard.resetScores(Bukkit.getOfflinePlayer("Team: " + teamdoo));
-                }
                 teams.addPlayerToTeam(player, team);
-                Team teamafter = teams.getTeam(player);
-                String teamafterr = teamafter.getName();
-                Score score5 = objective.getScore("Team: " + teamafterr);
-                score5.setScore(5);
                 player.sendMessage("You joined the " + team.getName() + " team!");
                 ChatColor colorteam = team.getChatColor();
                 player.setPlayerListName("[" + colorteam + team.getName() + ChatColor.RESET + "]" + " " + player.getName());

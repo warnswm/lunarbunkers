@@ -18,26 +18,29 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
+import qwezxc.asd.core.ScoreBoardLib;
 import qwezxc.asd.core.Team;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 public class DefaultListener implements Listener {
-    private Asd main;
-    private HashMap<UUID,Long> cooldown = new HashMap<UUID,Long>();
-    private final int cooldowntime = 15;
-    public DefaultListener(final Asd main) {
+    private final Asd main;
+    private HashMap<UUID, Long> cooldown = new HashMap<UUID, Long>();
+    public static double cooldowntime = 15.0;
+    private ScoreBoardLib scoreBoardLib;
+    public DefaultListener(final Asd main, ScoreBoardLib scoreBoardLib) {
         this.main = main;
+        this.scoreBoardLib = scoreBoardLib;
     }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-
+        if (event.getItem() == null) return;
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if(item.getType() == Material.DIAMOND_BLOCK ) {
+            if (item.getType() == Material.DIAMOND_BLOCK) {
                 event.setCancelled(true);
                 Inventory menu = Bukkit.createInventory(null, 9, "Team Select");
 
@@ -48,32 +51,38 @@ public class DefaultListener implements Listener {
             }
         }
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getItem() != null && event.getItem().getType() == Material.ENDER_PEARL) {
-                if(cooldown.containsKey(player.getUniqueId())) {
-                    long secondleft = ((cooldown.get(player.getUniqueId()) / 1000) + cooldowntime) - (System.currentTimeMillis() / 1000);
-                    if (secondleft > 0) {
-                        event.setCancelled(true);
+            if (event.getItem().getType() == Material.ENDER_PEARL) {
+                if (cooldown.containsKey(player.getUniqueId())) {
+                    event.setCancelled(true);
+                    return;
+                }
+                cooldown.put(player.getUniqueId(), System.currentTimeMillis());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        cooldown.remove(player.getUniqueId());
                     }
-                }
-                else{
-                    cooldown.put(player.getUniqueId(),System.currentTimeMillis());
-//                    new BukkitRunnable() {
-//                        @Override
-//                        public void run() {
-//                            long secondleft = ((cooldown.get(player.getUniqueId()) / 1000) + cooldowntime) - (System.currentTimeMillis() / 1000);
-//                            Scoreboard scoreboard = player.getScoreboard();
-//                            Objective objective = scoreboard.getObjective("Bunkers");
-//                            scoreboard.resetScores(Bukkit.getOfflinePlayer("Ender Pearl: " + secondleft+1));
-//                            Score score = objective.getScore("Ender Pearl: " + secondleft);
-//                            score.setScore(1);
-//                            player.setScoreboard(scoreboard);
-//                        }
-//                    }.runTaskTimer(Asd.getInstance(),1L,1L);
-                }
+                }.runTaskLater(main, 15 * 20L);
+                scoreBoardLib.enderpearlScoreBoard(player,main.getPluginManager().getPlayerLivesManager(), main.teams);
+                new BukkitRunnable() {
 
+                    @Override
+                    public void run() {
+                        cooldowntime -= 0.1;
+                        if (cooldowntime <= 0) {
+                            cooldowntime = 15.0;
+                            scoreBoardLib.sendScoreBoard(player,main.getPluginManager().getPlayerLivesManager(), main.teams);
+                            this.cancel();
+                        }
+                    }
+                }.runTaskTimer(main, 2L, 2L);
             }
         }
+
     }
+
+
+
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) {

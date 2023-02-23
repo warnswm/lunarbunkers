@@ -18,16 +18,20 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.yaml.snakeyaml.util.ArrayStack;
+import qwezxc.asd.core.PlayerKillsManager;
 import qwezxc.asd.core.PlayerLivesManager;
 import qwezxc.asd.core.Team;
 import qwezxc.asd.core.Teams;
 
 public class PlayerLivesListener implements Listener {
     private PlayerLivesManager playerLivesManager;
+
+    private PlayerKillsManager playerKillsManager;
     private Teams teams;
-    public PlayerLivesListener(PlayerLivesManager playerLivesManager,Teams teams) {
+    public PlayerLivesListener(PlayerLivesManager playerLivesManager,Teams teams,PlayerKillsManager playerKillsManager) {
         this.playerLivesManager = playerLivesManager;
         this.teams = teams;
+        this.playerKillsManager = playerKillsManager;
     }
 
     @EventHandler
@@ -37,6 +41,8 @@ public class PlayerLivesListener implements Listener {
         double finaldmg = event.getFinalDamage();
         if (victim instanceof Player && damager instanceof Player) {
             Player target = ((Player) victim).getPlayer();
+            Player attacker = ((Player) damager).getPlayer();
+            playerKillsManager.addPlayerKills(attacker);
             Team targetTeam = teams.getTeam(target);
             Location targetBase = targetTeam.getBase();
             if (target.isDead() || target.getHealth() - finaldmg < 0) {

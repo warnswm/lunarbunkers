@@ -6,12 +6,12 @@ import qwezxc.asd.Data.Database;
 @Getter
 public class PluginManager {
     private static PluginManager instance;
-    private PluginScoreboardManager pluginScoreboardManager;
     private Database database;
     private Teams teams;
     private EconomyDataBaseOld economyDataBaseOld;
     private PlayerLivesManager playerLivesManager;
     private Economy economy;
+    private PlayerKillsManager playerKillsManager;
 
 
     private KOTH koth;
@@ -21,8 +21,8 @@ public class PluginManager {
         this.database = new Database();
         this.economyDataBaseOld = new EconomyDataBaseOld();
         this.playerLivesManager = new PlayerLivesManager();
-        this.pluginScoreboardManager = new PluginScoreboardManager();
         this.economy = new Economy();
+        this.playerKillsManager = new PlayerKillsManager();
     }
 
     public static PluginManager getInstance() {

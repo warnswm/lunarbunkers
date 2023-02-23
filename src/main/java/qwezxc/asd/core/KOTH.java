@@ -1,6 +1,7 @@
 package qwezxc.asd.core;
 
 import com.google.common.collect.Lists;
+import me.tigerhix.lib.scoreboard.type.Entry;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
@@ -21,8 +22,7 @@ public class KOTH {
     private Teams teams;
     private final List<UUID> capturingPlayers;
     private BukkitRunnable captureTimer;
-    private int minutes;
-    private int seconds;
+    public static int timeLeft = 300;
     private static final Map<Integer, String> TIMES_TO_CLEAR = Map.of(
             299, "Classic: 5:00",
             239, "Classic: 4:00",
@@ -40,24 +40,10 @@ public class KOTH {
     private void startCaptureTimer() {
         if (captureTimer == null) {
             captureTimer = new BukkitRunnable() {
-                int timeLeft = 300;
 
                 @Override
                 public void run() {
                     timeLeft--;
-                    minutes = timeLeft / 60;
-                    seconds = timeLeft % 60;
-                    for (Player players : Bukkit.getOnlinePlayers()) {
-                        Scoreboard scoreboard = players.getScoreboard();
-                        Objective objective = scoreboard.getObjective("Bunkers");
-                        Score score = objective.getScore("Classic: " + String.format("%d:%02d", minutes, seconds));
-                        clearPreviousScores(scoreboard,minutes,seconds);
-                        scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds + 1)));
-                        score.setScore(7);
-                        players.setScoreboard(scoreboard);
-                    }
-
-                    // Check if the time has run out
                     if (timeLeft == 0) {
                         Team capturingTeam = teams.getTeam(capturingPlayers.get(0));
                         Bukkit.broadcastMessage(ChatColor.GREEN + "The " + capturingTeam.getName() + " team has captured the point!");
@@ -101,22 +87,11 @@ public class KOTH {
 
         capturingPlayers.remove(player.getUniqueId());
 
-
         if (capturingPlayers.isEmpty() && captureTimer != null) {
             captureTimer.cancel();
             captureTimer = null;
-            Bukkit.broadcastMessage(ChatColor.RED + "Capture of " + "" + " has been reset!");
-            for (Player players : Bukkit.getOnlinePlayers()) {
-                Scoreboard scoreboard = players.getScoreboard();
-                Objective objective = scoreboard.getObjective("Bunkers");
-                scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds)));
-                scoreboard.resetScores(Bukkit.getOfflinePlayer("Classic: " + String.format("%d:%02d", minutes, seconds + 1)));
-                Score score = objective.getScore("Classic: " + String.format("%d:%02d", 5, 0));
-                score.setScore(7);
-                players.setScoreboard(scoreboard);
-            } 
-            minutes = 5;
-            seconds = 0;
+            Bukkit.broadcastMessage(ChatColor.RED + "Capture of " + " has been reset!");
+            timeLeft = 300;
         }
     }
     private void clearPreviousScores(Scoreboard scoreboard, int minutes, int seconds) {

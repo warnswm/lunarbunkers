@@ -36,7 +36,7 @@ public class NPCInteract implements Listener {
         if (npc.getName().equals("Combat Shop")) {
             player.openInventory(RegisterInventory.combatShop);
         }
-        if (npc.getName().equals("Seller")) {
+        if (npc.getName().equals("Seller Shop")) {
             Inventory inventory = Bukkit.createInventory(null, 9, "Seller Shop");
 
             ItemStack coal = createSellItem(Material.COAL, "Sell Coal", COAL_PRICE, player);
