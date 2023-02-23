@@ -7,7 +7,7 @@ import lombok.Setter;
 public class PlayerKills {
     private int kills;
 
-    public PlayerKills(int lives) {
+    public PlayerKills(int kills) {
         this.kills = kills;
     }
 

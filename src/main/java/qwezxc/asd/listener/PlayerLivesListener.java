@@ -3,6 +3,7 @@ package qwezxc.asd.listener;
 import com.comphenix.protocol.PacketType;
 import net.minecraft.server.v1_12_R1.Items;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -18,6 +19,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.yaml.snakeyaml.util.ArrayStack;
+import qwezxc.asd.Asd;
 import qwezxc.asd.core.PlayerKillsManager;
 import qwezxc.asd.core.PlayerLivesManager;
 import qwezxc.asd.core.Team;
@@ -42,8 +44,8 @@ public class PlayerLivesListener implements Listener {
         if (victim instanceof Player && damager instanceof Player) {
             Player target = ((Player) victim).getPlayer();
             Player attacker = ((Player) damager).getPlayer();
-            playerKillsManager.addPlayerKills(attacker);
             Team targetTeam = teams.getTeam(target);
+            if (targetTeam == null) return;
             Location targetBase = targetTeam.getBase();
             if (target.isDead() || target.getHealth() - finaldmg < 0) {
                 event.setCancelled(true);
@@ -54,18 +56,19 @@ public class PlayerLivesListener implements Listener {
                     }
                     target.getWorld().dropItemNaturally(playerLoc, item);
                 }
+                playerKillsManager.givePlayerKills(attacker,1);
+                if(playerKillsManager.getPKills(attacker) == 1){
+                    Asd.getInstance().getPluginManager().getEconomy().addBalance(attacker, 250);
+                    attacker.sendMessage(ChatColor.GREEN + " Вы получили $250 за 1 убийство");
+                }
+                if(playerKillsManager.getPKills(attacker) == 2){
+                    attacker.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE,2));
+                    attacker.sendMessage(ChatColor.GREEN + " Вы получили 2 золотых яблока за 2 убийства");
+                }
                 target.teleport(targetBase);
                 target.setHealth(20);
                 target.getInventory().clear();
                 playerLivesManager.takePlayerLives(target, 1);
-                Scoreboard scoreboard = target.getScoreboard();
-                Objective objective = scoreboard.getObjective("Bunkers");
-                int n = playerLivesManager.getRemainingLives(target) + 1;
-                int p = playerLivesManager.getRemainingLives(target);
-                scoreboard.resetScores(Bukkit.getOfflinePlayer("Осталось жизней: " + n));
-                Score score5 = objective.getScore("Осталось жизней: " + p);
-                score5.setScore(5);
-                target.setScoreboard(scoreboard);
             }
         }
     }

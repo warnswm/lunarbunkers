@@ -77,7 +77,7 @@ public final class Asd extends JavaPlugin{
                 teamNPC,
                 new TeamMenuListener(teams),
                 new PlayerLivesListener(playerLivesManager,teams,playerKillsManager),
-                new PlayerJoinListener(this, playerLivesManager, gameManager,scoreBoardLib,koth)
+                new PlayerJoinListener(this, playerLivesManager, gameManager,scoreBoardLib,playerKillsManager)
         ));
 
         getCommand("balance").setExecutor(new BalanceCommand(this));

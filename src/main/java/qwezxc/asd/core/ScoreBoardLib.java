@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class ScoreBoardLib {
-    public void sendScoreBoard(Player player,PlayerLivesManager playerLivesManager,Teams teams) {
+    public void sendScoreBoard(Player player,PlayerLivesManager playerLivesManager,PlayerKillsManager playerKillsManager,Teams teams) {
         UUID uuid = player.getUniqueId();
         Scoreboard scoreboard = ScoreboardLib.createScoreboard(player)
                 .setHandler(new ScoreboardHandler() {
@@ -39,7 +39,7 @@ public class ScoreBoardLib {
                                 .next("Team: " + getTeamforScoreBoard(teams,player))
                                 .next("Осталось жизней: " + playerLivesManager.getRemainingLives(player))
                                 .blank()
-                                .next("Kills: " + Asd.getInstance().getPluginManager().getPlayerKillsManager().getKills(player))
+                                .next("Kills: " + playerKillsManager.getPKills(player) )
                                 .next("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player))
                                 .blank()
                                 .build();
@@ -49,7 +49,7 @@ public class ScoreBoardLib {
                 .setUpdateInterval(2l);
         scoreboard.activate();
     }
-    public void enderpearlScoreBoard(Player player,PlayerLivesManager playerLivesManager,Teams teams) {
+    public void enderpearlScoreBoard(Player player,PlayerLivesManager playerLivesManager,PlayerKillsManager playerKillsManager, Teams teams) {
 
         UUID uuid = player.getUniqueId();
         Scoreboard scoreboard = ScoreboardLib.createScoreboard(player)
@@ -72,9 +72,9 @@ public class ScoreBoardLib {
                                 .next("Team: " + getTeamforScoreBoard(teams,player))
                                 .next("Осталось жизней: " + playerLivesManager.getRemainingLives(player))
                                 .blank()
-                                .next("Kills: " + Asd.getInstance().getPluginManager().getPlayerKillsManager().getKills(player))
+                                .next("Kills: " + playerKillsManager.getPKills(player))
                                 .next("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player))
-                                .next("Ender Pearl: " + df.format(DefaultListener.cooldowntime))
+                                .next("Ender Pearl: " + df.format(DefaultListener.cooldowntime) +"s")
                                 .blank()
                                 .build();
                     }

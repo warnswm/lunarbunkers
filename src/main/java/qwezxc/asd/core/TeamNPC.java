@@ -69,7 +69,7 @@ public class TeamNPC implements Listener {
         npc.spawn(loc);
         npc.setName(team.getChatColor() + "Combat Shop");
         npc.getOrAddTrait(GameModeTrait.class).setGameMode(GameMode.SURVIVAL);
-        npc.getOrAddTrait(LookClose.class).setHeadOnly(true);
+        npc.getOrAddTrait(LookClose.class).useRealisticLooking();
         npc.data().setPersistent(NPC.Metadata.RESPAWN_DELAY, 300 * 20);
         npcTeams.put(npc.getId(), team);
     }

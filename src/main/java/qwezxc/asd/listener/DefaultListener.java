@@ -63,7 +63,7 @@ public class DefaultListener implements Listener {
                         cooldown.remove(player.getUniqueId());
                     }
                 }.runTaskLater(main, 15 * 20L);
-                scoreBoardLib.enderpearlScoreBoard(player,main.getPluginManager().getPlayerLivesManager(), main.teams);
+                scoreBoardLib.enderpearlScoreBoard(player,main.getPluginManager().getPlayerLivesManager(), main.getPluginManager().getPlayerKillsManager(), main.teams);
                 new BukkitRunnable() {
 
                     @Override
@@ -71,7 +71,7 @@ public class DefaultListener implements Listener {
                         cooldowntime -= 0.1;
                         if (cooldowntime <= 0) {
                             cooldowntime = 15.0;
-                            scoreBoardLib.sendScoreBoard(player,main.getPluginManager().getPlayerLivesManager(), main.teams);
+                            scoreBoardLib.sendScoreBoard(player,main.getPluginManager().getPlayerLivesManager(), main.getPluginManager().getPlayerKillsManager(), main.teams);
                             this.cancel();
                         }
                     }

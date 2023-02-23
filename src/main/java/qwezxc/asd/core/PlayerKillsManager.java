@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class PlayerKillsManager {
     private Map<Player, PlayerKills> playerKillsMap;
@@ -19,16 +20,17 @@ public class PlayerKillsManager {
 
     public void givePlayerKills(Player player, int amount) {
         PlayerKills playerKills = getPlayerKills(player);
-        playerKills.setKills(amount);
+        playerKills.addKills(amount);
     }
 
-    public int getKills(Player player) {
+    public void takePlayerKills(Player player, int amount) {
+        PlayerKills playerkills = getPlayerKills(player);
+        playerkills.removeKills(amount);
+
+    }
+    public int getPKills(Player player) {
         PlayerKills playerKills = getPlayerKills(player);
         return playerKills.getKills();
-    }
-    public void addPlayerKills(Player player){
-        PlayerKills playerKills = getPlayerKills(player);
-        playerKills.addKills(1);
     }
 
 }

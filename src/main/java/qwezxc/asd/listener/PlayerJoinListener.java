@@ -12,10 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import qwezxc.asd.Asd;
-import qwezxc.asd.core.GameManager;
-import qwezxc.asd.core.KOTH;
-import qwezxc.asd.core.PlayerLivesManager;
-import qwezxc.asd.core.ScoreBoardLib;
+import qwezxc.asd.core.*;
 
 import java.util.List;
 
@@ -24,16 +21,16 @@ public class PlayerJoinListener implements Listener {
 
     public final Asd main;
     private PlayerLivesManager playerLivesManager;
+    private PlayerKillsManager playerKillsManager;
     private GameManager gameManager;
     private ScoreBoardLib scoreBoardLib;
-    private KOTH koth;
     private final Location lobby = new Location(Bukkit.getWorld("world"),0.5,65,206.5);
-    public PlayerJoinListener(final Asd main,PlayerLivesManager playerLivesManager,GameManager gameManager,ScoreBoardLib scoreBoardLib,KOTH koth) {
+    public PlayerJoinListener(final Asd main,PlayerLivesManager playerLivesManager,GameManager gameManager,ScoreBoardLib scoreBoardLib,PlayerKillsManager playerKillsManager) {
         this.main = main;
         this.playerLivesManager = playerLivesManager;
         this.gameManager = gameManager;
         this.scoreBoardLib = scoreBoardLib;
-        this.koth =koth;
+        this.playerKillsManager = playerKillsManager;
     }
 
     @EventHandler
@@ -44,7 +41,7 @@ public class PlayerJoinListener implements Listener {
         player.setGameMode(GameMode.SURVIVAL);
         main.getPluginManager().getDatabase().addPlayertoDatabase(player);
         main.getPluginManager().getEconomyDataBaseOld().addPlayer(player.getUniqueId(),player.getName());
-        scoreBoardLib.sendScoreBoard(player,playerLivesManager, main.teams);
+        scoreBoardLib.sendScoreBoard(player,playerLivesManager, playerKillsManager,main.teams);
         playerLivesManager.givePlayerLives(player, 3);
         if (Bukkit.getOnlinePlayers().size() == 2) {
             gameManager.execute();
