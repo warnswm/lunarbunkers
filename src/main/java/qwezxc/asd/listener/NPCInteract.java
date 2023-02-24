@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import qwezxc.asd.Items.DiamodPick;
 import qwezxc.asd.Items.RegisterInventory;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.List;
 public class NPCInteract implements Listener {
     final int COAL_PRICE = 10;
     final int IRON_INGOT_PRICE = 15;
-    final int DIAMOND_PRICE = 20;
+    final int DIAMOND_PRICE = 30;
     final int GOLD_INGOT_PRICE = 20;
 
     public NPCInteract() {
@@ -37,7 +38,12 @@ public class NPCInteract implements Listener {
             player.openInventory(RegisterInventory.combatShop);
         }
         if (npc.getName().equals("Builder Shop")) {
-            player.openInventory(RegisterInventory.builderShop);
+            Inventory inventory =  Bukkit.createInventory(null, 45, "Builder Shop");
+            //Picaxe 50$
+            inventory.setItem(30, DiamodPick.createDiamondPickaxe());
+            inventory.setItem(31, DiamodPick.createDiamondAxe());
+
+            player.openInventory(inventory);
         }
         if (npc.getName().equals("Seller Shop")) {
             Inventory inventory = Bukkit.createInventory(null, 9, "Seller Shop");
@@ -46,6 +52,7 @@ public class NPCInteract implements Listener {
             ItemStack iron = createSellItem(Material.IRON_INGOT, "Sell Iron Ingot", IRON_INGOT_PRICE, player);
             ItemStack diamond = createSellItem(Material.DIAMOND, "Sell Diamond", DIAMOND_PRICE, player);
             ItemStack gold = createSellItem(Material.GOLD_INGOT, "Sell Gold Ingot", GOLD_INGOT_PRICE, player);
+            // ToDo: Add Emerald price 40$
 
             inventory.setItem(7, coal);
             inventory.setItem(5, iron);

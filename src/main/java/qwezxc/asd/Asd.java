@@ -32,8 +32,6 @@ public final class Asd extends JavaPlugin{
     public World world;
     private PlayerJoinListener playerJoinListener;
     private PlayerLivesManager playerLivesManager;
-
-    private Map<UUID, Integer> minutesInCenter = new HashMap<>();
     private PluginManager pluginManager;
     public KOTH koth;
     public Economy economy;
@@ -51,7 +49,6 @@ public final class Asd extends JavaPlugin{
 
     @Override
     public void onEnable() {
-        checkWorldsOnServer();
         ScoreboardLib.setPluginInstance(this);
         world = Bukkit.getWorld("world");
         this.pluginManager = PluginManager.getInstance();
@@ -77,7 +74,8 @@ public final class Asd extends JavaPlugin{
                 teamNPC,
                 new TeamMenuListener(teams),
                 new PlayerLivesListener(playerLivesManager,teams,playerKillsManager),
-                new PlayerJoinListener(this, playerLivesManager, gameManager,scoreBoardLib,playerKillsManager)
+                new PlayerJoinListener(this, playerLivesManager, gameManager,scoreBoardLib,playerKillsManager),
+                new RepairListener()
         ));
 
         getCommand("balance").setExecutor(new BalanceCommand(this));
@@ -91,12 +89,6 @@ public final class Asd extends JavaPlugin{
 
     }
 
-    public void checkWorldsOnServer() {
-        List<World> worlds = getServer().getWorlds();
-        for (World world : worlds) {
-            System.out.println("World on server: " + world.getName());
-        }
-    }
 
     private void registerListeners(List<Listener> listeners) {
         for (Listener listener : listeners) {

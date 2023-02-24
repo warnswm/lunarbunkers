@@ -13,11 +13,14 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
+import qwezxc.asd.Items.ItemInfo;
 import qwezxc.asd.Items.RegisterItems;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static qwezxc.asd.Items.ItemInfo.ITEM_INFOS;
 
 public class SellerListener implements Listener {
 
@@ -29,101 +32,34 @@ public class SellerListener implements Listener {
         UUID uuid = player.getUniqueId();
         ItemStack item = event.getCurrentItem();
         Inventory inventory = event.getInventory();
-        int emptySlots = -1;
-        for (ItemStack i : player.getInventory().getStorageContents()) {
-            if (i == null || i.getType() == Material.AIR) {
-                emptySlots++;
-            }
-        }
+        
         if (!inventory.getName().equalsIgnoreCase("seller shop")) return;
 
         event.setCancelled(true);
         if (item == null) return;
 
-        // ToDo: Меняй на нормальное решение. Должна быть одна функция, в которую передавая аргументы будет происходить тоже самое, нахер копипаст
-        if (item.getType() == Material.COAL && item.getItemMeta().hasLore()) {
-            int coalCount = player.getInventory().all(Material.COAL).values().stream().mapToInt(ItemStack::getAmount).sum();
-            int addCoalBalance = 0;
-            if (event.getClick() == ClickType.RIGHT) {
-                if (coalCount > 0) {
-                    addCoalBalance = coalCount * 10;
-                    removeItemFromInventory(player.getInventory(), Material.COAL, coalCount);
+        for (ItemInfo itemInfo : ITEM_INFOS) {
+            if (item.getType() == itemInfo.getType() && item.getItemMeta().hasLore()) {
+                int count = player.getInventory().all(itemInfo.getType()).values().stream().mapToInt(ItemStack::getAmount).sum();
+                int addBalance = 0;
+                if (event.getClick() == ClickType.RIGHT) {
+                    if (count > 0) {
+                        addBalance = count * itemInfo.getValue();
+                        removeItemFromInventory(player.getInventory(), itemInfo.getType(), count);
+                    }
+                } else {
+                    if (count > 0) {
+                        addBalance = itemInfo.getSingleValue();
+                        removeItemFromInventory(player.getInventory(), itemInfo.getType(), 1);
+                    }
                 }
-            } else {
-                if (coalCount > 0) {
-                    addCoalBalance = 10;
-                    removeItemFromInventory(player.getInventory(), Material.COAL, 1);
+                if (addBalance > 0) {
+                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addBalance);
                 }
-            }
-            if (addCoalBalance > 0) {
-                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addCoalBalance);
-                updateScoreboard(player, addCoalBalance);
-            }
-        } else if (item.getType() == Material.IRON_INGOT && item.getItemMeta().hasLore()) {
-            int ironCount = player.getInventory().all(Material.IRON_INGOT).values().stream().mapToInt(ItemStack::getAmount).sum();
-            int addIronBalance = 0;
-            if (event.getClick() == ClickType.RIGHT) {
-                if (ironCount > 0) {
-                    addIronBalance = ironCount * 15;
-                    removeItemFromInventory(player.getInventory(), Material.IRON_INGOT, ironCount);
-                }
-            } else {
-                if (ironCount > 0) {
-                    addIronBalance = 15;
-                    removeItemFromInventory(player.getInventory(), Material.IRON_INGOT, 1);
-                }
-            }
-            if (addIronBalance > 0) {
-                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addIronBalance);
-                updateScoreboard(player, addIronBalance);
-            }
-        } else if (item.getType() == Material.GOLD_INGOT && item.getItemMeta().hasLore()) {
-            int goldCount = player.getInventory().all(Material.GOLD_INGOT).values().stream().mapToInt(ItemStack::getAmount).sum();
-            int addGoldBalance = 0;
-            if (event.getClick() == ClickType.RIGHT) {
-                if (goldCount > 0) {
-                    addGoldBalance = goldCount * 20;
-                    removeItemFromInventory(player.getInventory(), Material.GOLD_INGOT, goldCount);
-                }
-            } else {
-                if (goldCount > 0) {
-                    addGoldBalance = 20;
-                    removeItemFromInventory(player.getInventory(), Material.GOLD_INGOT, 1);
-                }
-            }
-            if (addGoldBalance > 0) {
-                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addGoldBalance);
-                updateScoreboard(player, addGoldBalance);
-            }
-        } else if (item.getType() == Material.DIAMOND && item.getItemMeta().hasLore()) {
-            int diamondCount = player.getInventory().all(Material.DIAMOND).values().stream().mapToInt(ItemStack::getAmount).sum();
-            int addDiamondBalance = 0;
-            if (event.getClick() == ClickType.RIGHT) {
-                if (diamondCount > 0) {
-                    addDiamondBalance = diamondCount * 50;
-                    removeItemFromInventory(player.getInventory(), Material.DIAMOND, diamondCount);
-                }
-            } else {
-                if (diamondCount > 0) {
-                    addDiamondBalance = 50;
-                    removeItemFromInventory(player.getInventory(), Material.DIAMOND, 1);
-                }
-            }
-            if (addDiamondBalance > 0) {
-                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, addDiamondBalance);
-                updateScoreboard(player, addDiamondBalance);
+                break;
             }
         }
 
-    }
-
-    private void updateScoreboard(Player player, int balanceToAdd) {
-        Scoreboard scoreboard = player.getScoreboard();
-        Objective objective = scoreboard.getObjective("Bunkers");
-        scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + (Asd.getInstance().getPluginManager().getEconomy().getBalance(player)-balanceToAdd)));
-        Score score = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player));
-        score.setScore(1);
-        player.setScoreboard(scoreboard);
     }
 
     private void removeItemFromInventory(Inventory inventory, Material material, int amount) {

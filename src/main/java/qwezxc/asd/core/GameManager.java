@@ -16,6 +16,8 @@ public class GameManager {
     private BukkitRunnable gameStartTimer;
     private final TeamNPC teamNPC;
 
+    public static boolean canCapture = false;
+
     public static int gameTime = 0;
     public GameManager(Asd main, Teams teams,TeamNPC teamNPC) {
         this.teams = teams;
@@ -73,12 +75,8 @@ public class GameManager {
     }
 
     private void startGame() {
-        //updateScoreboard();
-
         for (Player player : Bukkit.getOnlinePlayers()) {
-
             Team playerTeam = teams.getTeam(player);
-
             if (playerTeam == null) {
                 if (teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(greenTeam) &&
                         teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(blueTeam) &&
@@ -130,6 +128,9 @@ public class GameManager {
                 gameTime++;
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     Asd.getInstance().getPluginManager().getEconomy().addBalance(player, 1);
+                }
+                if(gameTime == 300){
+                    canCapture = true;
                 }
             }
         }.runTaskTimer(main, 20L, 20L);

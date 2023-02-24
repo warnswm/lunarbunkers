@@ -16,8 +16,13 @@ import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class KOTH {
+
     private Asd main;
     private Teams teams;
     private final List<UUID> capturingPlayers;
@@ -63,7 +68,7 @@ public class KOTH {
     public void startCapture(Player player) {
         UUID uuid = player.getUniqueId();
         if (capturingPlayers.contains(uuid)) return;
-
+        if(!GameManager.canCapture) return;
         Team playerTeam = teams.getTeam(player);
 
         if (playerTeam != null) {
