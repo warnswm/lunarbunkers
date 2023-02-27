@@ -1,25 +1,17 @@
 package qwezxc.asd.core;
 
-import com.google.common.collect.Lists;
-import me.tigerhix.lib.scoreboard.type.Entry;
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
+import qwezxc.asd.listener.DefaultListener;
 
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class KOTH {
 
@@ -27,7 +19,8 @@ public class KOTH {
     private Teams teams;
     private final List<UUID> capturingPlayers;
     private BukkitRunnable captureTimer;
-    public static int timeLeft = 300;
+    public static int timeLeft;
+    private final GameManager gameManager;
     private static final Map<Integer, String> TIMES_TO_CLEAR = Map.of(
             299, "Classic: 5:00",
             239, "Classic: 4:00",
@@ -36,9 +29,10 @@ public class KOTH {
             59, "Classic: 1:00"
     );
 
-    public KOTH(Asd main, Teams teams) {
+    public KOTH(Asd main, Teams teams, GameManager gameManager) {
         this.main = main;
         this.teams = teams;
+        this.gameManager = gameManager;
         this.capturingPlayers = new ArrayList<>();
     }
 
@@ -56,6 +50,9 @@ public class KOTH {
                         captureTimer.cancel();
                         captureTimer = null;
                         endGame();
+                        DefaultListener.removeBlocks();
+                        gameManager.stopGameStartTimer();
+
                     }
                 }
             };
@@ -74,7 +71,7 @@ public class KOTH {
         if (playerTeam != null) {
             if (capturingPlayers.isEmpty()) {
                 capturingPlayers.add(uuid);
-                Bukkit.broadcastMessage(ChatColor.GOLD + player.getName() + " from the " + playerTeam.getName() + " team is capturing " + "name" + "!");
+                Bukkit.broadcastMessage(ChatColor.GOLD + player.getName() + " из команды " + playerTeam.getName() + " начала захват " + "!");
                 startCaptureTimer();
             } else {
                 Team capturingTeam = teams.getTeam(capturingPlayers.get(0));
@@ -95,103 +92,16 @@ public class KOTH {
         if (capturingPlayers.isEmpty() && captureTimer != null) {
             captureTimer.cancel();
             captureTimer = null;
-            Bukkit.broadcastMessage(ChatColor.RED + "Capture of " + " has been reset!");
-            timeLeft = 300;
+            Bukkit.broadcastMessage(ChatColor.RED + "Захват был сброшен!");
+            int gameTime = GameManager.gameTime;
+            if (gameTime < 900) timeLeft = 450;
+            else if (gameTime > 901 && gameTime < 1500) timeLeft = 300;
+            else timeLeft = 150;
         }
     }
-    private void clearPreviousScores(Scoreboard scoreboard, int minutes, int seconds) {
-        int timeLeft = minutes * 60 + seconds;
-        if (TIMES_TO_CLEAR.containsKey(timeLeft)) {
-            scoreboard.resetScores(Bukkit.getOfflinePlayer(TIMES_TO_CLEAR.get(timeLeft)));
-        }
-    }
-
     private void endGame(){
         Bukkit.getScheduler().runTaskLater(main, CitizensAPI.getNPCRegistry()::deregisterAll, 2);
     }
+
+
 }
-
-
-//            if (!capturingPlayers.containsKey(player.getUniqueId())) {
-//                capturingPlayers.put(player.getUniqueId(), playerTeam);
-//                player.sendMessage("TI ZASHEL");
-//                startCaptureTimer(playerTeam);
-//            }
-//        } else {
-//            if (capturingPlayers.containsKey(player.getUniqueId())) {
-//                capturingPlayers.remove(player.getUniqueId());
-//                player.sendMessage("TI VISHEL");
-//                capturingPlayers.clear();
-//            }
-//        }
-//    }
-//
-//    private void startCaptureTimer(Team capturingTeam) {
-//        new BukkitRunnable() {
-//            int time = 0;
-//
-//            @Override
-//            public void run() {
-//                if (capturingPlayers.values().stream().anyMatch(capturingTeam::equals)) {
-//                    time++;
-//                    for (UUID playeruuid : capturingPlayers.keySet()){
-//                        Player player = Bukkit.getPlayer(playeruuid);
-//                        player.sendMessage(String.valueOf(time));
-//                    }
-//                    if (time >= 10) {
-//                        Bukkit.broadcastMessage(capturingTeam.getName() + " has captured the point!");
-//                        cancel();
-//                        time = 0;
-//                        capturingPlayers.clear();
-//                    }
-//                } else {
-//                    cancel();
-//                    time = 0;
-//                    capturingPlayers.clear();
-//                }
-//            }
-//        }.runTaskTimer(Asd.getInstance(), 0, 20);
-//    }
-//
-
-
-//    private Map<UUID, PluginTeam> players;
-//    private Plugin plugin;
-//    private Location hillLocation;
-//    private Map<UUID, Long> playersOnHill = new HashMap<>();
-//    public KOTH(Map<UUID, PluginTeam> players, Plugin plugin,Location hillLocation) {
-//        this.players = players;
-//        this.plugin = plugin;
-//        this.hillLocation = hillLocation;
-//    }
-//
-//    @Override
-//    public void run() {
-//        for (UUID playerUUID : playersOnHill.keySet()) {
-//            Player player = Bukkit.getPlayer(playerUUID);
-//            if (player != null) {
-//                if (System.currentTimeMillis() - playersOnHill.get(playerUUID) >= 300000) {
-//                    player.sendMessage("You are the King of the Hill!");
-//                    playersOnHill.remove(playerUUID);
-//                }
-//            } else {
-//                playersOnHill.remove(playerUUID);
-//            }
-//        }
-//    }
-//
-//    @EventHandler
-//    public void onPlayerMove(PlayerMoveEvent event) {
-//        Player player = event.getPlayer();
-//        Location from = event.getFrom();
-//        Location to = event.getTo();
-//        if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ()) {
-//            return;
-//        }
-//        if (to.getBlockY() >= kingOfTheHillTask.getHillLocation().getBlockY()) {
-//            kingOfTheHillTask.addPlayerToHill(player);
-//        } else {
-//            kingOfTheHillTask.removePlayerFromHill(player);
-//        }
-//    }
-

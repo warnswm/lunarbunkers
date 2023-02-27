@@ -107,7 +107,7 @@ public class GameManager {
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
             Team playerTeam = teams.getTeam(player);
-
+            player.closeInventory();
             // Teleport the player to their team's base
             if (playerTeam == redTeam) {
                 player.teleport(playerTeam.getBase());
@@ -120,7 +120,7 @@ public class GameManager {
             }
 
             // Start the game
-            player.sendMessage("The game has started!");
+            player.sendMessage("Игра началась!");
         }
         new BukkitRunnable() {
             @Override
@@ -129,8 +129,28 @@ public class GameManager {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     Asd.getInstance().getPluginManager().getEconomy().addBalance(player, 1);
                 }
-                if(gameTime == 300){
-                    canCapture = true;
+                switch (gameTime) {
+                    case 300:
+                        canCapture = true;
+                        KOTH.timeLeft = 450;
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            player.sendMessage(ChatColor.ITALIC + "Точка захвата стала активна");
+                        }
+                        break;
+                    case 900:
+                        KOTH.timeLeft = 300;
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 5:00");
+                        }
+                        break;
+                    case 1500:
+                        KOTH.timeLeft = 150;
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 2:30");
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         }.runTaskTimer(main, 20L, 20L);

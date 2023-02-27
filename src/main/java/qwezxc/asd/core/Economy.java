@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class Economy {
-    private HashMap<UUID, Integer> balances;
+    private final HashMap<UUID, Integer> balances;
 
     public Economy() {
         balances = new HashMap<>();

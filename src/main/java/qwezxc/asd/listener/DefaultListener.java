@@ -1,28 +1,31 @@
 package qwezxc.asd.listener;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import qwezxc.asd.Asd;
+import qwezxc.asd.core.GameManager;
 import qwezxc.asd.core.ScoreBoardLib;
 import qwezxc.asd.core.Team;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 public class DefaultListener implements Listener {
@@ -32,6 +35,7 @@ public class DefaultListener implements Listener {
     private ScoreBoardLib scoreBoardLib;
     private final HashMap<UUID, Long> captureMessageCooldown = new HashMap<>();
     private final int MESSAGE_COOLDOWN_SECONDS = 10;
+    public static List<Block> placedBlocks = new ArrayList<>();
 
     public DefaultListener(final Asd main, ScoreBoardLib scoreBoardLib) {
         this.main = main;
@@ -47,7 +51,6 @@ public class DefaultListener implements Listener {
             if (item.getType() == Material.DIAMOND_BLOCK) {
                 event.setCancelled(true);
                 Inventory menu = Bukkit.createInventory(null, 9, "Team Select");
-
                 for (Team team : main.teams.getTeams()) {
                     menu.addItem(new ItemStack(team.getWoolBlock(), 1));
                 }
@@ -103,6 +106,18 @@ public class DefaultListener implements Listener {
         }
     }
 
+    public static void removeBlocks() {
+        for (Block block : placedBlocks) {
+            block.setType(Material.AIR);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        main.koth.stopCapture(player);
+    }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -113,11 +128,13 @@ public class DefaultListener implements Listener {
                 Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius &&
                 Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius) {
             main.koth.startCapture(player);
-            long lastMessageTime = captureMessageCooldown.getOrDefault(player.getUniqueId(), 0L);
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - lastMessageTime > MESSAGE_COOLDOWN_SECONDS * 1000) {
-                player.sendMessage(ChatColor.RED + "Точку можно захватить начиная с 5 минуты.");
-                captureMessageCooldown.put(player.getUniqueId(), currentTime);
+            if (GameManager.gameTime > 300) {
+                long lastMessageTime = captureMessageCooldown.getOrDefault(player.getUniqueId(), 0L);
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastMessageTime > MESSAGE_COOLDOWN_SECONDS * 1000) {
+                    player.sendMessage(ChatColor.RED + "Точку можно захватить начиная с 5 минуты.");
+                    captureMessageCooldown.put(player.getUniqueId(), currentTime);
+                }
             }
         } else {
             main.koth.stopCapture(player);
@@ -125,11 +142,28 @@ public class DefaultListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerLeave(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        main.koth.stopCapture(player);
+    public void onWeatherChange(WeatherChangeEvent e) {
+        e.setCancelled(e.toWeatherState());
     }
 
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+        if (!player.isOp()) {
+            placedBlocks.add(block);
+        }
+    }
 
-
+    @EventHandler
+    public void onBlockKOTH(BlockPlaceEvent event) {
+        Location blocklocaiton = event.getBlock().getLocation();
+        double captureRadius = 10.5;
+        Location capturePoint = new Location(Bukkit.getWorld("world"), 1.5, 63.5, 0.5);
+        if (Math.abs(blocklocaiton.getX() - capturePoint.getX()) <= captureRadius &&
+                Math.abs(blocklocaiton.getY() - capturePoint.getY()) <= captureRadius - 5 &&
+                Math.abs(blocklocaiton.getZ() - capturePoint.getZ()) <= captureRadius) {
+            event.setCancelled(true);
+        }
+    }
 }

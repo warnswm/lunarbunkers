@@ -1,40 +1,36 @@
 package qwezxc.asd.listener;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
-
-import java.util.UUID;
-
-public class MainTrader implements Listener {
+public class MainTraderListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
+        if (!inventory.getTitle().equals("Combat Shop")) return;
+
         Player player = (Player) event.getWhoClicked();
         ItemStack item = event.getCurrentItem();
-        Inventory inventory = event.getInventory();
-
-        if (!inventory.getTitle().equals("Combat Shop")) return;
 
         event.setCancelled(true);
 
-        if (item == null) return;
-        if (item.getItemMeta() == null) return;
-        if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II")) {
-            buyPotion(player, new ItemStack(Material.POTION, 1, (short) 8226), 10);
+        int availableSlots = player.getInventory().firstEmpty();
+        if (availableSlots == -1) {
+            player.sendMessage("Inventory is full");
+            return;
+        }
+
+        if (item == null || item.getItemMeta() == null) return;
+
+        if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II (1:30)")) {
+            buy(player, new ItemStack(Material.POTION, 1, (short) 8226), 10);
         } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
             if (event.getClick() == ClickType.RIGHT) {
                 int count = 0;
@@ -43,56 +39,73 @@ public class MainTrader implements Listener {
                         count++;
                     }
                 }
-                buyPotion(player, new ItemStack(Material.POTION, count, (short) 16421), 5 * count);
+                if (!Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(player, 5 * count)) {
+                    player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы заполнить инвентарь зельем");
+                    return;
+                }
+                for (int i = count; i > 0; i--) {
+                    buy(player, new ItemStack(Material.POTION, 1, (short) 16421), 5);
+                }
             } else {
-                buyPotion(player, new ItemStack(Material.POTION, 1, (short) 16421), 5);
+                buy(player, new ItemStack(Material.POTION, 1, (short) 16421), 5);
             }
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)")) {
-            buyPotion(player, new ItemStack(Material.POTION, 1, (short) 8195), 25);
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Slowness Potion (1:07)")) {
-            buyPotion(player, new ItemStack(Material.POTION, 1, (short) 16394), 25);
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Boots")) {
+        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)"))
+            buy(player, new ItemStack(Material.POTION, 1, (short) 8195), 25);
+         else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Slowness Potion (1:07)"))
+            buy(player, new ItemStack(Material.POTION, 1, (short) 16394), 25);
+         else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Diamond Sword"))
+            buy(player, new ItemStack(Material.POTION, 1, (short) 16394), 25);
+         else if (item.getType() == Material.DIAMOND_BOOTS)
             purchaseItem(player, new ItemStack(Material.DIAMOND_BOOTS), 125, "алмазные ботинки");
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Leggings")) {
+         else if (item.getType() == Material.DIAMOND_LEGGINGS)
             purchaseItem(player, new ItemStack(Material.DIAMOND_LEGGINGS), 250, "алмазные поножи");
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Chestplate")) {
+         else if (item.getType() == Material.DIAMOND_CHESTPLATE)
             purchaseItem(player, new ItemStack(Material.DIAMOND_CHESTPLATE), 275, "алмазный нагрудник");
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Diamond Helmet")) {
+         else if (item.getType() == Material.DIAMOND_HELMET)
             purchaseItem(player, new ItemStack(Material.DIAMOND_HELMET), 275, "алмазный шлем");
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Full set")) {
+         else if (item.getType() == Material.DIAMOND)
             purchaseItem(player, new ItemStack(Material.DIAMOND), 850, "фулл сет и меч");
+         else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Ender Pearl")) {
+            if (event.getClick() == ClickType.RIGHT) {
+                if (!Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(player, 25 * 16)) {
+                    player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы купить это");
+                    return;
+                }
+                Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, 25 * 16);
+                player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL, 16));
+            } else {
+                buy(player, new ItemStack(Material.ENDER_PEARL, 1), 25);
+            }
+        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Steak")) {
+            if (event.getClick() == ClickType.RIGHT) {
+                if (!Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(player, 75 * 4)) {
+                    player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы купить это");
+                    return;
+                }
+                Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, 75 * 4);
+                player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 64));
+            } else {
+                buy(player, new ItemStack(Material.COOKED_BEEF, 16), 75);
+            }
         }
     }
 
 
-    private void buyPotion(Player player, ItemStack potion, int price) {
-        int availableSlots = player.getInventory().firstEmpty();
-        if (availableSlots == -1) {
-            player.sendMessage("Inventory is full");
-            return;
-        }
+    private void buy(Player player, ItemStack item, int price) {
         if (!Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(player, price)) {
             player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы купить это зелье");
             return;
         }
         Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, price);
-        player.getInventory().addItem(potion);
-
+        player.getInventory().addItem(item);
     }
 
     public void purchaseItem(Player player, ItemStack itemStack, int cost, String displayName) {
-        Scoreboard scoreboard = player.getScoreboard();
-        Objective objective = scoreboard.getObjective("Bunkers");
-        int availableSlots = player.getInventory().firstEmpty();
-        if (availableSlots == -1) {
-            player.sendMessage("Inventory is full");
-            return;
-        }
+
         if (!Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(player, cost)) {
             player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы купить " + displayName);
             return;
         }
-        scoreboard.resetScores(Bukkit.getOfflinePlayer("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player)));
         Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, cost);
         if (itemStack.getType() == Material.DIAMOND) {
             ItemStack boots = player.getInventory().getBoots();
@@ -143,9 +156,6 @@ public class MainTrader implements Listener {
                 player.getInventory().addItem(item);
             }
         }
-        Score score1 = objective.getScore("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player));
-        score1.setScore(1);
-        player.setScoreboard(scoreboard);
     }
 
 }

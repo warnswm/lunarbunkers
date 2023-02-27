@@ -2,90 +2,53 @@ package qwezxc.asd.Items;
 
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagList;
-import net.minecraft.server.v1_12_R1.NBTTagString;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DiamodPick {
     public static ItemStack createDiamondPickaxe() {
-        ItemStack pickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
-        ItemMeta pickaxemeta = pickaxe.getItemMeta();
+        // Create a new ItemStack for a diamond pickaxe
+        ItemStack picaxe = new ItemStack(Material.DIAMOND_PICKAXE);
 
-
-        List<String> canBreak = new ArrayList<>();
-        canBreak.add("minecraft:diamond_ore");
-        canBreak.add("minecraft:gold_ore");
-        canBreak.add("minecraft:iron_ore");
-        canBreak.add("minecraft:coal_ore");
-
-        net.minecraft.server.v1_12_R1.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(pickaxe);
-        NBTTagList tagList = new NBTTagList();
-
-        for (String block : canBreak) {
-            NBTTagString tag = new NBTTagString(block);
-            tagList.add(tag);
-        }
+        net.minecraft.server.v1_12_R1.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(picaxe);
 
         NBTTagCompound tag = new NBTTagCompound();
-        tag.set("CanDestroy", tagList);
         tag.setBoolean("Unbreakable", true);
         nmsItemStack.setTag(tag);
-        nmsItemStack.getTag().setInt("HideFlags", 2);
-        nmsItemStack.getTag().setInt("HideFlags", 3);
-        nmsItemStack.getTag().setInt("HideFlags", 4);
-        pickaxe = CraftItemStack.asBukkitCopy(nmsItemStack);
-        pickaxemeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-        pickaxe.setItemMeta(pickaxemeta);
 
-        return pickaxe;
+        ItemStack it = CraftItemStack.asBukkitCopy(nmsItemStack);
+        ItemMeta itemMeta = it.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.GREEN + "Алмазная кирка");
+        it.setItemMeta(itemMeta);
 
-
+        return it;
     }
     public static ItemStack createStonePickaxe() {
         // Create a new ItemStack for a diamond pickaxe
-        ItemStack pickaxe = new ItemStack(Material.STONE_PICKAXE);
-        ItemMeta pickaxemeta = pickaxe.getItemMeta();
+        ItemStack picaxe = new ItemStack(Material.STONE_PICKAXE);
 
-
-        List<String> canBreak = new ArrayList<>();
-        canBreak.add("minecraft:diamond_ore");
-        canBreak.add("minecraft:gold_ore");
-        canBreak.add("minecraft:iron_ore");
-        canBreak.add("minecraft:coal_ore");
-
-        net.minecraft.server.v1_12_R1.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(pickaxe);
-        NBTTagList tagList = new NBTTagList();
-
-        for (String block : canBreak) {
-            NBTTagString tag = new NBTTagString(block);
-            tagList.add(tag);
-        }
+        net.minecraft.server.v1_12_R1.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(picaxe);
 
         NBTTagCompound tag = new NBTTagCompound();
-        tag.set("CanDestroy", tagList);
         tag.setBoolean("Unbreakable", true);
+        tag.setBoolean("Soulbound", true);
         nmsItemStack.setTag(tag);
-        nmsItemStack.getTag().setInt("HideFlags", 2);
-        nmsItemStack.getTag().setInt("HideFlags", 3);
-        nmsItemStack.getTag().setInt("HideFlags", 4);
-        pickaxe = CraftItemStack.asBukkitCopy(nmsItemStack);
-        pickaxemeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-        pickaxe.setItemMeta(pickaxemeta);
 
-        return pickaxe;
+        ItemStack it = CraftItemStack.asBukkitCopy(nmsItemStack);
+        ItemMeta itemMeta = it.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.GREEN + "Каменная кирка");
+        it.setItemMeta(itemMeta);
+
+        return it;
 
     }
 
     public static ItemStack createStoneAxe() {
         // Create a new ItemStack for a diamond pickaxe
         ItemStack pickaxe = new ItemStack(Material.STONE_AXE);
-        ItemMeta pickaxemeta = pickaxe.getItemMeta();
 
         net.minecraft.server.v1_12_R1.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(pickaxe);
         NBTTagList tagList = new NBTTagList();
@@ -93,13 +56,8 @@ public class DiamodPick {
         NBTTagCompound tag = new NBTTagCompound();
         tag.set("CanDestroy", tagList);
         tag.setBoolean("Unbreakable", true);
-        nmsItemStack.setTag(tag);
-        nmsItemStack.getTag().setInt("HideFlags", 2);
-        nmsItemStack.getTag().setInt("HideFlags", 3);
-        nmsItemStack.getTag().setInt("HideFlags", 4);
+        tag.setBoolean("Soulbound", true);
         pickaxe = CraftItemStack.asBukkitCopy(nmsItemStack);
-        pickaxemeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-        pickaxe.setItemMeta(pickaxemeta);
 
         return pickaxe;
 
@@ -107,25 +65,20 @@ public class DiamodPick {
 
     public static ItemStack createDiamondAxe() {
         // Create a new ItemStack for a diamond pickaxe
-        ItemStack pickaxe = new ItemStack(Material.DIAMOND_AXE);
-        ItemMeta pickaxemeta = pickaxe.getItemMeta();
+        ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
 
-        net.minecraft.server.v1_12_R1.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(pickaxe);
-        NBTTagList tagList = new NBTTagList();
+        net.minecraft.server.v1_12_R1.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(axe);
 
         NBTTagCompound tag = new NBTTagCompound();
-        tag.set("CanDestroy", tagList);
         tag.setBoolean("Unbreakable", true);
         nmsItemStack.setTag(tag);
-        nmsItemStack.getTag().setInt("HideFlags", 2);
-        nmsItemStack.getTag().setInt("HideFlags", 3);
-        nmsItemStack.getTag().setInt("HideFlags", 4);
-        pickaxe = CraftItemStack.asBukkitCopy(nmsItemStack);
-        pickaxemeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-        pickaxe.setItemMeta(pickaxemeta);
 
-        return pickaxe;
+        ItemStack it = CraftItemStack.asBukkitCopy(nmsItemStack);
+        ItemMeta itemMeta = it.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.GREEN + "Алмазный топор");
+        it.setItemMeta(itemMeta);
 
+        return it;
     }
 }
 

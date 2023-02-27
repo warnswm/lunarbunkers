@@ -8,7 +8,6 @@ public class PluginManager {
     private static PluginManager instance;
     private Database database;
     private Teams teams;
-    private EconomyDataBaseOld economyDataBaseOld;
     private PlayerLivesManager playerLivesManager;
     private Economy economy;
     private PlayerKillsManager playerKillsManager;
@@ -19,7 +18,6 @@ public class PluginManager {
         // Initialize the managers and utilities
         this.teams = new Teams();
         this.database = new Database();
-        this.economyDataBaseOld = new EconomyDataBaseOld();
         this.playerLivesManager = new PlayerLivesManager();
         this.economy = new Economy();
         this.playerKillsManager = new PlayerKillsManager();

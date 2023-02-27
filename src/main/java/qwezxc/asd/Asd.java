@@ -1,17 +1,12 @@
 package qwezxc.asd;
 
-import com.google.common.collect.Lists;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.npc.NPCRegistry;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import qwezxc.asd.Data.Database;
@@ -22,13 +17,13 @@ import qwezxc.asd.command.TestCommand;
 import qwezxc.asd.core.*;
 import qwezxc.asd.listener.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 
 public final class Asd extends JavaPlugin{
     private static Asd instance;
     private Database database;
-    private EconomyDataBaseOld economyDataBaseOld;
     public World world;
     private PlayerJoinListener playerJoinListener;
     private PlayerLivesManager playerLivesManager;
@@ -53,7 +48,6 @@ public final class Asd extends JavaPlugin{
         world = Bukkit.getWorld("world");
         this.pluginManager = PluginManager.getInstance();
         this.database = new Database();
-        this.economyDataBaseOld = new EconomyDataBaseOld();
         this.teams = new Teams();
         this.teamNPC = new TeamNPC(teams);
         this.gameManager = new GameManager(this, teams, teamNPC);
@@ -61,21 +55,23 @@ public final class Asd extends JavaPlugin{
         this.scoreBoardLib = new ScoreBoardLib();
         this.playerLivesManager = new PlayerLivesManager();
         this.playerKillsManager = new PlayerKillsManager();
-        koth = new KOTH(this, teams);
+        koth = new KOTH(this, teams, gameManager);
         oreRegen = new OreRegeneration(this);
 
         registerListeners(Arrays.asList(
-                new MainTrader(),
+                new MainTraderListener(),
                 new SellerListener(),
                 new TeamTerritory(teams),
                 new NPCInteract(),
-                new DefaultListener(this,scoreBoardLib),
+                new EnchantShopListener(),
+                new DefaultListener(this, scoreBoardLib),
                 oreRegen,
                 teamNPC,
                 new TeamMenuListener(teams),
-                new PlayerLivesListener(playerLivesManager,teams,playerKillsManager),
-                new PlayerJoinListener(this, playerLivesManager, gameManager,scoreBoardLib,playerKillsManager),
-                new RepairListener()
+                new PlayerLivesListener(playerLivesManager, teams, playerKillsManager),
+                new PlayerJoinListener(this, playerLivesManager, gameManager, scoreBoardLib, playerKillsManager),
+                new RepairListener(),
+                new BuildShopListener()
         ));
 
         getCommand("balance").setExecutor(new BalanceCommand(this));

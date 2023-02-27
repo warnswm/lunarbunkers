@@ -33,7 +33,6 @@ public class TeamTerritory implements Listener {
         double baseRadius = 14.5;
         if (block == null) return;
 
-
         if (block.getType() == Material.FENCE_GATE) {
 
             // Get the player's team
@@ -51,9 +50,7 @@ public class TeamTerritory implements Listener {
                         Math.abs(player.getLocation().getY() - baseLocation.getY()) <= baseRadius +200 &&
                         Math.abs(player.getLocation().getZ() - baseLocation.getZ()) <= baseRadius) {
 
-
                     isInBaseTerritory = true;
-
 
                     if (playerTeam.getName().equals(teamName)) {
                         event.setCancelled(false);

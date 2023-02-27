@@ -23,6 +23,4 @@ public class Team {
         this.maxPlayers = maxPlayers;
         this.base = base;
     }
-
-
 }

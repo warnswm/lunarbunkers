@@ -1,7 +1,5 @@
 package qwezxc.asd.listener;
 
-import me.tigerhix.lib.scoreboard.ScoreboardLib;
-import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -12,9 +10,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import qwezxc.asd.Asd;
-import qwezxc.asd.core.*;
-
-import java.util.List;
+import qwezxc.asd.core.GameManager;
+import qwezxc.asd.core.PlayerKillsManager;
+import qwezxc.asd.core.PlayerLivesManager;
+import qwezxc.asd.core.ScoreBoardLib;
 
 public class PlayerJoinListener implements Listener {
 
@@ -36,24 +35,26 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         event.setJoinMessage(null);
+
         Player player = event.getPlayer();
         player.teleport(lobby);
-        player.setGameMode(GameMode.SURVIVAL);
+        if (!player.isOp()) {
+            player.setGameMode(GameMode.SURVIVAL);
+        }
         main.getPluginManager().getDatabase().addPlayertoDatabase(player);
-        main.getPluginManager().getEconomyDataBaseOld().addPlayer(player.getUniqueId(),player.getName());
-        scoreBoardLib.sendScoreBoard(player,playerLivesManager, playerKillsManager,main.teams);
+        scoreBoardLib.sendScoreBoard(player, playerLivesManager, playerKillsManager, main.teams);
         playerLivesManager.givePlayerLives(player, 3);
         if (Bukkit.getOnlinePlayers().size() == 2) {
             gameManager.execute();
         }
-        if (Bukkit.getOnlinePlayers().isEmpty()){
+        if (Bukkit.getOnlinePlayers().isEmpty()) {
             Bukkit.getScheduler().runTaskLater(main, CitizensAPI.getNPCRegistry()::deregisterAll, 2);
         }
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
+        event.setQuitMessage("");
         if (Bukkit.getOnlinePlayers().size() != 4) {
             gameManager.stopGameStartTimer();
         }

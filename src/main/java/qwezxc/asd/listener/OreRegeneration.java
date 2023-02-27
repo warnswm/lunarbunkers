@@ -78,10 +78,21 @@ public class OreRegeneration implements Listener {
                 if (block.hasMetadata("RegenBlock")) {
                     event.setCancelled(true);
                 }
+                event.setCancelled(false);
+                return;
+            case FENCE_GATE:
+                event.setCancelled(false);
+                return;
+            case CHEST:
+                event.setCancelled(false);
+                return;
+            case LADDER:
+                event.setCancelled(false);
+                return;
             default:
                 if (!player.isOp()) {
                     event.setCancelled(true);
-                } else if (player.isOp() && player.getGameMode().equals(GameMode.CREATIVE)){
+                } else if (player.isOp() && player.getGameMode().equals(GameMode.CREATIVE)) {
                     breakBlocks.remove(block.getLocation());
                     event.setCancelled(false);
                 }

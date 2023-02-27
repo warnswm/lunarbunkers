@@ -12,23 +12,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
-    public static String color(String string){
-        return ChatColor.translateAlternateColorCodes('&',string);
+    public static String color(String string) {
+        return ChatColor.translateAlternateColorCodes('&', string);
     }
-    public static void msgPlayer(Player player, String... strings){
-        for (String string :strings){
+
+    public static void msgPlayer(Player player, String... strings) {
+        for (String string : strings) {
             player.sendMessage(color(string));
         }
     }
 
-    public static ItemStack createItem(Material type,int amount,boolean glow,boolean unbreakable,boolean hideUnb,String name,String... lines){
-        ItemStack item = new ItemStack(type,amount);
-        ItemMeta meta = item.getItemMeta();
-        if(glow){
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            meta.addEnchant(Enchantment.DURABILITY,1,true);
+    public static String declineNoun(String noun, int numeral) {
+        if (noun.equals("Дубовую калитку")) {
+            if (numeral == 1) {
+                return "Дубовую калитку";
+            } else {
+                return "Дубовых калиток";
+            }
+        } else {
+            if (numeral == 1) {
+                return noun;
+            } else if (numeral >= 2 && numeral <= 4) {
+                return noun + "а";
+            } else {
+                return noun + "ов";
+            }
         }
-        if(unbreakable) meta.setUnbreakable(true);
+    }
+
+
+    public static ItemStack createItem(Material type, int amount, boolean glow, boolean unbreakable, boolean hideUnb, String name, String... lines) {
+        ItemStack item = new ItemStack(type, amount);
+        ItemMeta meta = item.getItemMeta();
+        if (glow) {
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addEnchant(Enchantment.DURABILITY, 1, true);
+        }
+        if (unbreakable) meta.setUnbreakable(true);
         if (hideUnb) meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         if(name != null) meta.setDisplayName(color(name));
         if (lines!=null){

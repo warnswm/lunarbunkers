@@ -14,11 +14,11 @@ import java.util.List;
 
 public class RegisterItems {
 
-    public static ItemStack speedPotion = getPotion(Material.POTION, ChatColor.AQUA + "Speed Potion II", PotionType.SPEED, false, true, Arrays.asList(
+    public static ItemStack speedPotion = getPotion(Material.POTION, ChatColor.AQUA + "Speed Potion II (1:30)", PotionType.SPEED, false, true, Arrays.asList(
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
             ChatColor.GRAY + "x1 Speed II Potion",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$10"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$10"
     ));
 
     public static ItemStack healPotion = getPotion(Material.SPLASH_POTION,ChatColor.GREEN + "Health Potion II",PotionType.INSTANT_HEAL, false, true,Arrays.asList(
@@ -26,7 +26,7 @@ public class RegisterItems {
             ChatColor.GRAY + "x1 Health Splash Potion",
             ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to fill your inventory",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$5"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$5"
     ));
 
 
@@ -34,7 +34,7 @@ public class RegisterItems {
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
             ChatColor.GRAY + "x1 Fire Resistance Potion",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$25"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$25"
     ));
 
 
@@ -42,7 +42,7 @@ public class RegisterItems {
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
             ChatColor.GRAY + "x1 Slowness Splash Potion",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$50"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$50"
     ));
 
 
@@ -54,7 +54,7 @@ public class RegisterItems {
             ChatColor.GRAY + "1x Diamond Leggings",
             ChatColor.GRAY + "1x Diamond Boots",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$850"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$850"
     ));
 
 
@@ -62,14 +62,20 @@ public class RegisterItems {
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
             ChatColor.GRAY + "1x Diamond Sword",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$100"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$100"
     ));
 
+    public static ItemStack helmet = getItem(Material.DIAMOND_HELMET, ChatColor.RED + "Diamond Helmet", Arrays.asList(
+            ChatColor.GRAY + "―――――――――――――――――――――――――――",
+            ChatColor.GRAY + "1x Diamond Helmet",
+            ChatColor.GRAY + "―――――――――――――――――――――――――――",
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$125"
+    ));
     public static ItemStack chestplate = getItem(Material.DIAMOND_CHESTPLATE, ChatColor.RED + "Diamond Chestplate", Arrays.asList(
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
             ChatColor.GRAY + "1x Diamond Chestplate",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$275"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$275"
     ));
 
 
@@ -77,7 +83,7 @@ public class RegisterItems {
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
             ChatColor.GRAY + "1x Diamond Leggings",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$250"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$250"
     ));
 
 
@@ -85,7 +91,7 @@ public class RegisterItems {
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
             ChatColor.GRAY + "1x Diamond Boots",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$125"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$125"
     ));
 
 
@@ -94,17 +100,37 @@ public class RegisterItems {
             ChatColor.GRAY + "x1 Ender Pearl",
             ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to buy x16 Ender Pearl",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "$25"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$25"
     ));
 
 
-
-    public static ItemStack steak = getItem(Material.COOKED_BEEF,ChatColor.GREEN + "Steak", Arrays.asList(
+    public static ItemStack steak = getItem(Material.COOKED_BEEF, ChatColor.GREEN + "Steak", Arrays.asList(
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
             ChatColor.GRAY + "x16 Steak",
             ChatColor.YELLOW + "- " + ChatColor.GREEN + "Right-click to buy x64 Steak",
             ChatColor.GRAY + "―――――――――――――――――――――――――――",
-            ChatColor.YELLOW + "Price: " + ChatColor.GREEN + "75"
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$75"
+    ));
+
+    public static ItemStack enchanthelmet = getItem(Material.GOLD_HELMET, ChatColor.GREEN + "Прочность 3", Arrays.asList(
+            ChatColor.GRAY + "―――――――――――――――――――――――――――",
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "300",
+            ChatColor.GRAY + "―――――――――――――――――――――――――――"
+    ));
+    public static ItemStack enchantchestplate = getItem(Material.GOLD_CHESTPLATE, ChatColor.GREEN + "Прочность 3", Arrays.asList(
+            ChatColor.GRAY + "―――――――――――――――――――――――――――",
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "300",
+            ChatColor.GRAY + "―――――――――――――――――――――――――――"
+    ));
+    public static ItemStack enchantleggings = getItem(Material.GOLD_LEGGINGS, ChatColor.GREEN + "Прочность 3", Arrays.asList(
+            ChatColor.GRAY + "―――――――――――――――――――――――――――",
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "300",
+            ChatColor.GRAY + "―――――――――――――――――――――――――――"
+    ));
+    public static ItemStack enchantboots = getItem(Material.GOLD_BOOTS, ChatColor.GREEN + "Прочность 3", Arrays.asList(
+            ChatColor.GRAY + "―――――――――――――――――――――――――――",
+            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "300",
+            ChatColor.GRAY + "―――――――――――――――――――――――――――"
     ));
 
     public static ItemStack getItem(Material material, String name, List<String> lore) {

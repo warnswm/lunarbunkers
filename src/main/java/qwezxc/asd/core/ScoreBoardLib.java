@@ -2,24 +2,18 @@ package qwezxc.asd.core;
 
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
-import me.tigerhix.lib.scoreboard.common.Strings;
-import me.tigerhix.lib.scoreboard.common.animate.HighlightedString;
-import me.tigerhix.lib.scoreboard.common.animate.ScrollableString;
 import me.tigerhix.lib.scoreboard.type.Entry;
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import me.tigerhix.lib.scoreboard.type.ScoreboardHandler;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import qwezxc.asd.Asd;
 import qwezxc.asd.listener.DefaultListener;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.UUID;
 
 public class ScoreBoardLib {
     public void sendScoreBoard(Player player,PlayerLivesManager playerLivesManager,PlayerKillsManager playerKillsManager,Teams teams) {
-        UUID uuid = player.getUniqueId();
         Scoreboard scoreboard = ScoreboardLib.createScoreboard(player)
                 .setHandler(new ScoreboardHandler() {
 
@@ -50,12 +44,10 @@ public class ScoreBoardLib {
         scoreboard.activate();
     }
     public void enderpearlScoreBoard(Player player,PlayerLivesManager playerLivesManager,PlayerKillsManager playerKillsManager, Teams teams) {
-
-        UUID uuid = player.getUniqueId();
         Scoreboard scoreboard = ScoreboardLib.createScoreboard(player)
                 .setHandler(new ScoreboardHandler() {
 
-                    DecimalFormat df = new DecimalFormat("#.##");
+                    final DecimalFormat df = new DecimalFormat("#.##");
                     @Override
                     public String getTitle(Player player) {
                         return null;

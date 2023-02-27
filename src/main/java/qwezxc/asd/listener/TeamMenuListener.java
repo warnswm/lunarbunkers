@@ -10,13 +10,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.core.Team;
 import qwezxc.asd.core.Teams;
-
-import java.util.UUID;
 public class TeamMenuListener implements Listener {
     private Teams teams;
 
@@ -39,7 +34,7 @@ public class TeamMenuListener implements Listener {
         for (Team team : teams.getTeams()) {
             if (item.getType() == team.getWoolBlock()) {
                 if(teams.getNumPlayersInTeam(team) >= team.getMaxPlayers()){
-                    player.sendMessage("Max player in team");
+                    player.sendMessage("Команда заполнена");
                     return;
                 }
                 if(team == teams.getTeam(player)){
@@ -47,7 +42,7 @@ public class TeamMenuListener implements Listener {
                     return;
                 }
                 teams.addPlayerToTeam(player, team);
-                player.sendMessage("You joined the " + team.getName() + " team!");
+                player.sendMessage("Вы присоединились к команде " + team.getName());
                 ChatColor colorteam = team.getChatColor();
                 player.setPlayerListName("[" + colorteam + team.getName() + ChatColor.RESET + "]" + " " + player.getName());
                 break;
@@ -55,20 +50,29 @@ public class TeamMenuListener implements Listener {
         }
     }
 
-
-
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
+        String message = event.getMessage();
+        String teamMessage;
         Team team = teams.getTeam(player);
-        ChatColor colorteam = ChatColor.WHITE;
-        if(team != null) {
-            colorteam = team.getChatColor();
+        if (team == null) return;
+        ChatColor colorteam = team.getChatColor();
+
+        // Check if the message starts with "!"
+        if (message.startsWith("!")) {
+            // Global chat
+            event.setFormat(String.format("[%s] %s: %s", colorteam + team.getName() + ChatColor.RESET, player.getName(), message.substring(1)));
+            return;
         }
-        // Add the player's team name before their username in the chat
-        if (team != null) {
-            String message = String.format("[%s] %s: %s", colorteam + team.getName() + ChatColor.RESET, player.getName(), event.getMessage());
-            event.setFormat(message);
+
+        // The player is on a team
+        teamMessage = "[" + team.getChatColor() + "Team" + ChatColor.RESET + "] " + player.getName() + ": " + message;
+        event.setCancelled(true); // Cancel the original event
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (teams.getTeam(p) == team) {
+                p.sendMessage(teamMessage); // Send the message to all players on the same team
+            }
         }
     }
 }
