@@ -27,8 +27,7 @@ public class MainTraderListener implements Listener {
             return;
         }
 
-        if (item == null || item.getItemMeta() == null) return;
-
+        if (item == null || item.getItemMeta().getDisplayName() == null) return;
         if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II (1:30)")) {
             buy(player, new ItemStack(Material.POTION, 1, (short) 8226), 10);
         } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
@@ -54,7 +53,7 @@ public class MainTraderListener implements Listener {
          else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Slowness Potion (1:07)"))
             buy(player, new ItemStack(Material.POTION, 1, (short) 16394), 25);
          else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Diamond Sword"))
-            buy(player, new ItemStack(Material.POTION, 1, (short) 16394), 25);
+            buy(player, new ItemStack(Material.DIAMOND_SWORD, 1),100);
          else if (item.getType() == Material.DIAMOND_BOOTS)
             purchaseItem(player, new ItemStack(Material.DIAMOND_BOOTS), 125, "алмазные ботинки");
          else if (item.getType() == Material.DIAMOND_LEGGINGS)

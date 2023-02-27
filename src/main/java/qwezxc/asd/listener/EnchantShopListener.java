@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -90,101 +91,101 @@ public class EnchantShopListener implements Listener {
         NPC npc = event.getNPC();
         Player player = event.getClicker();
         if (player.getGameMode() != GameMode.SURVIVAL) return;
-        if (npc.getName().equals("Es")) {
-            Inventory chestInventory = Bukkit.createInventory(null, 54, ChatColor.GREEN + "Enchant Shop");
-            ItemStack[] armorContents = player.getInventory().getArmorContents();
-            boolean hasSword = false;
-            boolean hasPickaxe = false;
-            for (int i = 0; i < armorContents.length; i++) {
-                ItemStack armor = armorContents[i];
-                if (armor == null) {
-                    chestInventory.setItem(i == 0 ? 37 : i == 1 ? 28 : i == 2 ? 19 : 10, createRedPane());
-                    chestInventory.setItem(i == 0 ? 43 : i == 1 ? 34 : i == 2 ? 25 : 16, createRedPane());
-                    chestInventory.setItem(13, createRedPane());
-                    continue;
-                }
+        if (!npc.getName().equals("Es")) return;
+        Inventory chestInventory = Bukkit.createInventory(null, 54, ChatColor.GREEN + "Enchant Shop");
+        ItemStack[] armorContents = player.getInventory().getArmorContents();
+        boolean hasSword = false;
+        boolean hasPickaxe = false;
+        for (int i = 0; i < armorContents.length; i++) {
+            ItemStack armor = armorContents[i];
+            if (armor == null) {
+                chestInventory.setItem(i == 0 ? 37 : i == 1 ? 28 : i == 2 ? 19 : 10, createRedPane());
+                chestInventory.setItem(i == 0 ? 43 : i == 1 ? 34 : i == 2 ? 25 : 16, createRedPane());
+                chestInventory.setItem(13, createRedPane());
+                continue;
+            }
+            ItemStack playerArmor = new ItemStack(armor.getType(), 1);
+            ItemStack playerboots = new ItemStack(Material.FEATHER);
+            Map<Enchantment, Integer> enchantments = armor.getEnchantments();
+            int protectionLevel = enchantments.getOrDefault(Enchantment.PROTECTION_ENVIRONMENTAL, 0);
+            if (protectionLevel == 4) {
+                getItem(playerArmor, ChatColor.GREEN + "Max Protection ", Arrays.asList(
+                        ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                        ChatColor.RED + Utils.color("У вас максимальный лвл зачарования"),
+                        ChatColor.GRAY + "―――――――――――――――――――――――――――"
+                ));
+            } else {
+                getItem(playerArmor, ChatColor.GREEN + "Buy Protection " + (protectionLevel + 1), Arrays.asList(
+                        ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                        ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + ArmorPrice.getArmorEnchantByInt(protectionLevel + 1),
+                        ChatColor.GRAY + "―――――――――――――――――――――――――――"
+                ));
+            }
+            if (enchantments.containsKey(Enchantment.DURABILITY)) {
+                chestInventory.setItem(i == 0 ? 43 : i == 1 ? 34 : i == 2 ? 25 : 16, createRedPane());
+            } else {
+                chestInventory.setItem(enchantSlots[i], enchantItems[i]);
+            }
+            if (armor.getType() == Material.DIAMOND_BOOTS && enchantments.containsKey(Enchantment.PROTECTION_FALL) && enchantments.get(Enchantment.PROTECTION_FALL) == 4) {
+                chestInventory.setItem(13, createRedPane());
+            } else if (armor.getType() == Material.DIAMOND_BOOTS) {
+                // Boots without Feather Falling 4 enchantment
+                getItem(playerboots, ChatColor.GREEN + "Buy Feather Falling 4", Arrays.asList(
+                        ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                        ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$500",
+                        ChatColor.GRAY + "―――――――――――――――――――――――――――"
+                ));
+                chestInventory.setItem(13, playerboots);
+            }
 
-
-                ItemStack playerArmor = new ItemStack(armor.getType(), 1);
-                ItemStack playerboots = new ItemStack(Material.FEATHER);
-                Map<Enchantment, Integer> enchantments = armor.getEnchantments();
-                int protectionLevel = enchantments.getOrDefault(Enchantment.PROTECTION_ENVIRONMENTAL, 0);
-                if (protectionLevel == 4) {
-                    getItem(playerArmor, ChatColor.GREEN + "Max Protection ", Arrays.asList(
-                            ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                            ChatColor.RED + Utils.color("У вас максимальный лвл зачарования"),
-                            ChatColor.GRAY + "―――――――――――――――――――――――――――"
-                    ));
+            chestInventory.setItem(i == 0 ? 37 : i == 1 ? 28 : i == 2 ? 19 : 10, playerArmor);
+        }
+        ItemStack pickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+        ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null) continue;
+            if (item.getType() == Material.DIAMOND_PICKAXE) {
+                Map<Enchantment, Integer> enchantments = item.getEnchantments();
+                if (enchantments.containsKey(Enchantment.DIG_SPEED)) {
+                    chestInventory.setItem(14, createRedPane());
                 } else {
-                    getItem(playerArmor, ChatColor.GREEN + "Buy Protection " + (protectionLevel + 1), Arrays.asList(
-                            ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + ArmorPrice.getArmorEnchantByInt(protectionLevel + 1),
-                            ChatColor.GRAY + "―――――――――――――――――――――――――――"
-                    ));
-                }
-                if (enchantments.containsKey(Enchantment.DURABILITY)) {
-                    chestInventory.setItem(i == 0 ? 43 : i == 1 ? 34 : i == 2 ? 25 : 16, createRedPane());
-                } else {
-                    chestInventory.setItem(enchantSlots[i], enchantItems[i]);
-                }
-                if (armor.getType() == Material.DIAMOND_BOOTS && enchantments.containsKey(Enchantment.PROTECTION_FALL) && enchantments.get(Enchantment.PROTECTION_FALL) == 4) {
-                    chestInventory.setItem(13, createRedPane());
-                } else if (armor.getType() == Material.DIAMOND_BOOTS) {
-                    // Boots without Feather Falling 4 enchantment
-                    getItem(playerboots, ChatColor.GREEN + "Buy Feather Falling 4", Arrays.asList(
+                    getItem(pickaxe, ChatColor.GREEN + "Buy Efficiency 3", Arrays.asList(
                             ChatColor.GRAY + "―――――――――――――――――――――――――――",
                             ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$500",
                             ChatColor.GRAY + "―――――――――――――――――――――――――――"
                     ));
-                    chestInventory.setItem(13, playerboots);
-                }
-
-                chestInventory.setItem(i == 0 ? 37 : i == 1 ? 28 : i == 2 ? 19 : 10, playerArmor);
-            }
-            ItemStack pickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
-            ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
-            for (ItemStack item : player.getInventory().getContents()) {
-                if (item != null) {
-                    if (item.getType() == Material.DIAMOND_PICKAXE) {
-                        Map<Enchantment, Integer> enchantments = item.getEnchantments();
-                        if (enchantments.containsKey(Enchantment.DIG_SPEED)) {
-                            chestInventory.setItem(14, createRedPane());
-                        } else {
-                            getItem(pickaxe, ChatColor.GREEN + "Buy Efficiency 3", Arrays.asList(
-                                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                                    ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$500",
-                                    ChatColor.GRAY + "―――――――――――――――――――――――――――"
-                            ));
-                            hasPickaxe = true;
-                        }
-                    }
-                    if (item.getType() == Material.DIAMOND_SWORD) {
-                        Map<Enchantment, Integer> enchantments = item.getEnchantments();
-                        if (enchantments.containsKey(Enchantment.DAMAGE_ALL)) {
-                            int sharpnessLevel = enchantments.get(Enchantment.DAMAGE_ALL);
-                            if (sharpnessLevel < 5) {
-                                getItem(sword, ChatColor.GREEN + "Buy Sharpness " + (sharpnessLevel + 1), Arrays.asList(
-                                        ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                                        ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$" + SwordPrice.getSwordEnchantByInt(sharpnessLevel + 1),
-                                        ChatColor.GRAY + "―――――――――――――――――――――――――――"
-                                ));
-
-                                hasSword = true;
-                                chestInventory.setItem(12, item);
-                            }
-                        }
-                    }
+                    hasPickaxe = true;
+                    chestInventory.setItem(14, pickaxe);
                 }
             }
-            if (!hasSword) {
-                chestInventory.setItem(12, createRedPane());
+            else if (item.getType() == Material.DIAMOND_SWORD) {
+            Map<Enchantment, Integer> enchantments = item.getEnchantments();
+            int sharpnessLevel = enchantments.getOrDefault(Enchantment.DAMAGE_ALL, 0);
+                if (sharpnessLevel == 5) {
+                    getItem(sword, ChatColor.GREEN + "Max Sharpness ", Arrays.asList(
+                            ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                            ChatColor.RED + Utils.color("У вас максимальный лвл зачарования"),
+                            ChatColor.GRAY + "―――――――――――――――――――――――――――"
+                    ));
+                } else
+                    getItem(sword, ChatColor.GREEN + "Buy Sharpness " + (sharpnessLevel + 1), Arrays.asList(
+                            ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                            ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + "$" + SwordPrice.getSwordEnchantByInt(sharpnessLevel + 1),
+                            ChatColor.GRAY + "―――――――――――――――――――――――――――"
+                    ));
+
+                hasSword = true;
+                chestInventory.setItem(12, sword);
             }
-            if (!hasPickaxe) {
-                chestInventory.setItem(14, createRedPane());
-            }
-            player.openInventory(chestInventory);
         }
+        if (!hasSword)
+            chestInventory.setItem(12, createRedPane());
+        if (!hasPickaxe)
+            chestInventory.setItem(14, createRedPane());
+
+        player.openInventory(chestInventory);
     }
+
 
 
     @EventHandler
@@ -197,7 +198,7 @@ public class EnchantShopListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         ItemStack item = event.getCurrentItem();
 
-        if (item == null || item.getItemMeta() == null || item.getType() == null) return;
+        if (item == null || item.getItemMeta().getDisplayName() == null || item.getType() == null) return;
 
         if (item.getType() == Material.DIAMOND_BOOTS || item.getType() == Material.DIAMOND_HELMET || item.getType() == Material.DIAMOND_CHESTPLATE || item.getType() == Material.DIAMOND_LEGGINGS) {
             int levelenchant = Integer.parseInt(item.getItemMeta().getDisplayName().split(" ")[2]);
@@ -222,6 +223,59 @@ public class EnchantShopListener implements Listener {
             onDurabilityClick(player,item);
             int i = event.getSlot();
             inventory.setItem(i == 0 ? 43 : i == 1 ? 34 : i == 2 ? 25 : 16, createRedPane());
+        }
+        else if(item.getType() == Material.DIAMOND_SWORD){
+            int levelenchant = Integer.parseInt(item.getItemMeta().getDisplayName().split(" ")[2]);
+            if (Asd.getInstance().getPluginManager().getEconomy().getBalance(player) < SwordPrice.getSwordEnchantByInt(levelenchant)) {
+                player.sendMessage(Utils.color("&4&lНе досточно средств"));
+                return;
+            }
+            onSwordClick(player,levelenchant);
+            event.setCurrentItem(getItem(item, ChatColor.GREEN + "Buy Sharpness " + (levelenchant + 1), Arrays.asList(
+                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                    ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + SwordPrice.getSwordEnchantByInt(levelenchant + 1),
+                    ChatColor.GRAY + "―――――――――――――――――――――――――――"
+            )));
+        }
+        else if (item.getType() == Material.FEATHER){
+            if (Asd.getInstance().getPluginManager().getEconomy().getBalance(player) < 500) {
+                player.sendMessage(Utils.color("&4&lНе досточно средств"));
+                return;
+            }
+            ItemStack playerboots = player.getInventory().getBoots();
+            playerboots.addEnchantment(Enchantment.PROTECTION_FALL,4);
+            inventory.setItem(13,createRedPane());
+        }
+        else if (item.getType() == Material.DIAMOND_PICKAXE) {
+            if (Asd.getInstance().getPluginManager().getEconomy().getBalance(player) < 500) {
+                player.sendMessage(Utils.color("&4&lНе досточно средств"));
+                return;
+            }
+            for (ItemStack playeritem : player.getInventory().getContents()) {
+                if (playeritem != null && playeritem.getType() == Material.DIAMOND_PICKAXE) {
+                    playeritem.addEnchantment(Enchantment.DIG_SPEED, 3);
+                    inventory.setItem(14,createRedPane());
+                    break;
+                }
+            }
+        }
+
+    }
+
+    private void onSwordClick(Player player,int levelenchant){
+        Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, SwordPrice.getSwordEnchantByInt(levelenchant));
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.DIAMOND_SWORD) {
+                if (levelenchant == 1){
+                    item.addEnchantment(Enchantment.DAMAGE_ALL,levelenchant);
+                    break;
+                }
+                Map<Enchantment, Integer> enchantments = item.getEnchantments();
+                if (enchantments.containsKey(Enchantment.DAMAGE_ALL) && enchantments.get(Enchantment.DAMAGE_ALL) == levelenchant-1) {
+                    item.addEnchantment(Enchantment.DAMAGE_ALL,levelenchant);
+                    break;
+                }
+            }
         }
 
     }

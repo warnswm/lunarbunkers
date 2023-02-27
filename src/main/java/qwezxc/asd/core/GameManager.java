@@ -61,7 +61,7 @@ public class GameManager {
                     // Start the game
                     startGame();
                     for (Player player1 : Bukkit.getOnlinePlayers()){
-                        Asd.getInstance().getPluginManager().getEconomy().addBalance(player1,100);
+                        Asd.getInstance().getPluginManager().getEconomy().addBalance(player1,10000);
                     }
                     cancel();
                 } else {
