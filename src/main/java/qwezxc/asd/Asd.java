@@ -2,12 +2,13 @@ package qwezxc.asd;
 
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import net.citizensnpcs.api.CitizensAPI;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import qwezxc.asd.Data.Database;
 import qwezxc.asd.command.BalanceCommand;
@@ -26,7 +27,7 @@ public final class Asd extends JavaPlugin{
     private Database database;
     public World world;
     private PlayerJoinListener playerJoinListener;
-    private PlayerLivesManager playerLivesManager;
+    private TeamLivesManager teamLivesManager;
     private PluginManager pluginManager;
     public KOTH koth;
     public Economy economy;
@@ -53,7 +54,7 @@ public final class Asd extends JavaPlugin{
         this.gameManager = new GameManager(this, teams, teamNPC);
         this.economy = new Economy();
         this.scoreBoardLib = new ScoreBoardLib();
-        this.playerLivesManager = new PlayerLivesManager();
+        this.teamLivesManager = new TeamLivesManager();
         this.playerKillsManager = new PlayerKillsManager();
         koth = new KOTH(this, teams, gameManager);
         oreRegen = new OreRegeneration(this);
@@ -68,8 +69,8 @@ public final class Asd extends JavaPlugin{
                 oreRegen,
                 teamNPC,
                 new TeamMenuListener(teams),
-                new PlayerLivesListener(playerLivesManager, teams, playerKillsManager),
-                new PlayerJoinListener(this, playerLivesManager, gameManager, scoreBoardLib, playerKillsManager),
+                new PlayerLivesListener(teamLivesManager, teams, playerKillsManager),
+                new PlayerJoinListener(this, teamLivesManager, gameManager, scoreBoardLib, playerKillsManager),
                 new RepairListener(),
                 new BuildShopListener()
         ));
@@ -101,6 +102,18 @@ public final class Asd extends JavaPlugin{
         return this.pluginManager;
     }
 
+    public void createDaggerItem() {
+        ItemStack dagger = new ItemStack(Material.IRON_AXE);
+        ItemMeta daggerMeta = dagger.getItemMeta();
+        daggerMeta.setDisplayName(ChatColor.GREEN + "Dagger");
+        dagger.setItemMeta(daggerMeta);
+        NamespacedKey daggerKey = new NamespacedKey(this, "dagger");
+        ShapedRecipe daggerRecipe = new ShapedRecipe(daggerKey, dagger);
+        daggerRecipe.shape(" # ", "#X#", " # ");
+        daggerRecipe.setIngredient('#', Material.IRON_INGOT);
+        daggerRecipe.setIngredient('X', Material.STICK);
+        Bukkit.addRecipe(daggerRecipe);
+    }
     @Override
     public void onDisable() {
 

@@ -14,12 +14,12 @@ import qwezxc.asd.Asd;
 import qwezxc.asd.core.*;
 
 public class PlayerLivesListener implements Listener {
-    private PlayerLivesManager playerLivesManager;
+    private TeamLivesManager teamLivesManager;
 
     private PlayerKillsManager playerKillsManager;
     private Teams teams;
-    public PlayerLivesListener(PlayerLivesManager playerLivesManager,Teams teams,PlayerKillsManager playerKillsManager) {
-        this.playerLivesManager = playerLivesManager;
+    public PlayerLivesListener(TeamLivesManager teamLivesManager,Teams teams,PlayerKillsManager playerKillsManager) {
+        this.teamLivesManager = teamLivesManager;
         this.teams = teams;
         this.playerKillsManager = playerKillsManager;
     }
@@ -60,7 +60,7 @@ public class PlayerLivesListener implements Listener {
                 target.teleport(targetBase);
                 target.setHealth(20);
                 target.getInventory().clear();
-                playerLivesManager.takePlayerLives(target, 1);
+                teamLivesManager.removeTeamLives(targetTeam, 1);
             }
         }
     }
@@ -74,7 +74,7 @@ public class PlayerLivesListener implements Listener {
         Location targetBase = targetTeam.getBase();
         event.getEntity().spigot().respawn();
         player.teleport(targetBase);
-        playerLivesManager.takePlayerLives(player, 1);
+        teamLivesManager.removeTeamLives(targetTeam, 1);
     }
 
 }

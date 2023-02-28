@@ -53,7 +53,7 @@ public class GameManager {
 //        }
         // Start the game after a 5 second countdown
         gameStartTimer = new BukkitRunnable() {
-            int countdown = 5;
+            int countdown = 10;
 
             @Override
             public void run() {
@@ -61,7 +61,7 @@ public class GameManager {
                     // Start the game
                     startGame();
                     for (Player player1 : Bukkit.getOnlinePlayers()){
-                        Asd.getInstance().getPluginManager().getEconomy().addBalance(player1,10000);
+                        Asd.getInstance().getPluginManager().getEconomy().addBalance(player1,100);
                     }
                     cancel();
                 } else {

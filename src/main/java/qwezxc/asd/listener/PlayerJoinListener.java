@@ -12,21 +12,21 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import qwezxc.asd.Asd;
 import qwezxc.asd.core.GameManager;
 import qwezxc.asd.core.PlayerKillsManager;
-import qwezxc.asd.core.PlayerLivesManager;
 import qwezxc.asd.core.ScoreBoardLib;
+import qwezxc.asd.core.TeamLivesManager;
 
 public class PlayerJoinListener implements Listener {
 
 
     public final Asd main;
-    private PlayerLivesManager playerLivesManager;
+    private TeamLivesManager teamLivesManager;
     private PlayerKillsManager playerKillsManager;
     private GameManager gameManager;
     private ScoreBoardLib scoreBoardLib;
     private final Location lobby = new Location(Bukkit.getWorld("world"),0.5,65,206.5);
-    public PlayerJoinListener(final Asd main,PlayerLivesManager playerLivesManager,GameManager gameManager,ScoreBoardLib scoreBoardLib,PlayerKillsManager playerKillsManager) {
+    public PlayerJoinListener(final Asd main,TeamLivesManager playerLivesManager,GameManager gameManager,ScoreBoardLib scoreBoardLib,PlayerKillsManager playerKillsManager) {
         this.main = main;
-        this.playerLivesManager = playerLivesManager;
+        this.teamLivesManager = playerLivesManager;
         this.gameManager = gameManager;
         this.scoreBoardLib = scoreBoardLib;
         this.playerKillsManager = playerKillsManager;
@@ -42,9 +42,8 @@ public class PlayerJoinListener implements Listener {
             player.setGameMode(GameMode.SURVIVAL);
         }
         main.getPluginManager().getDatabase().addPlayertoDatabase(player);
-        scoreBoardLib.sendScoreBoard(player, playerLivesManager, playerKillsManager, main.teams);
-        playerLivesManager.givePlayerLives(player, 3);
-        if (Bukkit.getOnlinePlayers().size() == 2) {
+        scoreBoardLib.sendScoreBoard(player, teamLivesManager, playerKillsManager, main.teams);
+        if (Bukkit.getOnlinePlayers().size() == 8) {
             gameManager.execute();
         }
         if (Bukkit.getOnlinePlayers().isEmpty()) {
@@ -55,7 +54,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         event.setQuitMessage("");
-        if (Bukkit.getOnlinePlayers().size() != 4) {
+        if (Bukkit.getOnlinePlayers().size() != 8) {
             gameManager.stopGameStartTimer();
         }
     }

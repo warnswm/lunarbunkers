@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 public class ScoreBoardLib {
-    public void sendScoreBoard(Player player,PlayerLivesManager playerLivesManager,PlayerKillsManager playerKillsManager,Teams teams) {
+    public void sendScoreBoard(Player player,TeamLivesManager teamLivesManager,PlayerKillsManager playerKillsManager,Teams teams) {
         Scoreboard scoreboard = ScoreboardLib.createScoreboard(player)
                 .setHandler(new ScoreboardHandler() {
 
@@ -31,7 +31,7 @@ public class ScoreBoardLib {
                                 .next("Classic: " + String.format("%d:%02d", KOTH.timeLeft / 60, KOTH.timeLeft % 60))
                                 .blank()
                                 .next("Team: " + getTeamforScoreBoard(teams,player))
-                                .next("Осталось жизней: " + playerLivesManager.getRemainingLives(player))
+                                .next("Здоровья команды: " + teamLivesManager.getTeamLives(teams.getTeam(player)))
                                 .blank()
                                 .next("Kills: " + playerKillsManager.getPKills(player) )
                                 .next("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player))
@@ -43,7 +43,7 @@ public class ScoreBoardLib {
                 .setUpdateInterval(2l);
         scoreboard.activate();
     }
-    public void enderpearlScoreBoard(Player player,PlayerLivesManager playerLivesManager,PlayerKillsManager playerKillsManager, Teams teams) {
+    public void enderpearlScoreBoard(Player player,TeamLivesManager teamLivesManager,PlayerKillsManager playerKillsManager, Teams teams) {
         Scoreboard scoreboard = ScoreboardLib.createScoreboard(player)
                 .setHandler(new ScoreboardHandler() {
 
@@ -62,7 +62,7 @@ public class ScoreBoardLib {
                                 .next("Classic: " + String.format("%d:%02d", KOTH.timeLeft / 60, KOTH.timeLeft % 60))
                                 .blank()
                                 .next("Team: " + getTeamforScoreBoard(teams,player))
-                                .next("Осталось жизней: " + playerLivesManager.getRemainingLives(player))
+                                .next("Здоровья команды: " + teamLivesManager.getTeamLives(teams.getTeam(player)))
                                 .blank()
                                 .next("Kills: " + playerKillsManager.getPKills(player))
                                 .next("Balance: " + Asd.getInstance().getPluginManager().getEconomy().getBalance(player))

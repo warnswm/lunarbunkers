@@ -5,19 +5,24 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import qwezxc.asd.Asd;
 import qwezxc.asd.core.GameManager;
 import qwezxc.asd.core.ScoreBoardLib;
@@ -70,7 +75,7 @@ public class DefaultListener implements Listener {
                         cooldown.remove(player.getUniqueId());
                     }
                 }.runTaskLater(main, 15 * 20L);
-                scoreBoardLib.enderpearlScoreBoard(player, main.getPluginManager().getPlayerLivesManager(), main.getPluginManager().getPlayerKillsManager(), main.teams);
+                scoreBoardLib.enderpearlScoreBoard(player, main.getPluginManager().getTeamLivesManager(), main.getPluginManager().getPlayerKillsManager(), main.teams);
                 new BukkitRunnable() {
 
                     @Override
@@ -78,7 +83,7 @@ public class DefaultListener implements Listener {
                         cooldowntime -= 0.1;
                         if (cooldowntime <= 0) {
                             cooldowntime = 15.0;
-                            scoreBoardLib.sendScoreBoard(player, main.getPluginManager().getPlayerLivesManager(), main.getPluginManager().getPlayerKillsManager(), main.teams);
+                            scoreBoardLib.sendScoreBoard(player, main.getPluginManager().getTeamLivesManager(), main.getPluginManager().getPlayerKillsManager(), main.teams);
                             this.cancel();
                         }
                     }
@@ -166,4 +171,5 @@ public class DefaultListener implements Listener {
             event.setCancelled(true);
         }
     }
+
 }

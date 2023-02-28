@@ -15,12 +15,14 @@ public class Team {
     private ChatColor chatColor;
     private String prefix;
     private final Location base;
+    private int remainingLives;
 
-    public Team(String name, ChatColor chatColor, Material woolBlock, int maxPlayers, Location base) {
+    public Team(String name, ChatColor chatColor, Material woolBlock, int maxPlayers, Location base, int remainingLives) {
         this.name = name;
         this.chatColor = chatColor;
         this.woolBlock = woolBlock;
         this.maxPlayers = maxPlayers;
         this.base = base;
+        this.remainingLives = remainingLives;
     }
 }
