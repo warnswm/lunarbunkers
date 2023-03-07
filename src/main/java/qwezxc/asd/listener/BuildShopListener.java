@@ -12,18 +12,20 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import qwezxc.asd.Asd;
+import qwezxc.asd.listener.InventoryHolders.BuilderInventoryHolder;
 
 public class BuildShopListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+
+        if (!(event.getInventory().getHolder() instanceof BuilderInventoryHolder)) return;
+
         Player player = (Player) event.getWhoClicked();
         ItemStack item = event.getCurrentItem();
-        Inventory inventory = event.getInventory();
-
-        if (!inventory.getTitle().equals("Builder Shop")) return;
 
         event.setCancelled(true);
+
         int availableSlots = player.getInventory().firstEmpty();
         if (availableSlots == -1) {
             player.sendMessage("Inventory is full");

@@ -15,6 +15,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
 import qwezxc.asd.Items.ItemInfo;
 import qwezxc.asd.Items.RegisterItems;
+import qwezxc.asd.listener.InventoryHolders.BuilderInventoryHolder;
+import qwezxc.asd.listener.InventoryHolders.SellerInventoryHolder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,14 +30,14 @@ public class SellerListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+
+        if (!(event.getInventory().getHolder() instanceof SellerInventoryHolder)) return;
+
         Player player = (Player) event.getWhoClicked();
-        UUID uuid = player.getUniqueId();
         ItemStack item = event.getCurrentItem();
-        Inventory inventory = event.getInventory();
-        
-        if (!inventory.getName().equalsIgnoreCase("seller shop")) return;
 
         event.setCancelled(true);
+
         if (item == null) return;
 
         for (ItemInfo itemInfo : ITEM_INFOS) {

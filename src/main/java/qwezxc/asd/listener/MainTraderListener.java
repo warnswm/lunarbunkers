@@ -7,14 +7,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import qwezxc.asd.Asd;
+import qwezxc.asd.listener.InventoryHolders.CombatInventoryHolder;
+
 public class MainTraderListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Inventory inventory = event.getInventory();
-        if (!inventory.getTitle().equals("Combat Shop")) return;
+        if (!(event.getInventory().getHolder() instanceof CombatInventoryHolder)) return;
 
         Player player = (Player) event.getWhoClicked();
         ItemStack item = event.getCurrentItem();

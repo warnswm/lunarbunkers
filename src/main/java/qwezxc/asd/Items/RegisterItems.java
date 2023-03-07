@@ -2,15 +2,13 @@ package qwezxc.asd.Items;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import java.util.Arrays;
-import java.util.List;
+
+import static qwezxc.asd.util.Utils.getItem;
+import static qwezxc.asd.util.Utils.getPotion;
 
 public class RegisterItems {
 
@@ -145,24 +143,4 @@ public class RegisterItems {
             ChatColor.GRAY + "―――――――――――――――――――――――――――"
     ));
 
-    public static ItemStack getItem(Material material, String name, List<String> lore) {
-        ItemStack itemStack = new ItemStack(material);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(name);
-        itemMeta.setLore(lore);
-        itemStack.setItemMeta(itemMeta);
-
-        return itemStack;
-    }
-    public static ItemStack getPotion(Material material,String name,PotionType potionType,boolean extander,boolean upgraded, List<String> lore){
-        ItemStack itemStack = new ItemStack(material);
-        PotionMeta itemMeta = (PotionMeta) itemStack.getItemMeta();
-        itemMeta.setDisplayName(name);
-        itemMeta.setBasePotionData(new PotionData(potionType,extander,upgraded));
-        itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-        itemMeta.setLore(lore);
-        itemStack.setItemMeta(itemMeta);
-
-        return itemStack;
-    }
 }

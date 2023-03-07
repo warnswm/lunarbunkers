@@ -1,7 +1,20 @@
 package qwezxc.asd.util;
 
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
+import qwezxc.asd.Asd;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Utils {
     public static String color(String string) {
@@ -84,4 +97,93 @@ public class Utils {
         return first + time/60 + ":" + sec;
     }
 
+
+    public static ItemStack createSellItem(Material material, String displayName, int price, Player player) {
+        ItemStack item = new ItemStack(material, 1);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(ChatColor.BLUE + displayName);
+        int itemCount = 0;
+        for (ItemStack itemStack : player.getInventory().getContents()) {
+            if (itemStack != null && itemStack.getType() == material) {
+                itemCount += itemStack.getAmount();
+            }
+        }
+        if (itemCount != 0) {
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            lore.add(ChatColor.GRAY + "Щелкните левой кнопкой мыши, чтобы продать 1x " + Utils.declineNoun(displayName.replaceFirst("Продать ", ""), 1) + " за " + price + "$");
+            int totalPrice = price * itemCount;
+            lore.add(ChatColor.GRAY + "Щелкните правой кнопкой мыши, чтобы продать " + itemCount + "x " + Utils.declineNoun(displayName.replaceFirst("Продать ", ""), itemCount) + " за " + totalPrice + "$ ");
+            lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+            return item;
+        }
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.RED + "У вас недостаточно " + displayName.replaceFirst("Продать ", "") + " для продажи ");
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public static ItemStack createBuyItem(Material material, String displayName, String name, int price, Player player) {
+        ItemStack item = new ItemStack(material, 1);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(ChatColor.GREEN + displayName);
+        int itemCount;
+        int playerMoney = Asd.getInstance().getPluginManager().getEconomy().getBalance(player);
+        if (playerMoney >= price) {
+            itemCount = playerMoney / price;
+            itemCount = Math.min(itemCount, item.getMaxStackSize());
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            lore.add(ChatColor.GRAY + "Щелкните левой кнопкой мыши, чтобы купить 1 " + Utils.declineNoun(displayName, 1) + " за " + price + "$");
+
+            int totalPrice = price * itemCount;
+            lore.add(ChatColor.GRAY + "Щелкните правой кнопкой мыши, чтобы купить " + itemCount + " " + Utils.declineNoun(displayName, itemCount) + " за " + totalPrice + "$ ");
+            lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
+            meta.setLore(lore);
+
+
+            net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setBoolean(displayName, true);
+            nmsItem.setTag(nbtTagCompound);
+            item = CraftItemStack.asBukkitCopy(nmsItem);
+
+            item.setItemMeta(meta);
+            return item;
+        } else {
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.RED + "У вас недостаточно денег для покупки " + displayName);
+            meta.setLore(lore);
+        }
+
+        item.setItemMeta(meta);
+
+
+        return item;
+    }
+
+    public static ItemStack getItem(Material material, String name, List<String> lore) {
+        ItemStack itemStack = new ItemStack(material);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setDisplayName(name);
+        itemMeta.setLore(lore);
+        itemStack.setItemMeta(itemMeta);
+
+        return itemStack;
+    }
+    public static ItemStack getPotion(Material material, String name, PotionType potionType, boolean extander, boolean upgraded, List<String> lore){
+        ItemStack itemStack = new ItemStack(material);
+        PotionMeta itemMeta = (PotionMeta) itemStack.getItemMeta();
+        itemMeta.setDisplayName(name);
+        itemMeta.setBasePotionData(new PotionData(potionType,extander,upgraded));
+        itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        itemMeta.setLore(lore);
+        itemStack.setItemMeta(itemMeta);
+
+        return itemStack;
+    }
 }
