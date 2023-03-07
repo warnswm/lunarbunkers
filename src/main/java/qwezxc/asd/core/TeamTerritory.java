@@ -30,71 +30,65 @@ public class TeamTerritory implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        double baseRadius = 14.5;
+        Team playerTeam = teams.getTeam(player);
+        if (playerTeam == null) return;
+
         if (block == null) return;
 
         if (block.getType() == Material.FENCE_GATE) {
-
-            // Get the player's team
-            Team playerTeam = teams.getTeam(player);
-
-            if (playerTeam == null) {
+            if (!isPlayerInBaseTerritory(player)) {
+                event.setCancelled(false);
                 return;
             }
-            // Check if the player is within any base territory
-            boolean isInBaseTerritory = false;
-            for (Map.Entry<String, Location> entry : baseTerritories.entrySet()) {
-                String teamName = entry.getKey();
-                Location baseLocation = entry.getValue();
-                if (Math.abs(player.getLocation().getX() - baseLocation.getX()) <= baseRadius &&
-                        Math.abs(player.getLocation().getY() - baseLocation.getY()) <= baseRadius +200 &&
-                        Math.abs(player.getLocation().getZ() - baseLocation.getZ()) <= baseRadius) {
 
-                    isInBaseTerritory = true;
-
-                    if (playerTeam.getName().equals(teamName)) {
-                        event.setCancelled(false);
-                    } else {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.RED + "Вы не можете открывать каликти на территории базы других команд!");
-                    }
-                    break;
-                }
-            }
-
-            // If the player is not within any base territory, allow them to open the gate
-            if (!isInBaseTerritory) {
+            // Check if the player's team owns the base territory
+            String baseTerritoryTeam = getBaseTerritoryTeam(block.getLocation());
+            if (playerTeam.getName().equals(baseTerritoryTeam)) {
                 event.setCancelled(false);
+            } else {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "Вы не можете открывать каликти на территории базы других команд!");
             }
         } else if (block.getType() == Material.CHEST) {
-            Team playerTeam = teams.getTeam(player);
-            if (playerTeam == null) {
+            if (!isPlayerInBaseTerritory(player)) {
+                event.setCancelled(false);
                 return;
             }
-            // Check if the player is within any base territory
-            boolean isInBaseTerritory = false;
-            for (Map.Entry<String, Location> entry : baseTerritories.entrySet()) {
-                String teamName = entry.getKey();
-                Location baseLocation = entry.getValue();
-                if (Math.abs(player.getLocation().getX() - baseLocation.getX()) <= baseRadius &&
-                        Math.abs(player.getLocation().getY() - baseLocation.getY()) <= baseRadius &&
-                        Math.abs(player.getLocation().getZ() - baseLocation.getZ()) <= baseRadius) {
-                    isInBaseTerritory = true;
-
-                    if (playerTeam.getName().equals(teamName)) {
-                        event.setCancelled(false);
-                    } else {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.RED + "Вы не можете открывать сундук на территории базы других команд!");
-                    }
-                    break;
-                }
-            }
-
-            if (!isInBaseTerritory) {
+            // Check if the player's team owns the base territory
+            String baseTerritoryTeam = getBaseTerritoryTeam(block.getLocation());
+            if (playerTeam.getName().equals(baseTerritoryTeam)) {
                 event.setCancelled(false);
+            } else {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "Вы не можете открывать сундук на территории базы других команд!");
             }
         }
     }
+
+    private boolean isPlayerInBaseTerritory(Player player) {
+        double baseRadius = 14.5;
+        Location playerloc = player.getLocation();
+        for (Map.Entry<String, Location> entry : baseTerritories.entrySet()) {
+            Location baseLocation = entry.getValue();
+            if (Math.abs(playerloc.getX() - baseLocation.getX()) <= baseRadius &&
+                    Math.abs(playerloc.getY() - baseLocation.getY()) <= baseRadius &&
+                    Math.abs(playerloc.getZ() - baseLocation.getZ()) <= baseRadius) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String getBaseTerritoryTeam(Location location) {
+        for (Map.Entry<String, Location> entry : baseTerritories.entrySet()) {
+            String teamName = entry.getKey();
+            Location baseLocation = entry.getValue();
+            if (location.equals(baseLocation)) {
+                return teamName;
+            }
+        }
+        return null;
+    }
+
 
 }

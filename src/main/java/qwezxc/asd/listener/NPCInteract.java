@@ -2,10 +2,12 @@ package qwezxc.asd.listener;
 
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,9 +15,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import qwezxc.asd.Asd;
-import qwezxc.asd.Items.DiamodPick;
 import qwezxc.asd.Items.RegisterInventory;
-import qwezxc.asd.util.StringUtils;
+import qwezxc.asd.Items.RegisterItems;
+import qwezxc.asd.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +54,8 @@ public class NPCInteract implements Listener {
             inventory.setItem(2, createBuyItem(Material.CHEST, "Сундук", "Сундук", CHEST_PRICE, player));
             inventory.setItem(3, createBuyItem(Material.LADDER, "Лестница", "Лестница", LADDER_PRICE, player));
             inventory.setItem(5, createBuyItem(Material.COBBLESTONE, "Булыжник", "Булыжник", COBBLESTONE_PRICE, player));
-            inventory.setItem(30, DiamodPick.createDiamondPickaxe());
-            inventory.setItem(31, DiamodPick.createDiamondAxe());
+            inventory.setItem(30, RegisterItems.diamondpickaxe);
+            inventory.setItem(31, RegisterItems.diamondaxe);
 
             player.openInventory(inventory);
         } else if (npc.getName().equals("Seller Shop")) {
@@ -87,9 +89,9 @@ public class NPCInteract implements Listener {
         if (itemCount != 0) {
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            lore.add(ChatColor.GRAY + "Щелкните левой кнопкой мыши, чтобы продать 1x " + StringUtils.declineNoun(displayName.replaceFirst("Продать ", ""), 1) + " за " + price + "$");
+            lore.add(ChatColor.GRAY + "Щелкните левой кнопкой мыши, чтобы продать 1x " + Utils.declineNoun(displayName.replaceFirst("Продать ", ""), 1) + " за " + price + "$");
             int totalPrice = price * itemCount;
-            lore.add(ChatColor.GRAY + "Щелкните правой кнопкой мыши, чтобы продать " + itemCount + "x " + StringUtils.declineNoun(displayName.replaceFirst("Продать ", ""), itemCount) + " за " + totalPrice + "$ ");
+            lore.add(ChatColor.GRAY + "Щелкните правой кнопкой мыши, чтобы продать " + itemCount + "x " + Utils.declineNoun(displayName.replaceFirst("Продать ", ""), itemCount) + " за " + totalPrice + "$ ");
             lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
             meta.setLore(lore);
             item.setItemMeta(meta);
@@ -114,12 +116,20 @@ public class NPCInteract implements Listener {
 
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
-            lore.add(ChatColor.GRAY + "Щелкните левой кнопкой мыши, чтобы купить 1 " + StringUtils.declineNoun(displayName, 1) + " за " + price + "$");
+            lore.add(ChatColor.GRAY + "Щелкните левой кнопкой мыши, чтобы купить 1 " + Utils.declineNoun(displayName, 1) + " за " + price + "$");
 
             int totalPrice = price * itemCount;
-            lore.add(ChatColor.GRAY + "Щелкните правой кнопкой мыши, чтобы купить " + itemCount + " " + StringUtils.declineNoun(displayName, itemCount) + " за " + totalPrice + "$ ");
+            lore.add(ChatColor.GRAY + "Щелкните правой кнопкой мыши, чтобы купить " + itemCount + " " + Utils.declineNoun(displayName, itemCount) + " за " + totalPrice + "$ ");
             lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
             meta.setLore(lore);
+
+
+            net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setBoolean(displayName, true);
+            nmsItem.setTag(nbtTagCompound);
+            item = CraftItemStack.asBukkitCopy(nmsItem);
+
             item.setItemMeta(meta);
             return item;
         } else {
@@ -129,6 +139,8 @@ public class NPCInteract implements Listener {
         }
 
         item.setItemMeta(meta);
+
+
         return item;
     }
 

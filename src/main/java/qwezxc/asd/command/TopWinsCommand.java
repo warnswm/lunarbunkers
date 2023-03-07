@@ -16,7 +16,6 @@ public class TopWinsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        main.getPluginManager().getDatabase().displayTopPlayers(scoreboard);
         return false;
     }
 }

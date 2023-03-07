@@ -10,26 +10,26 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import qwezxc.asd.Asd;
-import qwezxc.asd.core.GameManager;
-import qwezxc.asd.core.PlayerKillsManager;
-import qwezxc.asd.core.ScoreBoardLib;
-import qwezxc.asd.core.TeamLivesManager;
+import qwezxc.asd.core.*;
 
 public class PlayerJoinListener implements Listener {
 
 
     public final Asd main;
-    private TeamLivesManager teamLivesManager;
-    private PlayerKillsManager playerKillsManager;
-    private GameManager gameManager;
-    private ScoreBoardLib scoreBoardLib;
-    private final Location lobby = new Location(Bukkit.getWorld("world"),0.5,65,206.5);
-    public PlayerJoinListener(final Asd main,TeamLivesManager playerLivesManager,GameManager gameManager,ScoreBoardLib scoreBoardLib,PlayerKillsManager playerKillsManager) {
+    private final TeamLivesManager teamLivesManager;
+    private final PlayerKillsManager playerKillsManager;
+    private final GameManager gameManager;
+    private final ScoreBoardLib scoreBoardLib;
+    private final Teams teams;
+    private final Location lobby = new Location(Bukkit.getWorld("world"), 0.5, 65, 206.5);
+
+    public PlayerJoinListener(final Asd main, TeamLivesManager playerLivesManager, GameManager gameManager, ScoreBoardLib scoreBoardLib, PlayerKillsManager playerKillsManager, Teams teams) {
         this.main = main;
         this.teamLivesManager = playerLivesManager;
         this.gameManager = gameManager;
         this.scoreBoardLib = scoreBoardLib;
         this.playerKillsManager = playerKillsManager;
+        this.teams = teams;
     }
 
     @EventHandler
@@ -42,7 +42,7 @@ public class PlayerJoinListener implements Listener {
             player.setGameMode(GameMode.SURVIVAL);
         }
         main.getPluginManager().getDatabase().addPlayertoDatabase(player);
-        scoreBoardLib.sendScoreBoard(player, teamLivesManager, playerKillsManager, main.teams);
+        scoreBoardLib.sendScoreBoard(player, teamLivesManager, playerKillsManager, teams);
         if (Bukkit.getOnlinePlayers().size() == 8) {
             gameManager.execute();
         }
@@ -56,6 +56,9 @@ public class PlayerJoinListener implements Listener {
         event.setQuitMessage("");
         if (Bukkit.getOnlinePlayers().size() != 8) {
             gameManager.stopGameStartTimer();
+        }
+        if (Bukkit.getOnlinePlayers().isEmpty()) {
+            Bukkit.getScheduler().runTaskLater(main, CitizensAPI.getNPCRegistry()::deregisterAll, 2);
         }
     }
 

@@ -10,24 +10,17 @@ import qwezxc.asd.listener.DefaultListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class KOTH {
 
-    private Asd main;
-    private Teams teams;
+    private final Asd main;
+    private final Teams teams;
     private final List<UUID> capturingPlayers;
     private BukkitRunnable captureTimer;
     public static int timeLeft;
     private final GameManager gameManager;
-    private static final Map<Integer, String> TIMES_TO_CLEAR = Map.of(
-            299, "Classic: 5:00",
-            239, "Classic: 4:00",
-            179, "Classic: 3:00",
-            119, "Classic: 2:00",
-            59, "Classic: 1:00"
-    );
+
 
     public KOTH(Asd main, Teams teams, GameManager gameManager) {
         this.main = main;

@@ -8,16 +8,26 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
+
 public class Teams {
     private Map<UUID, Team> players = new HashMap<>();
+    private final Map<String, Team> teamsMap = new HashMap<>();
     private List<Team> teams = Arrays.asList(
-            new Team("Red", ChatColor.RED, Material.RED_GLAZED_TERRACOTTA, 2, new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5),6),
-            new Team("Blue", ChatColor.BLUE, Material.BLUE_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 1.5, 64.5, -85.5),6),
-            new Team("Green", ChatColor.GREEN, Material.GREEN_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), -85.5, 64.5, 0.5),6),
-            new Team("Yellow", ChatColor.YELLOW, Material.YELLOW_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 85.5, 64.5, 0.5),6)
+            new Team("Red", ChatColor.RED, Material.RED_GLAZED_TERRACOTTA, 2, new Location(Bukkit.getWorld("world"), 1.5, 64.5, 85.5), 6),
+            new Team("Blue", ChatColor.BLUE, Material.BLUE_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 1.5, 64.5, -85.5), 6),
+            new Team("Green", ChatColor.GREEN, Material.GREEN_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), -85.5, 64.5, 0.5), 6),
+            new Team("Yellow", ChatColor.YELLOW, Material.YELLOW_GLAZED_TERRACOTTA, 1, new Location(Bukkit.getWorld("world"), 85.5, 64.5, 0.5), 6)
     );
 
-    public List<Team> getTeams() {return teams;}
+    public Teams() {
+        for (Team team : teams) {
+            teamsMap.put(team.getName(), team);
+        }
+    }
+
+    public List<Team> getTeams() {
+        return teams;
+    }
 
     public Map<UUID, Team> getPlayers() {
         return players;
@@ -47,6 +57,10 @@ public class Teams {
             }
         }
         return count;
+    }
+
+    public Team getTeamByName(String name) {
+        return teamsMap.get(name);
     }
 }
 

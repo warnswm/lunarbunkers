@@ -6,7 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import qwezxc.asd.Asd;
-import qwezxc.asd.Data.Database;
+import qwezxc.asd.data.Database;
 
 import java.util.UUID;
 

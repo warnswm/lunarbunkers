@@ -6,42 +6,35 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import qwezxc.asd.Asd;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameManager {
-    private final Asd  main;
+    private static final int CAPTURE_POINT_ACTIVATE_5MIN = 300;
+    private static final int CAPTURE_POINT_CHANGE_TIME_15MIN = 900;
+    private static final int CAPTURE_POINT_CHANGE_TIME_25MIN = 1500;
+    public static boolean canCapture = false;
+    public static int gameTime = 0;
+    private final Asd main;
+    private final Teams teams;
+
     private Team redTeam;
     private Team greenTeam;
     private Team blueTeam;
     private Team yellowTeam;
-    private final Teams teams;
     private BukkitRunnable gameStartTimer;
     private final TeamNPC teamNPC;
 
-    public static boolean canCapture = false;
 
-    public static int gameTime = 0;
-    public GameManager(Asd main, Teams teams,TeamNPC teamNPC) {
+    public GameManager(Asd main, Teams teams, TeamNPC teamNPC) {
         this.teams = teams;
-        for (Team team : teams.getTeams()) {
-            switch (team.getName()) {
-                case "Red":
-                    redTeam = team;
-                    break;
-                case "Green":
-                    greenTeam = team;
-                    break;
-                case "Blue":
-                    blueTeam = team;
-                    break;
-                case "Yellow":
-                    yellowTeam = team;
-                    break;
-                default:
-                    // Handle any other teams here
-                    break;
-            }
-        }
+        redTeam = teams.getTeamByName("Red");
+        greenTeam = teams.getTeamByName("Green");
+        blueTeam = teams.getTeamByName("Blue");
+        yellowTeam = teams.getTeamByName("Yellow");
         this.main = main;
-        this.teamNPC=teamNPC;
+        this.teamNPC = teamNPC;
     }
     public void execute() {
         int numPlayers = Bukkit.getOnlinePlayers().size();
@@ -51,9 +44,9 @@ public class GameManager {
 //            }
 //            return;
 //        }
-        // Start the game after a 5 second countdown
+        // Start
         gameStartTimer = new BukkitRunnable() {
-            int countdown = 10;
+            int countdown = 3;
 
             @Override
             public void run() {
@@ -75,52 +68,28 @@ public class GameManager {
     }
 
     private void startGame() {
+        Map<Team, Integer> teamSizes = new HashMap<>();
+        teamSizes.put(redTeam, teams.getNumPlayersInTeam(redTeam));
+        teamSizes.put(greenTeam, teams.getNumPlayersInTeam(greenTeam));
+        teamSizes.put(blueTeam, teams.getNumPlayersInTeam(blueTeam));
+        teamSizes.put(yellowTeam, teams.getNumPlayersInTeam(yellowTeam));
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             Team playerTeam = teams.getTeam(player);
             if (playerTeam == null) {
-                if (teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(greenTeam) &&
-                        teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(blueTeam) &&
-                        teams.getNumPlayersInTeam(redTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
-
-                    teams.addPlayerToTeam(player, redTeam);
-                    Team playerTeamafter = teams.getTeam(player);
-                    ChatColor colorteam = playerTeamafter.getChatColor();
-                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
-                } else if (teams.getNumPlayersInTeam(greenTeam) < teams.getNumPlayersInTeam(blueTeam) &&
-                        teams.getNumPlayersInTeam(greenTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
-                    teams.addPlayerToTeam(player, greenTeam);
-                    Team playerTeamafter = teams.getTeam(player);
-                    ChatColor colorteam = playerTeamafter.getChatColor();
-                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
-                } else if (teams.getNumPlayersInTeam(blueTeam) < teams.getNumPlayersInTeam(yellowTeam)) {
-                    teams.addPlayerToTeam(player, blueTeam);
-                    Team playerTeamafter = teams.getTeam(player);
-                    ChatColor colorteam = playerTeamafter.getChatColor();
-                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
-                } else {
-                    teams.addPlayerToTeam(player, yellowTeam);
-                    Team playerTeamafter = teams.getTeam(player);
-                    ChatColor colorteam = playerTeamafter.getChatColor();
-                    player.setPlayerListName("[" + colorteam + playerTeamafter.getName() + ChatColor.RESET + "]" + " " + player.getName());
-                }
+                Team smallestTeam = Collections.min(teamSizes.entrySet(), Map.Entry.comparingByValue()).getKey();
+                teams.addPlayerToTeam(player, smallestTeam);
+                updatePlayerListName(player);
             }
         }
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             Team playerTeam = teams.getTeam(player);
             player.closeInventory();
-            // Teleport the player to their team's base
-            if (playerTeam == redTeam) {
+            if (playerTeam != null) {
                 player.teleport(playerTeam.getBase());
-            } else if (playerTeam == greenTeam) {
-                player.teleport(playerTeam.getBase());
-            } else if (playerTeam == blueTeam) {
-                player.teleport(playerTeam.getBase());
-            } else if (playerTeam == yellowTeam) {
-                player.teleport(playerTeam.getBase());
+                player.sendMessage("Игра началась!");
             }
-
-            // Start the game
-            player.sendMessage("Игра началась!");
         }
         new BukkitRunnable() {
             @Override
@@ -130,20 +99,20 @@ public class GameManager {
                     Asd.getInstance().getPluginManager().getEconomy().addBalance(player, 1);
                 }
                 switch (gameTime) {
-                    case 300:
+                    case CAPTURE_POINT_ACTIVATE_5MIN:
                         canCapture = true;
                         KOTH.timeLeft = 450;
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             player.sendMessage(ChatColor.ITALIC + "Точка захвата стала активна");
                         }
                         break;
-                    case 900:
+                    case CAPTURE_POINT_CHANGE_TIME_15MIN:
                         KOTH.timeLeft = 300;
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 5:00");
                         }
                         break;
-                    case 1500:
+                    case CAPTURE_POINT_CHANGE_TIME_25MIN:
                         KOTH.timeLeft = 150;
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 2:30");
@@ -162,4 +131,14 @@ public class GameManager {
             gameStartTimer.cancel();
         }
     }
+
+    private void updatePlayerListName(Player player) {
+        Team playerTeam = teams.getTeam(player);
+        if (playerTeam != null) {
+            ChatColor colorteam = playerTeam.getChatColor();
+            player.setPlayerListName("[" + colorteam + playerTeam.getName() + ChatColor.RESET + "]" + " " + player.getName());
+        }
+    }
+
+
 }

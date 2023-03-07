@@ -5,28 +5,21 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import qwezxc.asd.Asd;
-import qwezxc.asd.core.GameManager;
-import qwezxc.asd.core.ScoreBoardLib;
-import qwezxc.asd.core.Team;
+import qwezxc.asd.core.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,17 +27,21 @@ import java.util.List;
 import java.util.UUID;
 
 public class DefaultListener implements Listener {
-    private final Asd main;
-    private HashMap<UUID, Long> cooldown = new HashMap<UUID, Long>();
+    private static final int MESSAGE_COOLDOWN_SECONDS = 10;
     public static double cooldowntime = 15.0;
+    private final Asd main;
+    private final Teams teams;
+    private final KOTH koth;
+    private HashMap<UUID, Long> cooldown = new HashMap<UUID, Long>();
     private ScoreBoardLib scoreBoardLib;
     private final HashMap<UUID, Long> captureMessageCooldown = new HashMap<>();
-    private final int MESSAGE_COOLDOWN_SECONDS = 10;
     public static List<Block> placedBlocks = new ArrayList<>();
 
-    public DefaultListener(final Asd main, ScoreBoardLib scoreBoardLib) {
+    public DefaultListener(final Asd main, ScoreBoardLib scoreBoardLib, KOTH koth, Teams teams) {
         this.main = main;
         this.scoreBoardLib = scoreBoardLib;
+        this.koth = koth;
+        this.teams = teams;
     }
 
     @EventHandler
@@ -56,7 +53,7 @@ public class DefaultListener implements Listener {
             if (item.getType() == Material.DIAMOND_BLOCK) {
                 event.setCancelled(true);
                 Inventory menu = Bukkit.createInventory(null, 9, "Team Select");
-                for (Team team : main.teams.getTeams()) {
+                for (Team team : teams.getTeams()) {
                     menu.addItem(new ItemStack(team.getWoolBlock(), 1));
                 }
                 player.openInventory(menu);
@@ -75,7 +72,7 @@ public class DefaultListener implements Listener {
                         cooldown.remove(player.getUniqueId());
                     }
                 }.runTaskLater(main, 15 * 20L);
-                scoreBoardLib.enderpearlScoreBoard(player, main.getPluginManager().getTeamLivesManager(), main.getPluginManager().getPlayerKillsManager(), main.teams);
+                scoreBoardLib.enderpearlScoreBoard(player, main.getPluginManager().getTeamLivesManager(), main.getPluginManager().getPlayerKillsManager(), teams);
                 new BukkitRunnable() {
 
                     @Override
@@ -83,7 +80,7 @@ public class DefaultListener implements Listener {
                         cooldowntime -= 0.1;
                         if (cooldowntime <= 0) {
                             cooldowntime = 15.0;
-                            scoreBoardLib.sendScoreBoard(player, main.getPluginManager().getTeamLivesManager(), main.getPluginManager().getPlayerKillsManager(), main.teams);
+                            scoreBoardLib.sendScoreBoard(player, main.getPluginManager().getTeamLivesManager(), main.getPluginManager().getPlayerKillsManager(), teams);
                             this.cancel();
                         }
                     }
@@ -105,7 +102,7 @@ public class DefaultListener implements Listener {
         UUID targetuuid = target.getUniqueId();
         UUID attackeruuid = attacker.getUniqueId();
 
-        if (main.teams.getTeam(attackeruuid) == main.teams.getTeam(targetuuid)) {
+        if (teams.getTeam(attackeruuid) == teams.getTeam(targetuuid)) {
             event.setCancelled(true);
             attacker.sendMessage("You can't attack players from the same team.");
         }
@@ -120,7 +117,7 @@ public class DefaultListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        main.koth.stopCapture(player);
+        koth.stopCapture(player);
     }
 
     @EventHandler
@@ -129,11 +126,13 @@ public class DefaultListener implements Listener {
         Location playerLoc = player.getLocation();
         double captureRadius = 3.5;
         Location capturePoint = new Location(Bukkit.getWorld("world"), 1.5, 63.5, 0.5);
+//        double distanceSquared = playerLoc.distanceSquared(capturePoint);
+//        if (distanceSquared <= captureRadius * captureRadius) {
         if (Math.abs(playerLoc.getX() - capturePoint.getX()) <= captureRadius &&
                 Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius &&
                 Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius) {
-            main.koth.startCapture(player);
-            if (GameManager.gameTime > 300) {
+            koth.startCapture(player);
+            if (GameManager.gameTime < 300) {
                 long lastMessageTime = captureMessageCooldown.getOrDefault(player.getUniqueId(), 0L);
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastMessageTime > MESSAGE_COOLDOWN_SECONDS * 1000) {
@@ -142,7 +141,7 @@ public class DefaultListener implements Listener {
                 }
             }
         } else {
-            main.koth.stopCapture(player);
+            koth.stopCapture(player);
         }
     }
 

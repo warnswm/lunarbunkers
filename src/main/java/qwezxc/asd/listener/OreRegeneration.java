@@ -16,8 +16,11 @@ import qwezxc.asd.Asd;
 import java.util.HashMap;
 
 public class OreRegeneration implements Listener {
-    private Asd main;
-
+    private static final int COAL_DELAY = 5;
+    private static final int IRON_DELAY = 11;
+    private static final int GOLD_DELAY = 17;
+    private static final int DIAMOND_DELAY = 28;
+    private final Asd main;
 
     public OreRegeneration(final Asd main) {
         this.main = main;
@@ -39,53 +42,24 @@ public class OreRegeneration implements Listener {
 
         switch (blockType) {
             case COAL_ORE:
-                block.setType(Material.AIR);
-                player.getInventory().addItem(new ItemStack(Material.COAL, 1));
-                Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
-                    block.setType(Material.COBBLESTONE);
-                    block.setMetadata("RegenBlock", new FixedMetadataValue(main, "true"));
-                });
-                Bukkit.getScheduler().runTaskLater(main, () -> block.setType(blockType), 5 * 20);
+                mineOre(player, Material.COAL, COAL_DELAY, block);
                 return;
             case GOLD_ORE:
-                block.setType(Material.AIR);
-                player.getInventory().addItem(new ItemStack(Material.GOLD_INGOT, 1));
-                Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
-                    block.setType(Material.COBBLESTONE);
-                    block.setMetadata("RegenBlock", new FixedMetadataValue(main, "true"));
-                });
-                Bukkit.getScheduler().runTaskLater(main, () -> block.setType(blockType), 17 * 20);
+                mineOre(player, Material.GOLD_INGOT, GOLD_DELAY, block);
                 return;
             case DIAMOND_ORE:
-                block.setType(Material.AIR);
-                player.getInventory().addItem(new ItemStack(Material.DIAMOND, 1));
-                Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
-                    block.setType(Material.COBBLESTONE);
-                    block.setMetadata("RegenBlock", new FixedMetadataValue(main, "true"));
-                });
-                Bukkit.getScheduler().runTaskLater(main, () -> block.setType(blockType), 28 * 20);
+                mineOre(player, Material.DIAMOND, DIAMOND_DELAY, block);
                 return;
             case IRON_ORE:
-                block.setType(Material.AIR);
-                player.getInventory().addItem(new ItemStack(Material.IRON_INGOT, 1));
-                Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
-                    block.setType(Material.COBBLESTONE);
-                    block.setMetadata("RegenBlock", new FixedMetadataValue(main, "true"));
-                });
-                Bukkit.getScheduler().runTaskLater(main, () -> block.setType(blockType), 11 * 20);
+                mineOre(player, Material.IRON_INGOT, IRON_DELAY, block);
                 return;
             case COBBLESTONE:
                 if (block.hasMetadata("RegenBlock")) {
                     event.setCancelled(true);
                 }
-                event.setCancelled(false);
                 return;
             case FENCE_GATE:
-                event.setCancelled(false);
-                return;
             case CHEST:
-                event.setCancelled(false);
-                return;
             case LADDER:
                 event.setCancelled(false);
                 return;
@@ -97,5 +71,15 @@ public class OreRegeneration implements Listener {
                     event.setCancelled(false);
                 }
         }
+    }
+
+    private void mineOre(Player player, Material oreMaterial, int delay, Block block) {
+        block.setType(Material.AIR);
+        player.getInventory().addItem(new ItemStack(oreMaterial, 1));
+        Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
+            block.setType(Material.COBBLESTONE);
+            block.setMetadata("RegenBlock", new FixedMetadataValue(main, "true"));
+        });
+        Bukkit.getScheduler().runTaskLater(main, () -> block.setType(oreMaterial), delay * 20);
     }
 }

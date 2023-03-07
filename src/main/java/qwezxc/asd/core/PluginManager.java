@@ -1,19 +1,27 @@
 package qwezxc.asd.core;
 
+import lombok.AccessLevel;
 import lombok.Getter;
-import qwezxc.asd.Data.Database;
+import lombok.experimental.FieldDefaults;
+import qwezxc.asd.Asd;
+import qwezxc.asd.data.Database;
+import qwezxc.asd.listener.OreRegeneration;
 
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PluginManager {
-    private static PluginManager instance;
-    private Database database;
-    private Teams teams;
-    private TeamLivesManager teamLivesManager;
-    private Economy economy;
-    private PlayerKillsManager playerKillsManager;
+    static PluginManager instance;
+    Database database;
+    TeamLivesManager teamLivesManager;
+    Economy economy;
+    PlayerKillsManager playerKillsManager;
+    OreRegeneration oreRegen;
+    Teams teams;
+    ScoreBoardLib scoreBoardLib;
+    KOTH koth;
+    GameManager gameManager;
+    TeamNPC teamNPC;
 
-
-    private KOTH koth;
     private PluginManager() {
         // Initialize the managers and utilities
         this.teams = new Teams();
@@ -21,6 +29,11 @@ public class PluginManager {
         this.teamLivesManager = new TeamLivesManager();
         this.economy = new Economy();
         this.playerKillsManager = new PlayerKillsManager();
+        this.teamNPC = new TeamNPC(teams);
+        this.gameManager = new GameManager(Asd.getInstance(), teams, teamNPC);
+        this.scoreBoardLib = new ScoreBoardLib();
+        koth = new KOTH(Asd.getInstance(), teams, gameManager);
+        oreRegen = new OreRegeneration(Asd.getInstance());
     }
 
     public static PluginManager getInstance() {

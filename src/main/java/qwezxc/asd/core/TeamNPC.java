@@ -4,13 +4,10 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.GameModeTrait;
 import net.citizensnpcs.trait.LookClose;
-import net.minecraft.server.v1_12_R1.EntityVillager;
-import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -24,7 +21,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import qwezxc.asd.Asd;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TeamNPC implements Listener {
@@ -32,12 +28,12 @@ public class TeamNPC implements Listener {
     private Teams teams;
     public Map<Integer, Team> npcTeams= new HashMap<>();
 
-    private final Map<String, Location> locations  = new HashMap<>() {{
+    private final Map<String, Location> locations = new HashMap<String, Location>() {{
         put("combatshopredLoc", new Location(Bukkit.getWorld("world"), 1.5, 65.5, 95.5));
-        put("combatshopblueLoc",new Location(Bukkit.getWorld("world"), 1.5, 65.5, -95.5));
+        put("combatshopblueLoc", new Location(Bukkit.getWorld("world"), 1.5, 65.5, -95.5));
         put("combatshopgreenLoc", new Location(Bukkit.getWorld("world"), -95.5, 65.5, 0.5));
         put("combatshopyellowLoc", new Location(Bukkit.getWorld("world"), 95.5, 65.5, 0.5));
-        put("sellershopredLoc",new Location(Bukkit.getWorld("world"), -2.5, 65.5, 95.5));
+        put("sellershopredLoc", new Location(Bukkit.getWorld("world"), -2.5, 65.5, 95.5));
         put("sellershopblueLoc", new Location(Bukkit.getWorld("world"), 5.5, 65.5, -95.5));
         put("sellershopgreenLoc", new Location(Bukkit.getWorld("world"), -95.5, 65.5, -3.5));
         put("sellershopyellowLoc", new Location(Bukkit.getWorld("world"), 95.5, 65.5, 4.5));
@@ -69,31 +65,19 @@ public class TeamNPC implements Listener {
     }
 
     public void spawnCombatShop(Team team, Location loc) {
-        NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "CombatShop");
-        npc.spawn(loc);
+        NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Combat Shop");
         npc.setName(team.getChatColor() + "Combat Shop");
-        npc.getOrAddTrait(GameModeTrait.class).setGameMode(GameMode.SURVIVAL);
-        npc.getOrAddTrait(LookClose.class).useRealisticLooking();
-        npc.data().setPersistent(NPC.Metadata.RESPAWN_DELAY, 300 * 20);
-        npcTeams.put(npc.getId(), team);
+        setDefaultSettings(npc, team, loc);
     }
     public void spawnSellerShop(Team team, Location loc) {
         NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "SellerShop");
-        npc.spawn(loc);
         npc.setName(team.getChatColor() + "Seller Shop");
-        npc.getOrAddTrait(GameModeTrait.class).setGameMode(GameMode.SURVIVAL);
-        npc.getOrAddTrait(LookClose.class).lookClose(true);
-        npc.data().setPersistent(NPC.Metadata.RESPAWN_DELAY, 300 * 20);
-        npcTeams.put(npc.getId(), team);
+        setDefaultSettings(npc, team, loc);
     }
     public void spawnBuilderShop(Team team, Location loc) {
         NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "BuilderShop");
-        npc.spawn(loc);
         npc.setName(team.getChatColor() + "Builder Shop");
-        npc.getOrAddTrait(GameModeTrait.class).setGameMode(GameMode.SURVIVAL);
-        npc.getOrAddTrait(LookClose.class).lookClose(true);
-        npc.data().setPersistent(NPC.Metadata.RESPAWN_DELAY, 300 * 20);
-        npcTeams.put(npc.getId(), team);
+        setDefaultSettings(npc, team, loc);
     }
 
     @EventHandler
@@ -106,27 +90,19 @@ public class TeamNPC implements Listener {
                 Player player = (Player) attacker;
                 Team playerTeam = teams.getTeam(player);
                 Team npcTeam = npcTeams.get(npc.getId());
-                if (playerTeam != null && npcTeam != null && playerTeam.equals(npcTeam)) {
-                    event.setCancelled(true);
-                }else{
-                    event.setCancelled(false);
-                }
+                event.setCancelled(playerTeam != null && npcTeam != null && playerTeam == npcTeam);
             }
         }
     }
+
     @EventHandler
-    public void onEntityDeath(EntityDeathEvent event){
+    public void onEntityDeath(EntityDeathEvent event) {
         Entity victim = event.getEntity();
         Location deathloc = event.getEntity().getLocation();
         if (victim.getType() == EntityType.VILLAGER) {
             NPC npc = CitizensAPI.getNPCRegistry().getNPC(victim);
             if (npc == null) return;
-            ArmorStand as = (ArmorStand) deathloc.getWorld().spawnEntity(deathloc, EntityType.ARMOR_STAND);
-            as.setGravity(false);
-            as.setCanPickupItems(false);
-            as.setCustomNameVisible(true);
-            as.setVisible(false);
-            as.setCustomName("Возрождение через 5:00");
+            ArmorStand as = spawnArmorStand(deathloc);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -136,18 +112,35 @@ public class TeamNPC implements Listener {
                     as.setCustomName("Возрождение через " + String.format("%02d:%02d", minutes, seconds));
                     if (time == 0) as.remove();
                 }
-            }.runTaskTimer(Asd.getInstance(),20L,20L);
+            }.runTaskTimer(Asd.getInstance(), 20L, 20L);
         }
     }
 
     @EventHandler
-    public void manipulate(PlayerArmorStandManipulateEvent e)
-    {
-        if (!e.getRightClicked().isVisible())
-        {
+    public void manipulate(PlayerArmorStandManipulateEvent e) {
+        if (!e.getRightClicked().isVisible()) {
             e.setCancelled(true);
         }
 
+    }
+
+    private ArmorStand spawnArmorStand(Location location) {
+        World world = location.getWorld();
+        ArmorStand as = (ArmorStand) world.spawnEntity(location, EntityType.ARMOR_STAND);
+        as.setGravity(false);
+        as.setCanPickupItems(false);
+        as.setCustomNameVisible(true);
+        as.setVisible(false);
+        as.setCustomName("Возрождение через 5:00");
+        return as;
+    }
+
+    private void setDefaultSettings(NPC npc, Team team, Location loc) {
+        npc.spawn(loc);
+        npc.getOrAddTrait(GameModeTrait.class).setGameMode(GameMode.SURVIVAL);
+        npc.getOrAddTrait(LookClose.class).lookClose(true);
+        npc.data().setPersistent(NPC.Metadata.RESPAWN_DELAY, 300 * 20);
+        npcTeams.put(npc.getId(), team);
     }
 }
 

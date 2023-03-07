@@ -21,11 +21,7 @@ public class Economy {
 
     public int getBalance(Player player) {
         UUID uuid = player.getUniqueId();
-        if (balances.containsKey(uuid)) {
-            return balances.get(uuid);
-        } else {
-            return 0;
-        }
+        return balances.getOrDefault(uuid, 0);
     }
 
     public boolean hasEnoughMoney(Player player, int amount) {

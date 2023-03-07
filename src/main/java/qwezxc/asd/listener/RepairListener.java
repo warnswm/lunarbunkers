@@ -12,8 +12,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Consumer;
 import qwezxc.asd.Asd;
 import qwezxc.asd.util.Utils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RepairListener implements Listener {
 
@@ -22,7 +26,7 @@ public class RepairListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         Inventory clickedInventory = event.getClickedInventory();
 
-        if (clickedInventory == null || !clickedInventory.getName().equals(ChatColor.GREEN + "Repair"))  return;
+        if (clickedInventory == null || !clickedInventory.getName().equals(ChatColor.GREEN + "Repair")) return;
         event.setCancelled(true);
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem == null || clickedItem.getType().getMaxDurability() <= 0 || clickedItem.getDurability() == 0) {
@@ -53,29 +57,7 @@ public class RepairListener implements Listener {
         repairedItem.setDurability((short) 0);
         repairedItem.addUnsafeEnchantments(clickedItem.getEnchantments());
         contents[slot] = repairedItem;
-        switch (repairedItem.getType()) {
-            case DIAMOND_HELMET:
-                player.getInventory().setHelmet(repairedItem);
-                break;
-            case DIAMOND_CHESTPLATE:
-                player.getInventory().setChestplate(repairedItem);
-                break;
-            case DIAMOND_LEGGINGS:
-                player.getInventory().setLeggings(repairedItem);
-                break;
-            case DIAMOND_BOOTS:
-                player.getInventory().setBoots(repairedItem);
-                break;
-            case DIAMOND_SWORD:
-                player.getInventory().setItem(slot, repairedItem);
-                break;
-            case DIAMOND_PICKAXE:
-                player.getInventory().setItem(slot, repairedItem);
-                break;
-            case DIAMOND_AXE:
-                player.getInventory().setItem(slot, repairedItem);
-                break;
-        }
+        setRepairedItem(player, slot, repairedItem);
 
         player.sendMessage(Utils.color("&a" + "Ты починнил " + clickedItem.getType().name().toLowerCase() + " за " + repairCost + "$"));
 
@@ -155,6 +137,24 @@ public class RepairListener implements Listener {
         }
 
         player.openInventory(chestInventory);
+    }
+
+    private void setRepairedItem(Player player, int slot, ItemStack repairedItem) {
+        Map<Material, Consumer<ItemStack>> setInventoryItem = new HashMap<>();
+        setInventoryItem.put(Material.DIAMOND_HELMET, player.getInventory()::setHelmet);
+        setInventoryItem.put(Material.DIAMOND_CHESTPLATE, player.getInventory()::setChestplate);
+        setInventoryItem.put(Material.DIAMOND_LEGGINGS, player.getInventory()::setLeggings);
+        setInventoryItem.put(Material.DIAMOND_BOOTS, player.getInventory()::setBoots);
+        setInventoryItem.put(Material.DIAMOND_SWORD, (item) -> player.getInventory().setItem(slot, item));
+        setInventoryItem.put(Material.DIAMOND_PICKAXE, (item) -> player.getInventory().setItem(slot, item));
+        setInventoryItem.put(Material.DIAMOND_AXE, (item) -> player.getInventory().setItem(slot, item));
+
+        Material itemMaterial = repairedItem.getType();
+        if (setInventoryItem.containsKey(itemMaterial)) {
+            setInventoryItem.get(itemMaterial).accept(repairedItem);
+        } else {
+            player.getInventory().setItem(slot, repairedItem);
+        }
     }
 
 

@@ -1,7 +1,9 @@
 package qwezxc.asd.listener;
 
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,11 +30,15 @@ public class BuildShopListener implements Listener {
             return;
         }
         if (item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null) return;
-        if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Дубовая калитка")) {
-            if (event.getClick() == ClickType.RIGHT) {
-                buymulti(player, new ItemStack(Material.FENCE_GATE), 3);
-            } else {
-                buysolo(player, new ItemStack(Material.FENCE_GATE), 3);
+        if (item.getType() == Material.FENCE_GATE) {
+            net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+            NBTTagCompound nbtTagCompound = nmsItem.getTag();
+            if (nbtTagCompound != null && nbtTagCompound.getBoolean("Дубовая калитка")) {
+                if (event.getClick() == ClickType.RIGHT) {
+                    buymulti(player, new ItemStack(Material.FENCE_GATE), 3);
+                } else {
+                    buysolo(player, new ItemStack(Material.FENCE_GATE), 3);
+                }
             }
         } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Сундук")) {
             if (event.getClick() == ClickType.RIGHT) {
