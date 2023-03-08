@@ -22,7 +22,7 @@ public class SellerInventoryHolder implements InventoryHolder {
     int GOLD_INGOT_PRICE = 20;
     @Override
     public Inventory getInventory() {
-        Inventory inventory = Bukkit.createInventory(null, 9, "Seller Shop");
+        Inventory inventory = Bukkit.createInventory(this, 9, "Seller Shop");
 
         ItemStack coal = createSellItem(Material.COAL, "Продать уголь", COAL_PRICE, player);
         ItemStack iron = createSellItem(Material.IRON_INGOT, "Продать железный слиток", IRON_INGOT_PRICE, player);
