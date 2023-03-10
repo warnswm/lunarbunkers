@@ -25,7 +25,7 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EnchanterInventoryHolder implements InventoryHolder {
 
-    Player player;
+    Player player; //test
     String ENCHANT_SHOP_TITLE = ChatColor.GREEN + "Enchant Shop";
     ItemStack RED_PANE = createRedPane();
     ItemStack FEATHER_FALLING_4 = new ItemStack(Material.FEATHER);
