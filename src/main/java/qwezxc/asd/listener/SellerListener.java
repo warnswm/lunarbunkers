@@ -1,6 +1,5 @@
 package qwezxc.asd.listener;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,28 +8,18 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import qwezxc.asd.Asd;
 import qwezxc.asd.Items.ItemInfo;
-import qwezxc.asd.Items.RegisterItems;
-import qwezxc.asd.listener.InventoryHolders.BuilderInventoryHolder;
 import qwezxc.asd.listener.InventoryHolders.SellerInventoryHolder;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static qwezxc.asd.Items.ItemInfo.ITEM_INFOS;
 
 public class SellerListener implements Listener {
 
-    private HashMap<UUID, Double> balances;
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-
         if (!(event.getInventory().getHolder() instanceof SellerInventoryHolder)) return;
 
         Player player = (Player) event.getWhoClicked();

@@ -19,6 +19,7 @@ public class KOTH {
     private final List<UUID> capturingPlayers;
     private BukkitRunnable captureTimer;
     public static int timeLeft;
+    public static boolean captureing = false;
     private final GameManager gameManager;
 
 
@@ -61,6 +62,8 @@ public class KOTH {
         if(!GameManager.canCapture) return;
         Team playerTeam = teams.getTeam(player);
 
+        captureing = true;
+
         if (playerTeam != null) {
             if (capturingPlayers.isEmpty()) {
                 capturingPlayers.add(uuid);
@@ -81,6 +84,8 @@ public class KOTH {
     public void stopCapture(Player player) {
 
         capturingPlayers.remove(player.getUniqueId());
+
+        captureing = false;
 
         if (capturingPlayers.isEmpty() && captureTimer != null) {
             captureTimer.cancel();

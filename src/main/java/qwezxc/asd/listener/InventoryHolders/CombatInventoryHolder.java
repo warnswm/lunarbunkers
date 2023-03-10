@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag;
@@ -20,14 +19,13 @@ import qwezxc.asd.Items.RegisterItems;
 import java.util.ArrayList;
 import java.util.List;
 
-import static qwezxc.asd.util.Utils.createSellItem;
 
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CombatInventoryHolder implements InventoryHolder {
     @Override
     public Inventory getInventory() {
-        Inventory inventory = Bukkit.createInventory(null, 54, "Combat Shop");
+        Inventory inventory = Bukkit.createInventory(this, 54, "Combat Shop");
 
         ItemStack invisibility = new ItemStack(Material.SPLASH_POTION);
         PotionMeta invisibilitymeta = (PotionMeta) invisibility.getItemMeta();

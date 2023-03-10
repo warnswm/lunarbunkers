@@ -1,7 +1,9 @@
 package qwezxc.asd.listener;
 
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,25 +14,27 @@ import qwezxc.asd.Asd;
 import qwezxc.asd.listener.InventoryHolders.CombatInventoryHolder;
 
 public class MainTraderListener implements Listener {
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getInventory().getHolder() instanceof CombatInventoryHolder)) return;
 
+        event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();
         ItemStack item = event.getCurrentItem();
 
-        event.setCancelled(true);
 
         int availableSlots = player.getInventory().firstEmpty();
         if (availableSlots == -1) {
             player.sendMessage("Inventory is full");
             return;
         }
-
-        if (item == null || item.getItemMeta().getDisplayName() == null) return;
-        if (item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Speed Potion II (1:30)")) {
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = nmsItem.getTag();
+        if (item == null || item.getItemMeta().getDisplayName() == null || tag == null) return;
+        if (tag.hasKey(ChatColor.AQUA + "Speed Potion II (1:30)")) {
             buy(player, new ItemStack(Material.POTION, 1, (short) 8226), 10);
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Health Potion II")) {
+        } else if (tag.hasKey(ChatColor.GREEN + "Health Potion II")) {
             if (event.getClick() == ClickType.RIGHT) {
                 int count = 0;
                 for (ItemStack i : player.getInventory().getStorageContents()) {
@@ -48,23 +52,23 @@ public class MainTraderListener implements Listener {
             } else {
                 buy(player, new ItemStack(Material.POTION, 1, (short) 16421), 5);
             }
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Fire Resistance Potion (3:00)"))
+        } else if (tag.hasKey(ChatColor.GOLD + "Fire Resistance Potion (3:00)"))
             buy(player, new ItemStack(Material.POTION, 1, (short) 8195), 25);
-         else if (item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Slowness Potion (1:07)"))
+        else if (tag.hasKey(ChatColor.DARK_GRAY + "Slowness Potion (1:07)"))
             buy(player, new ItemStack(Material.POTION, 1, (short) 16394), 25);
-         else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Diamond Sword"))
-            buy(player, new ItemStack(Material.DIAMOND_SWORD, 1),100);
-         else if (item.getType() == Material.DIAMOND_BOOTS)
+        else if (tag.hasKey(ChatColor.GREEN + "Diamond Sword"))
+            buy(player, new ItemStack(Material.DIAMOND_SWORD, 1), 100);
+        else if (tag.hasKey(ChatColor.RED + "Diamond Boots"))
             purchaseItem(player, new ItemStack(Material.DIAMOND_BOOTS), 125, "алмазные ботинки");
-         else if (item.getType() == Material.DIAMOND_LEGGINGS)
+        else if (tag.hasKey(ChatColor.RED + "Diamond Leggings"))
             purchaseItem(player, new ItemStack(Material.DIAMOND_LEGGINGS), 250, "алмазные поножи");
-         else if (item.getType() == Material.DIAMOND_CHESTPLATE)
+        else if (tag.hasKey(ChatColor.RED + "Diamond Chestplate"))
             purchaseItem(player, new ItemStack(Material.DIAMOND_CHESTPLATE), 275, "алмазный нагрудник");
-         else if (item.getType() == Material.DIAMOND_HELMET)
+        else if (tag.hasKey(ChatColor.RED + "Diamond Helmet"))
             purchaseItem(player, new ItemStack(Material.DIAMOND_HELMET), 275, "алмазный шлем");
-         else if (item.getType() == Material.DIAMOND)
+        else if (tag.hasKey(ChatColor.RED + "Full set"))
             purchaseItem(player, new ItemStack(Material.DIAMOND), 850, "фулл сет и меч");
-         else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Ender Pearl")) {
+        else if (tag.hasKey(ChatColor.GREEN + "Ender Pearl")) {
             if (event.getClick() == ClickType.RIGHT) {
                 if (!Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(player, 25 * 16)) {
                     player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы купить это");
@@ -75,7 +79,7 @@ public class MainTraderListener implements Listener {
             } else {
                 buy(player, new ItemStack(Material.ENDER_PEARL, 1), 25);
             }
-        } else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Steak")) {
+        } else if (tag.hasKey(ChatColor.GREEN + "Steak")) {
             if (event.getClick() == ClickType.RIGHT) {
                 if (!Asd.getInstance().getPluginManager().getEconomy().hasEnoughMoney(player, 75 * 4)) {
                     player.sendMessage(ChatColor.RED + "У вас не дстаточно денег чтобы купить это");

@@ -1,5 +1,6 @@
 package qwezxc.asd.util;
 
+
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -100,7 +101,12 @@ public class Utils {
 
     public static ItemStack createSellItem(Material material, String displayName, int price, Player player) {
         ItemStack item = new ItemStack(material, 1);
-        ItemMeta meta = item.getItemMeta();
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setString(displayName, "hello");
+        nmsItem.setTag(tag);
+        ItemStack newItem = CraftItemStack.asBukkitCopy(nmsItem);
+        ItemMeta meta = newItem.getItemMeta();
         meta.setDisplayName(ChatColor.BLUE + displayName);
         int itemCount = 0;
         for (ItemStack itemStack : player.getInventory().getContents()) {
@@ -126,9 +132,14 @@ public class Utils {
         return item;
     }
 
-    public static ItemStack createBuyItem(Material material, String displayName, String name, int price, Player player) {
+    public static ItemStack createBuyItem(Material material, String displayName, int price, Player player) {
         ItemStack item = new ItemStack(material, 1);
-        ItemMeta meta = item.getItemMeta();
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setString(displayName, "hello");
+        nmsItem.setTag(tag);
+        ItemStack newItem = CraftItemStack.asBukkitCopy(nmsItem);
+        ItemMeta meta = newItem.getItemMeta();
         meta.setDisplayName(ChatColor.GREEN + displayName);
         int itemCount;
         int playerMoney = Asd.getInstance().getPluginManager().getEconomy().getBalance(player);
@@ -144,13 +155,6 @@ public class Utils {
             lore.add(ChatColor.GRAY + "Щелкните правой кнопкой мыши, чтобы купить " + itemCount + " " + Utils.declineNoun(displayName, itemCount) + " за " + totalPrice + "$ ");
             lore.add(ChatColor.GRAY + "―――――――――――――――――――――――――――");
             meta.setLore(lore);
-
-
-            net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-            NBTTagCompound nbtTagCompound = new NBTTagCompound();
-            nbtTagCompound.setBoolean(displayName, true);
-            nmsItem.setTag(nbtTagCompound);
-            item = CraftItemStack.asBukkitCopy(nmsItem);
 
             item.setItemMeta(meta);
             return item;
@@ -168,20 +172,33 @@ public class Utils {
 
     public static ItemStack getItem(Material material, String name, List<String> lore) {
         ItemStack itemStack = new ItemStack(material);
-        ItemMeta itemMeta = itemStack.getItemMeta();
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setString(name, "hello");
+        nmsItem.setTag(tag);
+        ItemStack newItem = CraftItemStack.asBukkitCopy(nmsItem);
+        ItemMeta itemMeta = newItem.getItemMeta();
         itemMeta.setDisplayName(name);
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
     }
-    public static ItemStack getPotion(Material material, String name, PotionType potionType, boolean extander, boolean upgraded, List<String> lore){
+    public static ItemStack getPotion(Material material, String name, PotionType potionType, boolean extander, boolean upgraded, List<String> lore) {
         ItemStack itemStack = new ItemStack(material);
-        PotionMeta itemMeta = (PotionMeta) itemStack.getItemMeta();
+        //Add tag
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setString(name, "hello");
+        nmsItem.setTag(tag);
+        ItemStack newItem = CraftItemStack.asBukkitCopy(nmsItem);
+        //Add displayname
+        PotionMeta itemMeta = (PotionMeta) newItem.getItemMeta();
         itemMeta.setDisplayName(name);
-        itemMeta.setBasePotionData(new PotionData(potionType,extander,upgraded));
+        itemMeta.setBasePotionData(new PotionData(potionType, extander, upgraded));
         itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
         itemMeta.setLore(lore);
+
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;

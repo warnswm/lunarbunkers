@@ -54,7 +54,7 @@ public class GameManager {
                     // Start the game
                     startGame();
                     for (Player player1 : Bukkit.getOnlinePlayers()){
-                        Asd.getInstance().getPluginManager().getEconomy().addBalance(player1,100);
+                        Asd.getInstance().getPluginManager().getEconomy().addBalance(player1, 10000);
                     }
                     cancel();
                 } else {
@@ -107,12 +107,14 @@ public class GameManager {
                         }
                         break;
                     case CAPTURE_POINT_CHANGE_TIME_15MIN:
+                        if(KOTH.timeLeft < 300) return;
                         KOTH.timeLeft = 300;
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 5:00");
                         }
                         break;
                     case CAPTURE_POINT_CHANGE_TIME_25MIN:
+                        if(KOTH.timeLeft < 150) return;
                         KOTH.timeLeft = 150;
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 2:30");

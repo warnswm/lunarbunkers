@@ -25,10 +25,10 @@ public class BuilderInventoryHolder implements InventoryHolder {
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(this, 45, "Builder Shop");
 
-        inventory.setItem(1, createBuyItem(Material.FENCE_GATE, "Дубовая калитка", "Дубовая калитка", FENCE_GATE_PRICE,player));
-        inventory.setItem(2, createBuyItem(Material.CHEST, "Сундук", "Сундук", CHEST_PRICE,player));
-        inventory.setItem(3, createBuyItem(Material.LADDER, "Лестница", "Лестница", LADDER_PRICE,player));
-        inventory.setItem(5, createBuyItem(Material.COBBLESTONE, "Булыжник", "Булыжник", COBBLESTONE_PRICE,player));
+        inventory.setItem(1, createBuyItem(Material.FENCE_GATE, "Дубовая калитка", FENCE_GATE_PRICE, player));
+        inventory.setItem(2, createBuyItem(Material.CHEST, "Сундук", CHEST_PRICE, player));
+        inventory.setItem(3, createBuyItem(Material.LADDER, "Лестница", LADDER_PRICE, player));
+        inventory.setItem(5, createBuyItem(Material.COBBLESTONE, "Булыжник", COBBLESTONE_PRICE, player));
         inventory.setItem(30, RegisterItems.diamondpickaxe);
         inventory.setItem(31, RegisterItems.diamondaxe);
 

@@ -67,16 +67,19 @@ public class TeamNPC implements Listener {
     public void spawnCombatShop(Team team, Location loc) {
         NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Combat Shop");
         npc.setName(team.getChatColor() + "Combat Shop");
+        npc.data().set("Combat", "hello");
         setDefaultSettings(npc, team, loc);
     }
     public void spawnSellerShop(Team team, Location loc) {
         NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "SellerShop");
         npc.setName(team.getChatColor() + "Seller Shop");
+        npc.data().set("Seller", "hello");
         setDefaultSettings(npc, team, loc);
     }
     public void spawnBuilderShop(Team team, Location loc) {
         NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "BuilderShop");
         npc.setName(team.getChatColor() + "Builder Shop");
+        npc.data().set("Builder", "hello");
         setDefaultSettings(npc, team, loc);
     }
 
