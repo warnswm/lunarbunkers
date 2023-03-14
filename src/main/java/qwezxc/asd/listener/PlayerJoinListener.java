@@ -41,7 +41,7 @@ public class PlayerJoinListener implements Listener {
         if (!player.isOp()) {
             player.setGameMode(GameMode.SURVIVAL);
         }
-        main.getPluginManager().getDatabase().addPlayertoDatabase(player);
+        main.getPluginManager().getDatabase().addPlayer(player);
         scoreBoardLib.sendScoreBoard(player, teamLivesManager, playerKillsManager, teams);
         if (Bukkit.getOnlinePlayers().size() == 8) {
             gameManager.execute();

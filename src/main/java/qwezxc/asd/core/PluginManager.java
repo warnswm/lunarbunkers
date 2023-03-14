@@ -23,7 +23,6 @@ public class PluginManager {
     TeamNPC teamNPC;
 
     private PluginManager() {
-        // Initialize the managers and utilities
         this.teams = new Teams();
         this.database = new Database();
         this.teamLivesManager = new TeamLivesManager();

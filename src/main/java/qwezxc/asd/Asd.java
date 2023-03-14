@@ -39,7 +39,7 @@ public final class Asd extends JavaPlugin {
                 new SellerListener(),
                 new TeamTerritory(pluginManager.getTeams()),
                 new NPCInteract(),
-                new EnchantShopListener(),
+                new EnchantShopListener(pluginManager.getEconomy()),
                 new DefaultListener(this, pluginManager.getScoreBoardLib(), pluginManager.getKoth(), pluginManager.getTeams()),
                 pluginManager.getOreRegen(),
                 pluginManager.getTeamNPC(),

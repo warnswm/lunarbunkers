@@ -1,8 +1,5 @@
 package qwezxc.asd.listener;
 
-import net.citizensnpcs.api.event.NPCRightClickEvent;
-import net.citizensnpcs.api.npc.NPC;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -13,9 +10,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import qwezxc.asd.Asd;
-import qwezxc.asd.Items.RegisterItems;
-import qwezxc.asd.listener.InventoryHolders.CombatInventoryHolder;
+import org.jetbrains.annotations.NotNull;
+import qwezxc.asd.core.Economy;
 import qwezxc.asd.listener.InventoryHolders.EnchanterInventoryHolder;
 import qwezxc.asd.listener.enums.ArmorPrice;
 import qwezxc.asd.listener.enums.SwordPrice;
@@ -28,10 +24,18 @@ import java.util.Optional;
 
 public class EnchantShopListener implements Listener {
 
-    int[] DURABILITY_SLOTS = { 43, 34, 25, 16 };
+    private final Economy economy;
+    private static final int[] DURABILITY_SLOTS = {43, 34, 25, 16};
+
+    public EnchantShopListener(Economy economy) {
+        this.economy = economy;
+    }
+
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getInventory().getHolder() instanceof EnchanterInventoryHolder)) return;
+    public void onInventoryClick(@NotNull InventoryClickEvent event) {
+        if (!(event.getInventory().getHolder() instanceof EnchanterInventoryHolder)) {
+            return;
+        }
 
         event.setCancelled(true);
 
@@ -39,164 +43,187 @@ public class EnchantShopListener implements Listener {
         Inventory inventory = event.getInventory();
         ItemStack item = event.getCurrentItem();
 
-        if (item == null || item.getItemMeta().getDisplayName() == null || item.getType() == null || item.getItemMeta() == null) return;
-
-        if (item.getType() == Material.DIAMOND_BOOTS || item.getType() == Material.DIAMOND_HELMET || item.getType() == Material.DIAMOND_CHESTPLATE || item.getType() == Material.DIAMOND_LEGGINGS) {
-            int levelenchant = Integer.parseInt(item.getItemMeta().getDisplayName().split(" ")[2]);
-            if (Asd.getInstance().getPluginManager().getEconomy().getBalance(player) < ArmorPrice.getArmorEnchantByInt(levelenchant)) {
-                player.sendMessage(Utils.color("&4&lНе досточно средств"));
-                return;
-            }
-
-            onProtectionClick(player,item,levelenchant);
-            event.setCurrentItem(getItem(item, ChatColor.GREEN + "Buy Protection " + (levelenchant + 1), Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + ArmorPrice.getArmorEnchantByInt(levelenchant + 1),
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――"
-            )));
-        }
-        else if (item.getType() == Material.GOLD_BOOTS || item.getType() == Material.GOLD_HELMET || item.getType() == Material.GOLD_CHESTPLATE || item.getType() == Material.GOLD_LEGGINGS) {
-            if(Asd.getInstance().getPluginManager().getEconomy().getBalance(player) < 300) {
-                player.sendMessage(Utils.color("&4&lНе досточно средств"));
-                return;
-            }
-
-            onDurabilityClick(player,item);
-            int i = event.getSlot();
-            inventory.setItem(i, createRedPane());
-        }
-        else if(item.getType() == Material.DIAMOND_SWORD){
-            int levelenchant = Integer.parseInt(item.getItemMeta().getDisplayName().split(" ")[2]);
-            if (Asd.getInstance().getPluginManager().getEconomy().getBalance(player) < SwordPrice.getSwordEnchantByInt(levelenchant)) {
-                player.sendMessage(Utils.color("&4&lНе досточно средств"));
-                return;
-            }
-            onSwordClick(player,levelenchant);
-            event.setCurrentItem(getItem(item, ChatColor.GREEN + "Buy Sharpness " + (levelenchant + 1), Arrays.asList(
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――",
-                    ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + SwordPrice.getSwordEnchantByInt(levelenchant + 1),
-                    ChatColor.GRAY + "―――――――――――――――――――――――――――"
-            )));
-        }
-        else if (item.getType() == Material.FEATHER){
-            if (Asd.getInstance().getPluginManager().getEconomy().getBalance(player) < 500) {
-                player.sendMessage(Utils.color("&4&lНе досточно средств"));
-                return;
-            }
-            ItemStack playerboots = player.getInventory().getBoots();
-            playerboots.addEnchantment(Enchantment.PROTECTION_FALL,4);
-            inventory.setItem(13,createRedPane());
-        }
-        else if (item.getType() == Material.DIAMOND_PICKAXE) {
-            if (Asd.getInstance().getPluginManager().getEconomy().getBalance(player) < 500) {
-                player.sendMessage(Utils.color("&4&lНе досточно средств"));
-                return;
-            }
-            for (ItemStack playeritem : player.getInventory().getContents()) {
-                if (playeritem != null && playeritem.getType() == Material.DIAMOND_PICKAXE) {
-                    playeritem.addEnchantment(Enchantment.DIG_SPEED, 3);
-                    inventory.setItem(14,createRedPane());
-                    break;
-                }
-            }
-        }
-
-    }
-
-    private void onDurabilityClick(Player player, ItemStack item){
-        switch (item.getType()) {
-            case GOLD_HELMET:
-                ItemStack playerhelmet = player.getInventory().getHelmet();
-                playerhelmet.addEnchantment(Enchantment.DURABILITY, 3);
-                player.getInventory().setHelmet(playerhelmet);
-                break;
-            case GOLD_CHESTPLATE:
-                ItemStack playerchest = player.getInventory().getChestplate();
-                playerchest.addEnchantment(Enchantment.DURABILITY, 3);
-                player.getInventory().setChestplate(playerchest);
-                break;
-            case GOLD_LEGGINGS:
-                ItemStack playerleg = player.getInventory().getLeggings();
-                playerleg.addEnchantment(Enchantment.DURABILITY, 3);
-                player.getInventory().setLeggings(playerleg);
-                break;
-            case GOLD_BOOTS:
-                ItemStack playerboots = player.getInventory().getBoots();
-                playerboots.addEnchantment(Enchantment.DURABILITY, 3);
-                player.getInventory().setBoots(playerboots);
-                break;
-        }
-    }
-    private void onProtectionClick(Player player, ItemStack item,int levelenchant){
         switch (item.getType()) {
             case DIAMOND_HELMET:
-                Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, ArmorPrice.getArmorEnchantByInt(levelenchant));
-                ItemStack playerhelmet = player.getInventory().getHelmet();
-                playerhelmet.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, levelenchant);
-                player.getInventory().setHelmet(playerhelmet);
-                if(levelenchant == 4){
-                    player.closeInventory();
-                }
-                break;
             case DIAMOND_CHESTPLATE:
-                Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, ArmorPrice.getArmorEnchantByInt(levelenchant));
-                ItemStack playerchest = player.getInventory().getChestplate();
-                playerchest.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, levelenchant);
-                player.getInventory().setChestplate(playerchest);
-                if(levelenchant == 4){
-                    player.closeInventory();
-                }
-                break;
             case DIAMOND_LEGGINGS:
-                Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, ArmorPrice.getArmorEnchantByInt(levelenchant));
-                ItemStack playerleg = player.getInventory().getLeggings();
-                playerleg.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, levelenchant);
-                player.getInventory().setLeggings(playerleg);
-
-                if(levelenchant == 4){
-                    player.closeInventory();
-                }
-                break;
             case DIAMOND_BOOTS:
-                Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, ArmorPrice.getArmorEnchantByInt(levelenchant));
-                ItemStack playerboots = player.getInventory().getBoots();
-                playerboots.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, levelenchant);
-                player.getInventory().setBoots(playerboots);
-
-                if (levelenchant == 4) {
-                    player.closeInventory();
-                }
+                handleArmorEnchantmentClick(player, inventory, item,event.getSlot());
                 break;
+            case GOLD_BOOTS:
+            case GOLD_LEGGINGS:
+            case GOLD_CHESTPLATE:
+            case GOLD_HELMET:
+                handleDurabilityClick(player, item, event.getSlot());
+                inventory.setItem(event.getSlot(), createRedPane());
+                break;
+            case DIAMOND_SWORD:
+                handleSwordEnchantmentClick(player, item);
+                break;
+            case FEATHER:
+                handleFeatherEnchantmentClick(player);
+                inventory.setItem(13, createRedPane());
+                break;
+            case DIAMOND_PICKAXE:
+                handleDiamondPickaxeEnchantmentClick(player);
+                inventory.setItem(14, createRedPane());
+                break;
+            default:break;
         }
     }
 
-    private void onSwordClick(Player player, int levelEnchant) {
-        int swordPrice = SwordPrice.getSwordEnchantByInt(levelEnchant);
-        Asd.getInstance().getPluginManager().getEconomy().removeBalance(player, swordPrice);
+    private void handleArmorEnchantmentClick(Player player, Inventory inventory, ItemStack item,int slot) {
+        int levelEnchant = Integer.parseInt(item.getItemMeta().getDisplayName().split(" ")[2]);
 
-        Optional<ItemStack> diamondSword = Arrays.stream(player.getInventory().getContents())
-                .filter(item -> item != null && item.getType() == Material.DIAMOND_SWORD)
+        if (economy.getBalance(player) < ArmorPrice.getArmorEnchantByInt(levelEnchant)) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, ArmorPrice.getArmorEnchantByInt(levelEnchant));
+
+        if (item.getType() == Material.DIAMOND_HELMET) {
+            addEnchantment(player.getInventory().getHelmet(), Enchantment.PROTECTION_ENVIRONMENTAL, levelEnchant);
+        } else if (item.getType() == Material.DIAMOND_CHESTPLATE) {
+            addEnchantment(player.getInventory().getChestplate(), Enchantment.PROTECTION_ENVIRONMENTAL, levelEnchant);
+        } else if (item.getType() == Material.DIAMOND_LEGGINGS) {
+            addEnchantment(player.getInventory().getLeggings(), Enchantment.PROTECTION_ENVIRONMENTAL, levelEnchant);
+        } else if (item.getType() == Material.DIAMOND_BOOTS) {
+            addEnchantment(player.getInventory().getBoots(), Enchantment.PROTECTION_ENVIRONMENTAL, levelEnchant);
+        }
+
+        if (levelEnchant == 4) {
+            player.closeInventory();
+        }
+
+        inventory.setItem(slot, getItem(item, ChatColor.GREEN + "Buy Protection " + (levelEnchant + 1), Arrays.asList(
+                ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + ArmorPrice.getArmorEnchantByInt(levelEnchant + 1),
+                ChatColor.GRAY + "―――――――――――――――――――――――――――"
+        )));
+    }
+
+    private void handleDurabilityClick(Player player, ItemStack item,int slot) {
+        int index = Arrays.binarySearch(DURABILITY_SLOTS, slot);
+        ItemStack armor;
+        Enchantment enchantment;
+
+        switch (item.getType()) {
+            case GOLD_HELMET:
+                armor = player.getInventory().getHelmet();
+                enchantment = Enchantment.DURABILITY;
+                break;
+            case GOLD_CHESTPLATE:
+                armor = player.getInventory().getChestplate();
+                enchantment = Enchantment.DURABILITY;
+                break;
+            case GOLD_LEGGINGS:
+                armor = player.getInventory().getLeggings();
+                enchantment = Enchantment.DURABILITY;
+                break;
+            case GOLD_BOOTS:
+                armor = player.getInventory().getBoots();
+                enchantment = Enchantment.DURABILITY;
+                break;
+            default:
+                return;
+        }
+
+        if (economy.getBalance(player) < 300) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, 300);
+
+        addEnchantment(armor, enchantment, 3);
+
+        if (index >= 0) {
+            item.setDurability((short) (item.getDurability() + 1));
+        }
+    }
+
+    private void handleSwordEnchantmentClick(Player player, ItemStack item) {
+        int levelEnchant = Integer.parseInt(item.getItemMeta().getDisplayName().split(" ")[2]);
+
+        if (economy.getBalance(player) < SwordPrice.getSwordEnchantByInt(levelEnchant)) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, SwordPrice.getSwordEnchantByInt(levelEnchant));
+
+        Optional<ItemStack> optionalSword = Arrays.stream(player.getInventory().getContents())
+                .filter(sword -> sword != null && sword.getType() == Material.DIAMOND_SWORD)
                 .findFirst();
 
-        if (diamondSword.isPresent()) {
-            ItemStack sword = diamondSword.get();
+        if (optionalSword.isPresent()) {
+            ItemStack sword = optionalSword.get();
+            Map<Enchantment, Integer> enchantments = sword.getEnchantments();
+
             if (levelEnchant == 1) {
                 addEnchantment(sword, Enchantment.DAMAGE_ALL, levelEnchant);
             } else {
-                Map<Enchantment, Integer> enchantments = sword.getEnchantments();
-                if (enchantments.containsKey(Enchantment.DAMAGE_ALL) && enchantments.get(Enchantment.DAMAGE_ALL) == levelEnchant - 1) {
+                int previousLevel = levelEnchant - 1;
+
+                if (enchantments.containsKey(Enchantment.DAMAGE_ALL) && enchantments.get(Enchantment.DAMAGE_ALL) == previousLevel) {
                     addEnchantment(sword, Enchantment.DAMAGE_ALL, levelEnchant);
                 }
-                if( levelEnchant == 5){
-                    player.closeInventory();
-                }
             }
+
+            if (levelEnchant == 5) {
+                player.closeInventory();
+            }
+
+            item.setItemMeta(sword.getItemMeta());
+            player.getInventory().remove(sword);
+            player.getInventory().addItem(item);
         }
     }
 
+    private void handleFeatherEnchantmentClick(Player player) {
+        if (economy.getBalance(player) < 500) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, 500);
+
+        ItemStack boots = player.getInventory().getBoots();
+        boots.addEnchantment(Enchantment.PROTECTION_FALL, 4);
+        player.getInventory().setBoots(boots);
+
+        player.updateInventory();
+    }
+
+    private void handleDiamondPickaxeEnchantmentClick(Player player) {
+        if (economy.getBalance(player) < 500) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, 500);
+
+        ItemStack diamondPickaxe = null;
+
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.DIAMOND_PICKAXE) {
+                diamondPickaxe = item;
+                break;
+            }
+        }
+
+        if (diamondPickaxe != null) {
+            addEnchantment(diamondPickaxe, Enchantment.DIG_SPEED, 3);
+
+            player.updateInventory();
+        }
+    }
 
     private void addEnchantment(ItemStack item, Enchantment enchantment, int level) {
-        item.addEnchantment(enchantment, level);
+        if (item != null) {
+            item.addEnchantment(enchantment, level);
+        }
     }
 
     private ItemStack getItem(ItemStack itemStack, String name, List<String> lore) {
@@ -216,3 +243,217 @@ public class EnchantShopListener implements Listener {
         return pane;
     }
 }
+
+
+/*
+* bay me optimized code:
+public class EnchantShopListener implements Listener {
+
+    private final Economy economy;
+    private static final int[] DURABILITY_SLOTS = {43, 34, 25, 16};
+    private static final Map<Material, BiConsumer<EnchantShopListener, InventoryClickEvent>> ITEM_CLICK_HANDLERS = new HashMap<>();
+
+    static {
+        ITEM_CLICK_HANDLERS.put(Material.DIAMOND_HELMET, EnchantShopListener::handleArmorEnchantmentClick);
+        ITEM_CLICK_HANDLERS.put(Material.DIAMOND_CHESTPLATE, EnchantShopListener::handleArmorEnchantmentClick);
+        ITEM_CLICK_HANDLERS.put(Material.DIAMOND_LEGGINGS, EnchantShopListener::handleArmorEnchantmentClick);
+        ITEM_CLICK_HANDLERS.put(Material.DIAMOND_BOOTS, EnchantShopListener::handleArmorEnchantmentClick);
+        ITEM_CLICK_HANDLERS.put(Material.GOLD_HELMET, EnchantShopListener::handleDurabilityClick);
+        ITEM_CLICK_HANDLERS.put(Material.GOLD_CHESTPLATE, EnchantShopListener::handleDurabilityClick);
+        ITEM_CLICK_HANDLERS.put(Material.GOLD_LEGGINGS, EnchantShopListener::handleDurabilityClick);
+        ITEM_CLICK_HANDLERS.put(Material.GOLD_BOOTS, EnchantShopListener::handleDurabilityClick);
+        ITEM_CLICK_HANDLERS.put(Material.DIAMOND_SWORD, EnchantShopListener::handleSwordEnchantmentClick);
+        ITEM_CLICK_HANDLERS.put(Material.FEATHER, EnchantShopListener::handleFeatherEnchantmentClick);
+        ITEM_CLICK_HANDLERS.put(Material.DIAMOND_PICKAXE, EnchantShopListener::handleDiamondPickaxeEnchantmentClick);
+    }
+
+    public EnchantShopListener(Economy economy) {
+        this.economy = economy;
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getInventory().getHolder() instanceof EnchanterInventoryHolder)) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        Player player = (Player) event.getWhoClicked();
+        Inventory inventory = event.getInventory();
+        ItemStack item = event.getCurrentItem();
+
+        ITEM_CLICK_HANDLERS.getOrDefault(item.getType(), (l, e) -> {}).accept(this, event);
+    }
+
+    private void handleArmorEnchantmentClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        Inventory inventory = event.getInventory();
+        ItemStack item = event.getCurrentItem();
+        int slot = event.getSlot();
+        int levelEnchant = Integer.parseInt(item.getItemMeta().getDisplayName().split(" ")[2]);
+
+        if (economy.getBalance(player) < ArmorPrice.getArmorEnchantByInt(levelEnchant)) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, ArmorPrice.getArmorEnchantByInt(levelEnchant));
+        ItemStack armor = null;
+        Enchantment enchantment = Enchantment.PROTECTION_ENVIRONMENTAL;
+        if (item.getType() == Material.DIAMOND_HELMET) {
+            armor = player.getInventory().getHelmet();
+        } else if (item.getType() == Material.DIAMOND_CHESTPLATE) {
+            armor = player.getInventory().getChestplate();
+        } else if (item.getType() == Material.DIAMOND_LEGGINGS) {
+            armor = player.getInventory().getLeggings();
+        } else if (item.getType() == Material.DIAMOND_BOOTS) {
+            armor = player.getInventory().getBoots();
+        }
+
+        if (armor != null) {
+            addEnchantment(armor, enchantment, levelEnchant);
+        }
+
+        if (levelEnchant == 4) {
+            player.closeInventory();
+        }
+
+        updateItem(item, name, Arrays.asList(
+                ChatColor.GRAY + "―――――――――――――――――――――――――――",
+                ChatColor.YELLOW + "Цена: " + ChatColor.GREEN + ArmorPrice.ArmorEnchant.getArmorEnchantByInt(levelEnchant + 1),
+                ChatColor.GRAY + "―――――――――――――――――――――――――――"
+        ));
+        inventory.setItem(slot, item);
+    }
+
+    private void handleDurabilityClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        ItemStack item = event.getCurrentItem();
+        int slot = event.getSlot();
+        int index = Arrays.binarySearch(DURABILITY_SLOTS, slot);
+        Enchantment enchantment = Enchantment.DURABILITY;
+        ItemStack armor = null;
+
+        if (item.getType() == Material.GOLD_HELMET) {
+            armor = player.getInventory().getHelmet();
+        } else if (item.getType() == Material.GOLD_CHESTPLATE) {
+            armor = player.getInventory().getChestplate();
+        } else if (item.getType() == Material.GOLD_LEGGINGS) {
+            armor = player.getInventory().getLeggings();
+        } else if (item.getType() == Material.GOLD_BOOTS) {
+            armor = player.getInventory().getBoots();
+        }
+
+        if (economy.getBalance(player) < 300) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, 300);
+
+        if (armor != null) {
+            addEnchantment(armor, enchantment, 3);
+        }
+
+        if (index >= 0) {
+            item.setDurability((short) (item.getDurability() + 1));
+        }
+
+        updateItem(item, ChatColor.GREEN + "Buy Durability", null);
+        event.getInventory().setItem(slot, item);
+    }
+
+    private void handleSwordEnchantmentClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        ItemStack item = event.getCurrentItem();
+        int levelEnchant = Integer.parseInt(item.getItemMeta().getDisplayName().split(" ")[2]);
+
+        if (economy.getBalance(player) < SwordPrice.getSwordEnchantByInt(levelEnchant)) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, SwordPrice.getSwordEnchantByInt(levelEnchant));
+
+        Optional<ItemStack> optionalSword = Arrays.stream(player.getInventory().getContents())
+                .filter(sword -> sword != null && sword.getType() == Material.DIAMOND_SWORD)
+                .findFirst();
+
+        if (optionalSword.isPresent()) {
+            ItemStack sword = optionalSword.get();
+            Map<Enchantment, Integer> enchantments = sword.getEnchantments();
+
+            if (levelEnchant == 1) {
+                addEnchantment(sword, Enchantment.DAMAGE_ALL, levelEnchant);
+            } else {
+                int previousLevel = levelEnchant - 1;
+
+                if (enchantments.containsKey(Enchantment.DAMAGE_ALL) && enchantments.get(Enchantment.DAMAGE_ALL) == previousLevel) {
+                    addEnchantment(sword, Enchantment.DAMAGE_ALL, levelEnchant);
+                }
+            }
+
+            if (levelEnchant == 5) {
+                player.closeInventory();
+            }
+
+            item.setItemMeta(sword.getItemMeta());
+            player.getInventory().remove(sword);
+            player.getInventory().addItem(item);
+        }
+    }
+
+    private void handleFeatherEnchantmentClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+
+        if (economy.getBalance(player) < 500) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, 500);
+
+        ItemStack boots = player.getInventory().getBoots();
+        boots.addEnchantment(Enchantment.PROTECTION_FALL, 4);
+        player.getInventory().setBoots(boots);
+
+        player.updateInventory();
+    }
+
+    private void handleDiamondPickaxeEnchantmentClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+
+        if (economy.getBalance(player) < 500) {
+            player.sendMessage(Utils.color("&4&lНе досточно средств"));
+            return;
+        }
+
+        economy.removeBalance(player, 500);
+
+        ItemStack diamondPickaxe = null;
+
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.DIAMOND_PICKAXE) {
+                diamondPickaxe = item;
+                break;
+            }
+        }
+
+        if (diamondPickaxe != null) {
+            addEnchantment(diamondPickaxe, Enchantment.DIG_SPEED, 3);
+            player.updateInventory();
+        }
+    }
+
+    private void addEnchantment(ItemStack item, Enchantment enchantment, int level) {
+        item.addEnchantment(enchantment, level);
+    }
+
+    private void updateItem(ItemStack item, String name, List<String> lore) {
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setDisplayName(name);
+        itemMeta.setLore(lore);
+        item.setItemMeta(itemMeta);
+    }
+}*/

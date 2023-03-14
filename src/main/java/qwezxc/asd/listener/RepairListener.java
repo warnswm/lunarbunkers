@@ -14,6 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Consumer;
+import org.jetbrains.annotations.NotNull;
 import qwezxc.asd.Asd;
 import qwezxc.asd.listener.InventoryHolders.CombatInventoryHolder;
 import qwezxc.asd.listener.InventoryHolders.RepairInventoryHolder;
@@ -25,7 +26,7 @@ import java.util.Map;
 public class RepairListener implements Listener {
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
+    public void onInventoryClick(@NotNull InventoryClickEvent event) {
         if (!(event.getInventory().getHolder() instanceof RepairInventoryHolder)) return;
 
         event.setCancelled(true);
@@ -33,7 +34,7 @@ public class RepairListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         ItemStack clickedItem = event.getCurrentItem();
 
-        if (clickedItem == null || clickedItem.getType().getMaxDurability() <= 0 || clickedItem.getDurability() == 0) {
+        if (clickedItem.getType().getMaxDurability() <= 0 || clickedItem.getDurability() == 0) {
             return;
         }
 
@@ -105,6 +106,4 @@ public class RepairListener implements Listener {
             player.getInventory().setItem(slot, repairedItem);
         }
     }
-
-
 }

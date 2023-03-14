@@ -31,7 +31,7 @@ public class RemoveDBPlayerCommand implements CommandExecutor {
         }
 
         String targetName = args[0];
-        UUID targetUUID = Bukkit.getOfflinePlayer(targetName).getUniqueId();
+        UUID targetUUID = Bukkit.getPlayer(targetName).getUniqueId();
 
         // Use the Database class to remove the player from the database
         Database database = main.getInstance().getPluginManager().getDatabase();
