@@ -4,9 +4,11 @@ import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import qwezxc.asd.Asd;
 import qwezxc.asd.listener.DefaultListener;
+import qwezxc.asd.listener.PlayerJoinListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +42,17 @@ public class KOTH {
                     if (timeLeft == 0) {
                         Team capturingTeam = teams.getTeam(capturingPlayers.get(0));
                         Bukkit.broadcastMessage(ChatColor.GREEN + "The " + capturingTeam.getName() + " team has captured the point!");
+                        for (Player player : PlayerJoinListener.joinedPlayers ){
+                            Team playerteam = teams.getTeam(player);
+                            if(playerteam != capturingTeam) return;
+                            Asd.getInstance().getPluginManager().getDatabase().addWin(player.getUniqueId());
+                        }
                         capturingPlayers.clear();
                         captureTimer.cancel();
                         captureTimer = null;
                         endGame();
                         DefaultListener.removeBlocks();
                         gameManager.stopGameStartTimer();
-
                     }
                 }
             };

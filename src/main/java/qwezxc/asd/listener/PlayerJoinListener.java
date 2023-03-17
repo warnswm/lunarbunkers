@@ -1,5 +1,7 @@
 package qwezxc.asd.listener;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -12,6 +14,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import qwezxc.asd.Asd;
 import qwezxc.asd.core.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class PlayerJoinListener implements Listener {
 
 
@@ -22,7 +28,7 @@ public class PlayerJoinListener implements Listener {
     private final ScoreBoardLib scoreBoardLib;
     private final Teams teams;
     private final Location lobby = new Location(Bukkit.getWorld("world"), 0.5, 65, 206.5);
-
+    public static final List<Player> joinedPlayers = new ArrayList<>();
     public PlayerJoinListener(final Asd main, TeamLivesManager playerLivesManager, GameManager gameManager, ScoreBoardLib scoreBoardLib, PlayerKillsManager playerKillsManager, Teams teams) {
         this.main = main;
         this.teamLivesManager = playerLivesManager;
@@ -41,8 +47,9 @@ public class PlayerJoinListener implements Listener {
         if (!player.isOp()) {
             player.setGameMode(GameMode.SURVIVAL);
         }
-        main.getPluginManager().getDatabase().addPlayer(player);
+        main.getPluginManager().getDatabase().addPlayer(player.getUniqueId());
         scoreBoardLib.sendScoreBoard(player, teamLivesManager, playerKillsManager, teams);
+        joinedPlayers.add(player);
         if (Bukkit.getOnlinePlayers().size() == 8) {
             gameManager.execute();
         }
@@ -54,12 +61,20 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         event.setQuitMessage("");
+        Player player = event.getPlayer();
+        if(GameManager.gameTime > 0){
+            joinedPlayers.remove(player);
+        }
         if (Bukkit.getOnlinePlayers().size() != 8) {
             gameManager.stopGameStartTimer();
+        }
+        if (Bukkit.getOnlinePlayers().size() == 1) {
+            //ToDo: Добавить победы если остался 1 игрок
         }
         if (Bukkit.getOnlinePlayers().isEmpty()) {
             Bukkit.getScheduler().runTaskLater(main, CitizensAPI.getNPCRegistry()::deregisterAll, 2);
         }
+
     }
 
 }

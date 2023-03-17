@@ -10,27 +10,29 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import qwezxc.asd.core.Team;
 import qwezxc.asd.core.Teams;
 public class TeamMenuListener implements Listener {
-    private Teams teams;
+    private final Teams teams;
 
     public TeamMenuListener(Teams teams) {
         this.teams = teams;
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
+    public void onInventoryClick(@NotNull InventoryClickEvent event) {
+        if (!event.getInventory().getTitle().equals("Team Select")) return;
         Player player = (Player) event.getWhoClicked();
         ItemStack item = event.getCurrentItem();
-        Inventory inventory = event.getInventory();
+
         if (item == null || item.getType() == Material.AIR) {
             return;
         }
-        if (!inventory.getTitle().equals("Team Select")) return;
+
 
         event.setCancelled(true);
-        if (item == null) return;
+
         for (Team team : teams.getTeams()) {
             if (item.getType() == team.getWoolBlock()) {
                 if(teams.getNumPlayersInTeam(team) >= team.getMaxPlayers()){
@@ -51,12 +53,12 @@ public class TeamMenuListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
+    public void onPlayerChat(@NotNull AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String message = event.getMessage();
         String teamMessage;
         Team team = teams.getTeam(player);
-        if (team == null) return;
+
         ChatColor colorteam = team.getChatColor();
 
         // Check if the message starts with "!"

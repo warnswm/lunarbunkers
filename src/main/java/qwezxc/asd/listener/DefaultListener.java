@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -160,7 +161,7 @@ public class DefaultListener implements Listener {
     }
 
     @EventHandler
-    public void onBlockKOTH(BlockPlaceEvent event) {
+    public void onBlockKOTH(BlockPlaceEvent event, BlockBreakEvent even) {
         Location blocklocaiton = event.getBlock().getLocation();
         double captureRadius = 10.5;
         Location capturePoint = new Location(Bukkit.getWorld("world"), 1.5, 63.5, 0.5);
@@ -168,6 +169,7 @@ public class DefaultListener implements Listener {
                 Math.abs(blocklocaiton.getY() - capturePoint.getY()) <= captureRadius - 5 &&
                 Math.abs(blocklocaiton.getZ() - capturePoint.getZ()) <= captureRadius) {
             event.setCancelled(true);
+            even.setCancelled(true);
         }
     }
 

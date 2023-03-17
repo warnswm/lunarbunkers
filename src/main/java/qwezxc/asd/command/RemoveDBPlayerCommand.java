@@ -35,12 +35,8 @@ public class RemoveDBPlayerCommand implements CommandExecutor {
 
         // Use the Database class to remove the player from the database
         Database database = main.getInstance().getPluginManager().getDatabase();
-        boolean removed = database.removePlayer(targetUUID);
 
-        if (!removed) {
-            player.sendMessage("Player " + targetName + " was not found in the database.");
-            return false;
-        }
+
 
         player.sendMessage("Player " + targetName + " was successfully removed from the database.");
         return true;

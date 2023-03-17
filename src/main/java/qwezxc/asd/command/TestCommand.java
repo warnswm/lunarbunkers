@@ -21,7 +21,7 @@ public class TestCommand implements CommandExecutor {
             return false;
         }
         Player player = ((Player) sender).getPlayer();
-        Asd.getInstance().getPluginManager().getDatabase().addWin(player);
+        Asd.getInstance().getPluginManager().getDatabase().addWin(player.getUniqueId());
         return true;
     }
 

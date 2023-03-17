@@ -79,10 +79,14 @@ public class GameManager {
             if (playerTeam == null) {
                 Team smallestTeam = Collections.min(teamSizes.entrySet(), Map.Entry.comparingByValue()).getKey();
                 teams.addPlayerToTeam(player, smallestTeam);
+                playerTeam = smallestTeam; // assign the newly added team to the playerTeam variable
                 updatePlayerListName(player);
             }
-        }
 
+            // update the number of players for the player's team
+            int teamSize = teams.getNumPlayersInTeam(playerTeam);
+            teamSizes.put(playerTeam, teamSize);
+        }
         for (Player player : Bukkit.getOnlinePlayers()) {
             Team playerTeam = teams.getTeam(player);
             player.closeInventory();

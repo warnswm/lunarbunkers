@@ -23,14 +23,14 @@ public class PluginManager {
     TeamNPC teamNPC;
 
     private PluginManager() {
-        this.teams = new Teams();
-        this.database = new Database();
-        this.teamLivesManager = new TeamLivesManager();
-        this.economy = new Economy();
-        this.playerKillsManager = new PlayerKillsManager();
-        this.teamNPC = new TeamNPC(teams);
-        this.gameManager = new GameManager(Asd.getInstance(), teams, teamNPC);
-        this.scoreBoardLib = new ScoreBoardLib();
+        teams = new Teams();
+        database = new Database();
+        teamLivesManager = new TeamLivesManager();
+        economy = new Economy();
+        playerKillsManager = new PlayerKillsManager();
+        teamNPC = new TeamNPC(teams);
+        gameManager = new GameManager(Asd.getInstance(), teams, teamNPC);
+        scoreBoardLib = new ScoreBoardLib();
         koth = new KOTH(Asd.getInstance(), teams, gameManager);
         oreRegen = new OreRegeneration(Asd.getInstance());
     }
