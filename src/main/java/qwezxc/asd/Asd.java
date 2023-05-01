@@ -24,8 +24,6 @@ public final class Asd extends JavaPlugin {
     private static Asd instance;
     public  World world;
     @Getter
-    private static DefaultListener defaultListener;
-    @Getter
     private PluginManager pluginManager;
 
     @Override
@@ -35,7 +33,6 @@ public final class Asd extends JavaPlugin {
         world = Bukkit.getWorld("world");
         this.pluginManager = PluginManager.getInstance();
 
-        defaultListener = new DefaultListener(this, pluginManager.getScoreBoardLib(), pluginManager.getKoth(), pluginManager.getTeams());
 
         registerListeners(
                 new MainTraderListener(),
@@ -43,13 +40,13 @@ public final class Asd extends JavaPlugin {
                 new TeamTerritory(pluginManager.getTeams()),
                 new NPCInteract(),
                 new EnchantShopListener(pluginManager.getEconomy()),
-                defaultListener,
-                pluginManager.getOreRegen(),
-                pluginManager.getTeamNPC(),
                 new TeamMenuListener(pluginManager.getTeams()),
                 new PlayerJoinListener(this, pluginManager.getTeamLivesManager(), pluginManager.getGameManager(), pluginManager.getScoreBoardLib(), pluginManager.getPlayerKillsManager(), pluginManager.getTeams()),
                 new RepairListener(),
-                new BuildShopListener()
+                new BuildShopListener(),
+                pluginManager.getDefaultListener(),
+                pluginManager.getOreRegen(),
+                pluginManager.getTeamNPC()
         );
 
         getCommand("balance").setExecutor(new BalanceCommand(this));

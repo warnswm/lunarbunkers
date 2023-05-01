@@ -11,6 +11,7 @@ import qwezxc.asd.listener.DefaultListener;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class GameManager {
     private static final int CAPTURE_POINT_ACTIVATE_5MIN = 300;
@@ -26,7 +27,8 @@ public class GameManager {
     private Team yellowTeam;
     private BukkitRunnable gameStartTimer;
     private final TeamNPC teamNPC;
-
+    private static final int MESSAGE_COOLDOWN_SECONDS = 10;
+    private final HashMap<UUID, Long> captureMessageCooldown = new HashMap<>();
 
     public GameManager(Asd main, Teams teams, TeamNPC teamNPC) {
         this.teams = teams;
@@ -57,7 +59,7 @@ public class GameManager {
                     for (Player player1 : Bukkit.getOnlinePlayers()){
                         Asd.getInstance().getPluginManager().getEconomy().addBalance(player1, 10000);
                     }
-                    Asd.getDefaultListener().playerLocationChecker();
+                    Asd.getInstance().getPluginManager().getDefaultListener().playerLocationChecker();
                     cancel();
                 } else {
                     // Countdown message

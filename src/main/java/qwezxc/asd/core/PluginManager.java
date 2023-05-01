@@ -23,6 +23,7 @@ public class PluginManager {
     KOTH koth;
     GameManager gameManager;
     TeamNPC teamNPC;
+    DefaultListener defaultListener;
 
     private PluginManager() {
         teams = new Teams();
@@ -31,10 +32,11 @@ public class PluginManager {
         economy = new Economy();
         playerKillsManager = new PlayerKillsManager();
         teamNPC = new TeamNPC(teams);
-        gameManager = new GameManager(Asd.getInstance(), teams, teamNPC);
         scoreBoardLib = new ScoreBoardLib();
-        koth = new KOTH(Asd.getInstance(), teams, gameManager);
         oreRegen = new OreRegeneration(Asd.getInstance());
+        gameManager = new GameManager(Asd.getInstance(), teams, teamNPC);
+        koth = new KOTH(Asd.getInstance(), teams, gameManager);
+        defaultListener = new DefaultListener(Asd.getInstance(), scoreBoardLib, koth, teams);
     }
 
     public static PluginManager getInstance() {
