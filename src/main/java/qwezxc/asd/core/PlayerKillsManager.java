@@ -50,38 +50,38 @@ public class PlayerKillsManager implements Listener {
         Entity victim = event.getEntity();
         Entity damager = event.getDamager();
         double finaldmg = event.getFinalDamage();
-        if (victim instanceof Player && damager instanceof Player) {
-            Player target = ((Player) victim).getPlayer();
-            Player attacker = ((Player) damager).getPlayer();
-            Team targetTeam = teams.getTeam(target);
-            if (targetTeam == null) return;
-            Location targetBase = targetTeam.getBase();
-            if (target.getHealth() - finaldmg < 0) {
-                event.setCancelled(true);
-                Location playerLoc = target.getLocation();
-                for (ItemStack item : target.getInventory().getContents()) {
-                    if (item == null || item.getType() == Material.AIR) {
-                        continue;
-                    }
-                    target.getWorld().dropItemNaturally(playerLoc, item);
-                }
-                givePlayerKills(attacker, 1);
-                switch (getPKills(attacker)) {
-                    case 1:
-                        Asd.getInstance().getPluginManager().getEconomy().addBalance(attacker, 250);
-                        attacker.sendMessage(ChatColor.GREEN + " Вы получили $250 за 1 убийство");
-                        break;
-                    case 2:
-                        attacker.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 2));
-                        attacker.sendMessage(ChatColor.GREEN + " Вы получили 2 золотых яблока за 2 убийства");
-                        break;
-                }
-                target.teleport(targetBase);
-                target.setHealth(20);
-                target.getInventory().clear();
-                teamLivesManager.removeTeamLives(targetTeam, 1, target);
+        if (!(victim instanceof Player && damager instanceof Player)) return;
+        Player target = ((Player) victim).getPlayer();
+        Player attacker = ((Player) damager).getPlayer();
+        Team targetTeam = teams.getTeam(target);
+        if (targetTeam == null) return;
+        Location targetBase = targetTeam.getBase();
+        if (!(target.getHealth() - finaldmg < 0)) return;
+        event.setCancelled(true);
+        Location playerLoc = target.getLocation();
+        for (ItemStack item : target.getInventory().getContents()) {
+            if (item == null || item.getType() == Material.AIR) {
+                continue;
             }
+            target.getWorld().dropItemNaturally(playerLoc, item);
         }
+        givePlayerKills(attacker, 1);
+        switch (getPKills(attacker)) {
+            case 1:
+                Asd.getInstance().getPluginManager().getEconomy().addBalance(attacker, 250);
+                attacker.sendMessage(ChatColor.GREEN + " Вы получили $250 за 1 убийство");
+                break;
+            case 2:
+                attacker.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 2));
+                attacker.sendMessage(ChatColor.GREEN + " Вы получили 2 золотых яблока за 2 убийства");
+                break;
+            default:
+                return;
+        }
+        target.teleport(targetBase);
+        target.setHealth(20);
+        target.getInventory().clear();
+        teamLivesManager.removeTeamLives(targetTeam, 1, target);
     }
 
     @EventHandler

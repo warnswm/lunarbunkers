@@ -13,7 +13,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.Inventory;
@@ -34,7 +33,7 @@ public class DefaultListener implements Listener {
     private final Teams teams;
     private final KOTH koth;
     private HashMap<UUID, Long> cooldown = new HashMap<UUID, Long>();
-    private ScoreBoardLib scoreBoardLib;
+    private final ScoreBoardLib scoreBoardLib;
     private final HashMap<UUID, Long> captureMessageCooldown = new HashMap<>();
     public static List<Block> placedBlocks = new ArrayList<>();
 
@@ -121,30 +120,33 @@ public class DefaultListener implements Listener {
         koth.stopCapture(player);
     }
 
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        Location playerLoc = player.getLocation();
-        double captureRadius = 3.5;
-        Location capturePoint = new Location(Bukkit.getWorld("world"), 1.5, 63.5, 0.5);
-//        double distanceSquared = playerLoc.distanceSquared(capturePoint);
-//        if (distanceSquared <= captureRadius * captureRadius) {
-        if (Math.abs(playerLoc.getX() - capturePoint.getX()) <= captureRadius &&
-                Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius &&
-                Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius) {
-            koth.startCapture(player);
-            if (GameManager.gameTime < 300) {
-                long lastMessageTime = captureMessageCooldown.getOrDefault(player.getUniqueId(), 0L);
-                long currentTime = System.currentTimeMillis();
-                if (currentTime - lastMessageTime > MESSAGE_COOLDOWN_SECONDS * 1000) {
-                    player.sendMessage(ChatColor.RED + "Точку можно захватить начиная с 5 минуты.");
-                    captureMessageCooldown.put(player.getUniqueId(), currentTime);
+    public void playerLocationChecker() {
+        Bukkit.getScheduler().runTaskTimer(Asd.getInstance(), () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Location playerLoc = player.getLocation();
+                double captureRadius = 3.5;
+                Location capturePoint = new Location(Bukkit.getWorld("world"), 1.5, 63.5, 0.5);
+//            double distanceSquared = playerLoc.distanceSquared(capturePoint);
+//            if (distanceSquared <= captureRadius * captureRadius) {
+                if (Math.abs(playerLoc.getX() - capturePoint.getX()) <= captureRadius &&
+                        Math.abs(playerLoc.getY() - capturePoint.getY()) <= captureRadius &&
+                        Math.abs(playerLoc.getZ() - capturePoint.getZ()) <= captureRadius) {
+                    koth.startCapture(player);
+                    if (GameManager.gameTime < 300) {
+                        long lastMessageTime = captureMessageCooldown.getOrDefault(player.getUniqueId(), 0L);
+                        long currentTime = System.currentTimeMillis();
+                        if (currentTime - lastMessageTime > MESSAGE_COOLDOWN_SECONDS * 1000) {
+                            player.sendMessage(ChatColor.RED + "Точку можно захватить начиная с 5 минуты.");
+                            captureMessageCooldown.put(player.getUniqueId(), currentTime);
+                        }
+                    }
+                } else {
+                    koth.stopCapture(player);
                 }
             }
-        } else {
-            koth.stopCapture(player);
-        }
+        }, 0L, 10L);
     }
+
 
     @EventHandler
     public void onWeatherChange(WeatherChangeEvent e) {

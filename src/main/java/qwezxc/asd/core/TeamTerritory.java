@@ -35,44 +35,27 @@ public class TeamTerritory implements Listener {
 
         if (block == null) return;
 
-        if (block.getType() == Material.FENCE_GATE) {
-            if (!isPlayerInBaseTerritory(player)) {
-                event.setCancelled(false);
-                return;
-            }
-
-            // Check if the player's team owns the base territory
-            String baseTerritoryTeam = getBaseTerritoryTeam(block.getLocation());
-            if (playerTeam.getName().equals(baseTerritoryTeam)) {
-                event.setCancelled(false);
-            } else {
-                event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "Вы не можете открывать каликти на территории базы других команд!");
-            }
-        } else if (block.getType() == Material.CHEST) {
-            if (!isPlayerInBaseTerritory(player)) {
-                event.setCancelled(false);
-                return;
-            }
-            // Check if the player's team owns the base territory
-            String baseTerritoryTeam = getBaseTerritoryTeam(block.getLocation());
-            if (playerTeam.getName().equals(baseTerritoryTeam)) {
-                event.setCancelled(false);
-            } else {
-                event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "Вы не можете открывать сундук на территории базы других команд!");
-            }
+        if (block.getType() != Material.FENCE_GATE || block.getType() != Material.CHEST) return;
+        if (!isPlayerInBaseTerritory(player)) {
+            event.setCancelled(false);
+            return;
+        }
+        String baseTerritoryTeam = getBaseTerritoryTeam(block.getLocation());
+        if (playerTeam.getName().equals(baseTerritoryTeam)) {
+            event.setCancelled(false);
+        } else {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "Вы не можете с этим взаимодействовать");
         }
     }
 
     private boolean isPlayerInBaseTerritory(Player player) {
         double baseRadius = 14.5;
         Location playerloc = player.getLocation();
-        for (Map.Entry<String, Location> entry : baseTerritories.entrySet()) {
-            Location baseLocation = entry.getValue();
-            if (Math.abs(playerloc.getX() - baseLocation.getX()) <= baseRadius &&
-                    Math.abs(playerloc.getY() - baseLocation.getY()) <= baseRadius &&
-                    Math.abs(playerloc.getZ() - baseLocation.getZ()) <= baseRadius) {
+        for (Location value : baseTerritories.values()) {
+            if (Math.abs(playerloc.getX() - value.getX()) <= baseRadius &&
+                    Math.abs(playerloc.getY() - value.getY()) <= baseRadius &&
+                    Math.abs(playerloc.getZ() - value.getZ()) <= baseRadius) {
                 return true;
             }
         }

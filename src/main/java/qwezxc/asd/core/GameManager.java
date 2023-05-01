@@ -2,9 +2,11 @@ package qwezxc.asd.core;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import qwezxc.asd.Asd;
+import qwezxc.asd.listener.DefaultListener;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,7 +20,6 @@ public class GameManager {
     public static int gameTime = 0;
     private final Asd main;
     private final Teams teams;
-
     private Team redTeam;
     private Team greenTeam;
     private Team blueTeam;
@@ -56,6 +57,7 @@ public class GameManager {
                     for (Player player1 : Bukkit.getOnlinePlayers()){
                         Asd.getInstance().getPluginManager().getEconomy().addBalance(player1, 10000);
                     }
+                    Asd.getDefaultListener().playerLocationChecker();
                     cancel();
                 } else {
                     // Countdown message
@@ -145,6 +147,4 @@ public class GameManager {
             player.setPlayerListName("[" + colorteam + playerTeam.getName() + ChatColor.RESET + "]" + " " + player.getName());
         }
     }
-
-
 }

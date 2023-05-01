@@ -3,8 +3,10 @@ package qwezxc.asd.core;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.bukkit.Bukkit;
 import qwezxc.asd.Asd;
 import qwezxc.asd.data.Database;
+import qwezxc.asd.listener.DefaultListener;
 import qwezxc.asd.listener.OreRegeneration;
 
 @Getter
@@ -41,5 +43,4 @@ public class PluginManager {
         }
         return instance;
     }
-
 }

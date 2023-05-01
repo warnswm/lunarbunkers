@@ -22,8 +22,9 @@ import qwezxc.asd.listener.*;
 public final class Asd extends JavaPlugin {
     @Getter
     private static Asd instance;
-    public World world;
-
+    public  World world;
+    @Getter
+    private static DefaultListener defaultListener;
     @Getter
     private PluginManager pluginManager;
 
@@ -34,13 +35,15 @@ public final class Asd extends JavaPlugin {
         world = Bukkit.getWorld("world");
         this.pluginManager = PluginManager.getInstance();
 
+        defaultListener = new DefaultListener(this, pluginManager.getScoreBoardLib(), pluginManager.getKoth(), pluginManager.getTeams());
+
         registerListeners(
                 new MainTraderListener(),
                 new SellerListener(),
                 new TeamTerritory(pluginManager.getTeams()),
                 new NPCInteract(),
                 new EnchantShopListener(pluginManager.getEconomy()),
-                new DefaultListener(this, pluginManager.getScoreBoardLib(), pluginManager.getKoth(), pluginManager.getTeams()),
+                defaultListener,
                 pluginManager.getOreRegen(),
                 pluginManager.getTeamNPC(),
                 new TeamMenuListener(pluginManager.getTeams()),
@@ -65,7 +68,6 @@ public final class Asd extends JavaPlugin {
             Bukkit.getPluginManager().registerEvents(listener, this);
         }
     }
-
     @Override
     public void onDisable() {
 

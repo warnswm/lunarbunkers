@@ -1,7 +1,10 @@
 package qwezxc.asd.data;
 
+import com.mongodb.MongoCommandException;
 import com.mongodb.MongoException;
 import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,9 +14,11 @@ import java.nio.ByteBuffer;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Database {
     private MongoClient mongoClient;
@@ -49,33 +54,55 @@ public class Database {
     }
 
     public List<Player> updateTopPlayers() {
-        List<Player> topPlayers = new ArrayList<>();
-        List<Document> topPlayerDocs = playersCollection.find()
-                .sort(new Document("wins", -1)).limit(10).into(new ArrayList<>());
-        for (Document playerDoc : topPlayerDocs) {
-            UUID uuid = UUID.fromString(playerDoc.getString("uuid"));
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                topPlayers.add(player);
-            }
+        ClientSession session = mongoClient.startSession();
+        try {
+            session.startTransaction();
+
+            List<Player> topPlayers = playersCollection.find()
+                    .sort(new Document("wins", -1))
+                    .projection(Projections.include("uuid"))
+                    .limit(10)
+                    .into(new ArrayList<>())
+                    .stream()
+                    .map(playerDoc -> Bukkit.getPlayer(UUID.fromString(playerDoc.getString("uuid"))))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            session.commitTransaction();
+            return topPlayers;
+        } catch (MongoCommandException e) {
+            session.abortTransaction();
+        } finally {
+            session.close();
         }
-        return topPlayers;
+
+        return new ArrayList<>();
     }
 
-    public void addPlayer(@NotNull UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
-        if (playersCollection.find(new Document("uuid", uuid.toString())).first() != null) {
-            logger.log(Level.WARNING, "Player already exists in database");
-            return;
+
+
+
+
+    public boolean addPlayer(@NotNull UUID uuid) {
+        ClientSession session = mongoClient.startSession();
+        try {
+            session.startTransaction();
+            if (playersCollection.find(Filters.eq("uuid", uuid.toString()))
+                    .iterator()
+                    .hasNext()) return true;
+            playersCollection.insertOne(new Document("uuid", uuid.toString())
+                    .append("wins", 0)
+                    .append("kills",0)
+                    .append("death",0)
+                    .append("capturing_point",0));
+            session.commitTransaction();
+            return true;
+        } catch (MongoCommandException e) {
+            session.abortTransaction();
+        } finally {
+            session.close();
         }
-        Document newPlayer = new Document("uuid", uuid.toString())
-                .append("name", player.getName())
-                .append("wins", 0)
-                .append("kills",0)
-                .append("death",0)
-                .append("capturing_point",0);
-        playersCollection.insertOne(newPlayer);
-        logger.log(Level.INFO, "New player added to the database");
+        return false;
     }
 
     private void createCollection() {
