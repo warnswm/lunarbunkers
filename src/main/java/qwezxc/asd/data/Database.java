@@ -27,7 +27,7 @@ public class Database {
 
     public Database() {
         try {
-            mongoClient = MongoClients.create("mongodb+srv://warn:cCSz9w1XoAQJSXbb@cluster0.vhp1gse.mongodb.net/?retryWrites=true&w=majority");
+            mongoClient = MongoClients.create("url");
             MongoDatabase database = mongoClient.getDatabase("Asd");
             playersCollection = database.getCollection("players");
             createCollection();
