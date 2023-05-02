@@ -25,9 +25,11 @@ import java.util.Map;
 
 public class TeamNPC implements Listener {
 
+    private static final String COMBAT_SHOP_NAME = "Combat Shop";
+    private static final String SELLER_SHOP_NAME = "Seller Shop";
+    private static final String BUILDER_SHOP_NAME = "Builder Shop";
     private Teams teams;
-    public Map<Integer, Team> npcTeams= new HashMap<>();
-
+    private Map<Integer, Team> npcTeams = new HashMap<>();
     private final Map<String, Location> locations = new HashMap<String, Location>() {{
         put("combatshopredLoc", new Location(Bukkit.getWorld("world"), 1.5, 65.5, 95.5));
         put("combatshopblueLoc", new Location(Bukkit.getWorld("world"), 1.5, 65.5, -95.5));
@@ -42,7 +44,6 @@ public class TeamNPC implements Listener {
         put("buildershopgreenLoc", new Location(Bukkit.getWorld("world"), -95.5, 65.5, 4.5));
         put("buildershopyellowLoc", new Location(Bukkit.getWorld("world"), 95.5, 65.5, -3.5));
     }};
-
     private int time;
     public TeamNPC(Teams teams) {
         this.teams = teams;
@@ -50,39 +51,19 @@ public class TeamNPC implements Listener {
     }
 
     public void spawnAll() {
-        spawnCombatShop(teams.getTeams().get(0), locations.get("combatshopredLoc"));
-        spawnCombatShop(teams.getTeams().get(1), locations.get("combatshopblueLoc"));
-        spawnCombatShop(teams.getTeams().get(2), locations.get("combatshopgreenLoc"));
-        spawnCombatShop(teams.getTeams().get(3), locations.get("combatshopyellowLoc"));
-        spawnSellerShop(teams.getTeams().get(0), locations.get("sellershopredLoc"));
-        spawnSellerShop(teams.getTeams().get(1), locations.get("sellershopblueLoc"));
-        spawnSellerShop(teams.getTeams().get(2), locations.get("sellershopgreenLoc"));
-        spawnSellerShop(teams.getTeams().get(3), locations.get("sellershopyellowLoc"));
-        spawnBuilderShop(teams.getTeams().get(0), locations.get("buildershopredLoc"));
-        spawnBuilderShop(teams.getTeams().get(1), locations.get("buildershopblueLoc"));
-        spawnBuilderShop(teams.getTeams().get(2), locations.get("buildershopgreenLoc"));
-        spawnBuilderShop(teams.getTeams().get(3), locations.get("buildershopyellowLoc"));
+        for (Team team : teams.getTeams()) {
+            spawnShop(COMBAT_SHOP_NAME, team, locations.get("combatshop" + team.getName().toLowerCase() + "Loc"));
+            spawnShop(SELLER_SHOP_NAME, team, locations.get("sellershop" + team.getName().toLowerCase() + "Loc"));
+            spawnShop(BUILDER_SHOP_NAME, team, locations.get("buildershop" + team.getName().toLowerCase() + "Loc"));
+        }
     }
 
-    public void spawnCombatShop(Team team, Location loc) {
-        NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Combat Shop");
-        npc.setName(team.getChatColor() + "Combat Shop");
-        npc.data().set("Combat", "hello");
+    private void spawnShop(String shopType, Team team, Location loc) {
+        NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, shopType);
+        npc.setName(team.getChatColor() + shopType);
+        npc.data().set(shopType, "hello");
         setDefaultSettings(npc, team, loc);
     }
-    public void spawnSellerShop(Team team, Location loc) {
-        NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "SellerShop");
-        npc.setName(team.getChatColor() + "Seller Shop");
-        npc.data().set("Seller", "hello");
-        setDefaultSettings(npc, team, loc);
-    }
-    public void spawnBuilderShop(Team team, Location loc) {
-        NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "BuilderShop");
-        npc.setName(team.getChatColor() + "Builder Shop");
-        npc.data().set("Builder", "hello");
-        setDefaultSettings(npc, team, loc);
-    }
-
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity victim = event.getEntity();

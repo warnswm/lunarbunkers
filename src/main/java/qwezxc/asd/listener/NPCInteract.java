@@ -31,17 +31,17 @@ public class NPCInteract implements Listener {
         if (npc.data() == null) return;
 
 
-        if (npc.data().has("Combat")) {
+        if (npc.data().has("Combat Shop")) {
             InventoryHolder inventoryHolder = new CombatInventoryHolder();
             Inventory inventory = inventoryHolder.getInventory();
 
             player.openInventory(inventory);
-        } else if (npc.data().has("Builder")) {
+        } else if (npc.data().has("Builder Shop")) {
             InventoryHolder inventoryHolder = new BuilderInventoryHolder(player);
             Inventory inventory = inventoryHolder.getInventory();
 
             player.openInventory(inventory);
-        } else if (npc.data().has("Seller")) {
+        } else if (npc.data().has("Seller Shop")) {
             InventoryHolder inventoryHolder = new SellerInventoryHolder(player);
             Inventory inventory = inventoryHolder.getInventory();
 

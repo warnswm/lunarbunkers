@@ -2,11 +2,9 @@ package qwezxc.asd.core;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import qwezxc.asd.Asd;
-import qwezxc.asd.listener.DefaultListener;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,8 +25,6 @@ public class GameManager {
     private Team yellowTeam;
     private BukkitRunnable gameStartTimer;
     private final TeamNPC teamNPC;
-    private static final int MESSAGE_COOLDOWN_SECONDS = 10;
-    private final HashMap<UUID, Long> captureMessageCooldown = new HashMap<>();
 
     public GameManager(Asd main, Teams teams, TeamNPC teamNPC) {
         this.teams = teams;
