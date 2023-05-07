@@ -9,7 +9,6 @@ import qwezxc.asd.Asd;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class GameManager {
     private static final int CAPTURE_POINT_ACTIVATE_5MIN = 300;
@@ -19,22 +18,14 @@ public class GameManager {
     public static int gameTime = 0;
     private final Asd main;
     private final Teams teams;
-    private Team redTeam;
-    private Team greenTeam;
-    private Team blueTeam;
-    private Team yellowTeam;
-    private BukkitRunnable gameStartTimer;
     private final TeamNPC teamNPC;
-
+    private BukkitRunnable gameStartTimer;
     public GameManager(Asd main, Teams teams, TeamNPC teamNPC) {
         this.teams = teams;
-        redTeam = teams.getTeamByName("Red");
-        greenTeam = teams.getTeamByName("Green");
-        blueTeam = teams.getTeamByName("Blue");
-        yellowTeam = teams.getTeamByName("Yellow");
         this.main = main;
         this.teamNPC = teamNPC;
     }
+
     public void execute() {
         int numPlayers = Bukkit.getOnlinePlayers().size();
 //        if(numPlayers < 2){
@@ -66,69 +57,59 @@ public class GameManager {
         };
         gameStartTimer.runTaskTimer(main, 0, 20);
     }
-
     private void startGame() {
         Map<Team, Integer> teamSizes = new HashMap<>();
-        teamSizes.put(redTeam, teams.getNumPlayersInTeam(redTeam));
-        teamSizes.put(greenTeam, teams.getNumPlayersInTeam(greenTeam));
-        teamSizes.put(blueTeam, teams.getNumPlayersInTeam(blueTeam));
-        teamSizes.put(yellowTeam, teams.getNumPlayersInTeam(yellowTeam));
+        for (Team team : teams.getTeams()) {
+            teamSizes.put(team, teams.getNumPlayersInTeam(team));
+        }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             Team playerTeam = teams.getTeam(player);
             if (playerTeam == null) {
                 Team smallestTeam = Collections.min(teamSizes.entrySet(), Map.Entry.comparingByValue()).getKey();
-                teams.addPlayerToTeam(player, smallestTeam);
-                playerTeam = smallestTeam; // assign the newly added team to the playerTeam variable
-                updatePlayerListName(player);
-            }
-
-            // update the number of players for the player's team
-            int teamSize = teams.getNumPlayersInTeam(playerTeam);
-            teamSizes.put(playerTeam, teamSize);
-        }
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Team playerTeam = teams.getTeam(player);
-            player.closeInventory();
-            if (playerTeam != null) {
-                player.teleport(playerTeam.getBase());
-                player.sendMessage("Игра началась!");
-            }
-        }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                gameTime++;
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    Asd.getInstance().getPluginManager().getEconomy().addBalance(player, 1);
-                }
-                switch (gameTime) {
-                    case CAPTURE_POINT_ACTIVATE_5MIN:
-                        canCapture = true;
-                        KOTH.timeLeft = 450;
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            player.sendMessage(ChatColor.ITALIC + "Точка захвата стала активна");
-                        }
-                        break;
-                    case CAPTURE_POINT_CHANGE_TIME_15MIN:
-                        if(KOTH.timeLeft < 300) return;
-                        KOTH.timeLeft = 300;
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 5:00");
-                        }
-                        break;
-                    case CAPTURE_POINT_CHANGE_TIME_25MIN:
-                        if(KOTH.timeLeft < 150) return;
-                        KOTH.timeLeft = 150;
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 2:30");
-                        }
-                        break;
-                    default:
-                        break;
+                if (smallestTeam != null) {
+                    playerTeam = smallestTeam;
+                    teamSizes.put(playerTeam, teamSizes.get(playerTeam) + 1);
+                    teams.addPlayerToTeam(player, playerTeam);
+                    updatePlayerListName(player);
+                    player.teleport(playerTeam.getBase());
+                    player.sendMessage(ChatColor.GOLD + "You have joined the " + playerTeam.getChatColor() + playerTeam.getName() + ChatColor.GOLD + " team!");
+                    player.sendMessage("Игра началась!");
                 }
             }
-        }.runTaskTimer(main, 20L, 20L);
+        }
+        // Start game timer
+        Bukkit.getScheduler().runTaskTimer(main, () -> {
+            gameTime++;
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Asd.getInstance().getPluginManager().getEconomy().addBalance(player, 1);
+            }
+            switch (gameTime) {
+                case CAPTURE_POINT_ACTIVATE_5MIN:
+                    canCapture = true;
+                    KOTH.timeLeft = 450;
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.sendMessage(ChatColor.ITALIC + "Точка захвата стала активна");
+                    }
+                    break;
+                case CAPTURE_POINT_CHANGE_TIME_15MIN:
+                    if(KOTH.timeLeft < 300) return;
+                    KOTH.timeLeft = 300;
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 5:00");
+                    }
+                    break;
+                case CAPTURE_POINT_CHANGE_TIME_25MIN:
+                    if(KOTH.timeLeft < 150) return;
+                    KOTH.timeLeft = 150;
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.sendMessage(ChatColor.ITALIC + "Теперь точку захвата можно захватить за 2:30");
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }, 0, 20);
         teamNPC.spawnAll();
     }
 

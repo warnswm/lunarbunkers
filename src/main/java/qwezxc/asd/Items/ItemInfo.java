@@ -34,6 +34,6 @@ public class ItemInfo {
             new ItemInfo(Material.IRON_INGOT, 15, 15),
             new ItemInfo(Material.GOLD_INGOT, 25, 25),
             new ItemInfo(Material.DIAMOND, 30, 30)
-            //ToDo: if added Emerald sell iron 20, gold 25, emerald 40
+            //ToDo: if added Emerald, sell iron 20, gold 25, emerald 40
     );
 }

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TeamNPC implements Listener {
-
     private static final String COMBAT_SHOP_NAME = "Combat Shop";
     private static final String SELLER_SHOP_NAME = "Seller Shop";
     private static final String BUILDER_SHOP_NAME = "Builder Shop";
@@ -49,7 +48,6 @@ public class TeamNPC implements Listener {
         this.teams = teams;
         this.time = 300;
     }
-
     public void spawnAll() {
         for (Team team : teams.getTeams()) {
             spawnShop(COMBAT_SHOP_NAME, team, locations.get("combatshop" + team.getName().toLowerCase() + "Loc"));
